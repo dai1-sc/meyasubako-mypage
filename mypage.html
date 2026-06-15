@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>投書マイページ</title>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #userBox { margin-bottom: 20px; font-size: 18px; }
+    .post {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>投書マイページ</h2>
+  <div id="userBox">ログイン確認中...</div>
+
+  <h3>あなたの投書一覧</h3>
+  <div id="posts">読み込み中...</div>
+
+  <script>
+    /* ★ Firebase設定（login.html と同じ） */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdw_CrJ6I9OasCND_OkbDSzyeBXr66LVw",
+      authDomain: "meyasubako-login-d39bb.firebaseapp.com",
+      projectId: "meyasubako-login-d39bb",
+      storageBucket: "meyasubako-login-d39bb.appspot.com",
+      messagingSenderId: "472226741247",
+      appId: "1:472226741247:web:e06d9f94a046e2a26905ca"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    /* ★ ログイン状態を監視 */
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById("userBox").innerHTML =
+        "ログイン中：" + user.email;
+
+      /* ★ GAS WebAPI から投書データを取得 */
+      const apiUrl = "https://script.google.com/macros/s/AKfycbzpVCfpNGLLT1dbp8QGPr_Ro84ZGPZ7JW61ykVWHbp6YgJb5GgJwgC4Ys7YnAgeIfM/exec?email=" + encodeURIComponent(user.email);
+
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          const posts = document.getElementById("posts");
+          posts.innerHTML = "";
+
+          if (data.length === 0) {
+            posts.innerHTML = "投書はありません。";
+            return;
+          }
+
+          data.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "post";
+            div.innerHTML = `
+              <b>カテゴリ：</b> ${p.category}<br>
+              <b>内容：</b> ${p.detail}<br>
+              <b>ステータス：</b> ${p.status}<br>
+            `;
+            posts.appendChild(div);
+          });
+        });
+    });
+  </script>
+
+</body>
+</html>
