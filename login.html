@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ログイン - 投書マイページ</title>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+  <script>
+    // ★ 正しい Firebase 設定（1回だけ書く）
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdw_CrJ6I9OasCND_OkbDSzyeBXr66LVw",
+      authDomain: "meyasubako-login-d39bb.firebaseapp.com",
+      projectId: "meyasubako-login-d39bb",
+      storageBucket: "meyasubako-login-d39bb.appspot.com",
+      messagingSenderId: "472226741247",
+      appId: "1:472226741247:web:e06d9f94a046e2a26905ca"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
+
+  <style>
+    body { font-family: sans-serif; text-align: center; padding-top: 100px; }
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      background: #4285F4;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>投書マイページ ログイン</h2>
+  <p>学校の Google アカウントでログインしてください</p>
+
+  <button id="loginBtn">Googleでログイン</button>
+
+  <script>
+    document.getElementById("loginBtn").onclick = function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).then(() => {
+        window.location.href = "mypage.html";
+      });
+    };
+  </script>
+
+</body>
+</html>
