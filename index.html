@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <title>ログイン - 投書マイページ</title>
 
-  <!-- Firebase CDN -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <!-- Firebase CDN（最新版） -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 
   <script>
-    // ★ 正しい Firebase 設定（1回だけ書く）
+    // Firebase 設定（1回だけ書く）
     const firebaseConfig = {
       apiKey: "AIzaSyDdw_CrJ6I9OasCND_OkbDSzyeBXr66LVw",
       authDomain: "meyasubako-login-d39bb.firebaseapp.com",
@@ -46,9 +46,15 @@
   <script>
     document.getElementById("loginBtn").onclick = function() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).then(() => {
-        window.location.href = "mypage.html";
-      });
+      auth.signInWithPopup(provider)
+        .then(result => {
+          console.log("ログイン成功:", result.user.email);
+          window.location.href = "mypage.html";
+        })
+        .catch(error => {
+          console.error("ログインエラー:", error);
+          alert("ログインに失敗しました: " + error.message);
+        });
     };
   </script>
 
