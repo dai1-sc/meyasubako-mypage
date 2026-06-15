@@ -4,9 +4,24 @@
   <meta charset="UTF-8">
   <title>投書マイページ</title>
 
-  <!-- Firebase CDN -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <!-- Firebase CDN（compat版） -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase 設定（index.html と同じ）
+    const firebaseConfig = {
+      apiKey: "AIzaSyDdw_CrJ6I9OasCND_OkbDSzyeBXr66LVw",
+      authDomain: "meyasubako-login-d39bb.firebaseapp.com",
+      projectId: "meyasubako-login-d39bb",
+      storageBucket: "meyasubako-login-d39bb.appspot.com",
+      messagingSenderId: "472226741247",
+      appId: "1:472226741247:web:e06d9f94a046e2a26905ca"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
 
   <style>
     body { font-family: sans-serif; padding: 20px; }
@@ -29,20 +44,6 @@
   <div id="posts">読み込み中...</div>
 
   <script>
-    /* ★ Firebase設定（login.html と同じ） */
-    const firebaseConfig = {
-      apiKey: "AIzaSyDdw_CrJ6I9OasCND_OkbDSzyeBXr66LVw",
-      authDomain: "meyasubako-login-d39bb.firebaseapp.com",
-      projectId: "meyasubako-login-d39bb",
-      storageBucket: "meyasubako-login-d39bb.appspot.com",
-      messagingSenderId: "472226741247",
-      appId: "1:472226741247:web:e06d9f94a046e2a26905ca"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    /* ★ ログイン状態を監視 */
     auth.onAuthStateChanged(user => {
       if (!user) {
         window.location.href = "index.html";
@@ -52,8 +53,10 @@
       document.getElementById("userBox").innerHTML =
         "ログイン中：" + user.email;
 
-      /* ★ GAS WebAPI から投書データを取得 */
-      const apiUrl = "https://script.google.com/macros/s/AKfycbzpVCfpNGLLT1dbp8QGPr_Ro84ZGPZ7JW61ykVWHbp6YgJb5GgJwgC4Ys7YnAgeIfM/exec?email=" + encodeURIComponent(user.email);
+      // ★ GAS WebAPI の URL を入れる（/exec の方）
+      const apiUrl =
+        "https://script.google.com/macros/s/AKfycbzpVCfpNGLLT1dbp8QGPr_Ro84ZGPZ7JW61ykVWHbp6YgJb5GgJwgC4Ys7YnAgeIfM/exec?email=" +
+        encodeURIComponent(user.email);
 
       fetch(apiUrl)
         .then(res => res.json())
@@ -76,6 +79,11 @@
             `;
             posts.appendChild(div);
           });
+        })
+        .catch(err => {
+          console.error("APIエラー:", err);
+          document.getElementById("posts").innerHTML =
+            "データの取得に失敗しました。";
         });
     });
   </script>
