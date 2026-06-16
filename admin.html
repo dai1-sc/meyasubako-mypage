@@ -149,11 +149,12 @@ data.forEach(item => {
             </td>
             <td class="p-4 whitespace-nowrap">
                 <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
-                    <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
-                    <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
-                    <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
-                    <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
-                </select>
+    <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
+    <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
+    <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
+    <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 開示請求</option>
+    <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
+</select>
             </td>
             <td class="p-4 text-center whitespace-nowrap">
                 <button onclick="openAdminChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl transition shadow-sm">
