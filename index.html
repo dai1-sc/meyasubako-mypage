@@ -99,20 +99,22 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    showAlert("認証成功！画面を切り替えます...", "info");
-                    
-                    // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
-                    sessionStorage.setItem("user_email", email);
-                    sessionStorage.setItem("user_role", result.role);
+    showAlert("認証成功！画面を切り替えます...", "info");
+    
+    // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
+    sessionStorage.setItem("user_email", email);
+    sessionStorage.setItem("user_role", result.role);
 
-                    // 3. 役割に応じてリダイレクト
-                    setTimeout(() => {
-if (res.role === "council" || res.role === "admin" || res.role === "vice_president" || res.role === "teacher") {
-    window.location.href = "council.html"; // 全員生徒会画面へ進む
-} else {
-    window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
+    // 3. 役割に応じてリダイレクト
+    setTimeout(() => {
+        // 👑【修正】 res.role ➔ result.role に書き換えました！
+        if (result.role === "council" || result.role === "admin" || result.role === "vice_president" || result.role === "teacher") {
+            window.location.href = "council.html"; // 全員生徒会画面へ進む
+        } else {
+            window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
+        }
+    }, 800);
 }
-                    }, 800);
                 } else {
                     showAlert("サーバー側でエラーが発生しました: " + result.message, "error");
                 }
