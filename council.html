@@ -143,17 +143,23 @@ async function loadCouncilData() {
                                     <i class="fas fa-shield-alt"></i> 🚨 本名開示請求・3者承認状況
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">副会長: ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                    ${(!item.approvals?.vice_president && isVPUser) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : ''}
-                                </div>
+    <span class="text-gray-600">副会長: ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
+    ${(!item.approvals?.vice_president && (typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : ''}
+</div>
+<div class="flex items-center justify-between">
+    <span class="text-gray-600">管理者: ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
+    ${(!item.approvals?.admin && (typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : ''}
+</div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">管理者: ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                    ${(!item.approvals?.admin && isAdminUser) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : ''}
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">担 当: ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                    ${(!item.approvals?.teacher && isTeacherUser) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold">承認</button>` : ''}
-                                </div>
+    <span class="text-gray-600 font-medium">担 当:</span>
+    <div>
+        ${item.approvals?.teacher 
+            ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' 
+            : ((typeof userRole !== 'undefined' && userRole === 'teacher') 
+                ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] hover:bg-purple-700 font-bold shadow-sm transition">承認する</button>` 
+                : '<span class="text-gray-400">⏳ 未承認</span>')}
+    </div>
+</div>
                             </div>
                         `;
                     }
