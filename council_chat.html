@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル目安箱 - 生徒会対話ルーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .brand-bg { background-color: #130182; }
+        .brand-text { color: #130182; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="brand-bg text-white shadow-md shrink-0">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center">
+            <button onclick="window.location.href='council.html'" class="flex items-center space-x-1 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+                <i class="fas fa-arrow-left"></i>
+                <span>戻る</span>
+            </button>
+            <span class="font-bold tracking-wider">生徒会・回答チャット</span>
+            <div class="w-16"></div> </div>
+    </nav>
+
+    <main class="max-w-3xl w-full mx-auto flex-1 flex flex-col overflow-hidden p-4 space-y-4">
+        
+        <div id="suggestion-summary" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 shrink-0">
+            <div class="flex items-center space-x-2 text-[11px] font-bold text-gray-400 mb-1">
+                <span id="sum-category" class="bg-gray-100 px-2 py-0.5 rounded text-gray-600">---</span>
+                <span id="sum-date">---</span>
+                <span id="sum-status" class="px-2 py-0.5 rounded text-white font-medium ml-auto">---</span>
+            </div>
+            <h2 id="sum-title" class="text-sm font-bold text-gray-800 line-clamp-1">読み込み中...</h2>
+            <p id="sum-content" class="text-xs text-gray-500 mt-1 whitespace-pre-wrap max-h-20 overflow-y-auto">---</p>
+        </div>
+
+        <div id="chat-container" class="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 overflow-y-auto flex flex-col space-y-3">
+            <div id="chat-loading" class="text-center py-8 text-gray-400 my-auto">
+                <i class="fas fa-spinner animate-spin text-xl mb-1"></i>
+                <p class="text-xs">メッセージ履歴を読込中...</p>
+            </div>
+        </div>
+
+        <form id="chat-form" class="flex items-center space-x-2 shrink-0">
+            <input type="text" id="chat-input" placeholder="生徒へ返信メッセージを入力..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-900 shadow-sm" required>
+            <button type="submit" id="btn-send" class="brand-bg text-white w-12 h-12 rounded-xl hover:bg-opacity-90 transition flex items-center justify-center shadow-sm shrink-0">
+                <i class="fas fa-paper-plane text-sm"></i>
+            </button>
+        </form>
+    </main>
+
+    <script>
+        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+
+        // URLパラメータから投書IDを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const suggestionId = urlParams.get('id');
+        
+        const userEmail = sessionStorage.getItem("user_email");
+        const userRole = sessionStorage.getItem("user_role");
+
+        // ログイン＆権限チェック
+        if (!userEmail || (userRole !== "council" && userRole !== "admin") || !suggestionId) {
+            window.location.href = "index.html";
+        }
+
+        const chatContainer = document.getElementById("chat-container");
+        const chatForm = document.getElementById("chat-form");
+        const chatInput = document.getElementById("chat-input");
+
+        // ==========================================
+        // 1. チャット履歴＆意見を「生徒会用API」から取得
+        // ==========================================
+        async function loadCouncilChatLog() {
+            try {
+                // 生徒会専用の「getCouncilChatLog」アクションを呼び出す
+                const res = await fetch(`${GAS_API_URL}?action=getCouncilChatLog&suggestionId=${suggestionId}&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+                
+                if (data.status === "error") {
+                    alert("アクセス権限がないか、エラーが発生しました。");
+                    window.location.href = "council.html";
+                    return;
+                }
+
+                // ① 上部の意見データをセット
+                document.getElementById("sum-category").innerText = data.suggestion.category;
+                document.getElementById("sum-date").innerText = data.suggestion.date;
+                document.getElementById("sum-title").innerText = data.suggestion.title;
+                document.getElementById("sum-content").innerText = data.suggestion.content;
+                
+                const statusBadge = document.getElementById("sum-status");
+                statusBadge.innerText = data.suggestion.status;
+                if (data.suggestion.status === "受付") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-blue-500 ml-auto";
+                if (data.suggestion.status === "検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-yellow-500 ml-auto";
+                if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-green-500 ml-auto";
+
+                // ② チャットタイムラインをセット
+                document.getElementById("chat-loading").classList.add("hidden");
+                
+                // 既存のチャットメッセージをリフレッシュ
+                const existingMsgs = chatContainer.querySelectorAll('.msg-bubble');
+                existingMsgs.forEach(el => el.remove());
+
+                if (data.chats.length === 0) {
+                    const infoMsg = document.createElement("div");
+                    infoMsg.className = "msg-bubble text-center text-[11px] text-gray-400 my-auto bg-slate-50 p-4 rounded-xl border border-dashed border-gray-200";
+                    infoMsg.innerHTML = `<i class="fas fa-reply text-lg mb-1 block"></i>この意見に対して、生徒へ質問や回答メッセージを直接送ることができます。`;
+                    chatContainer.appendChild(infoMsg);
+                } else {
+                    data.chats.forEach(chat => {
+                        // 生徒会側画面では、自分が「council」、相手が「student」
+                        const isMe = (chat.sender === "council"); 
+                        const wrapper = document.createElement("div");
+                        wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
+
+                        // 送信者ラベル
+                        const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${isMe ? 'あなた（生徒会役員）' : '生徒（匿名）'}</span>`;
+                        
+                        // 吹き出し
+                        const bubble = `
+                            <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${isMe ? 'bg-indigo-900 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'}">
+                                <p class="whitespace-pre-wrap">${chat.message}</p>
+                            </div>
+                            <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
+                        `;
+                        
+                        wrapper.innerHTML = nameLabel + bubble;
+                        chatContainer.appendChild(wrapper);
+                    });
+                }
+
+                // 一番下までスクロール
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("chat-loading").innerHTML = `<p class="text-xs text-red-500">履歴の読み込みに失敗しました。</p>`;
+            }
+        }
+
+        // ==========================================
+        // 2. 返信メッセージを送信（sender = council）
+        // ==========================================
+        chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+
+            const btnSend = document.getElementById("btn-send");
+            btnSend.disabled = true;
+            chatInput.disabled = true;
+
+            const payload = {
+                action: "sendChatMessage",
+                suggestionId: suggestionId,
+                email: userEmail,
+                sender: "council", // 生徒会からの返信
+                message: messageText
+            };
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    chatInput.value = "";
+                    loadCouncilChatLog(); // 画面を更新
+                } else {
+                    alert("送信失敗: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("通信エラーが発生しました。");
+            } finally {
+                btnSend.disabled = false;
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
+        });
+
+        window.onload = loadCouncilChatLog;
+        
+        // 30秒ごとにチャットログを自動更新
+        setInterval(loadCouncilChatLog, 30000);
+    </script>
+</body>
+</html>
