@@ -254,6 +254,35 @@ if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "te
 
         // 起動時に自動ロード
         window.onload = loadAdminData;
+        // 👑 🌟【追加】ボタンが押されたらGASの「approveDisclosure」アクションを呼び出す関数
+async function approveRequest(suggestionId, roleToApprove) {
+    if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
+    
+    // ログイン中のメールアドレスを取得（変数名が異なる場合は適宜調整してください）
+    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
+    
+    try {
+        const response = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "approveDisclosure",
+                email: senderEmail,
+                suggestionId: suggestionId,
+                role: roleToApprove // "vice_president", "admin", "teacher" のいずれか
+            })
+        });
+        const res = await response.json();
+        if (res.status === "success") {
+            alert("承認を記録しました！");
+            loadAdminData(); // 🔄 画面を最新状態にリフレッシュする
+        } else {
+            alert("エラー: " + res.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信に失敗しました。");
+    }
+}
     </script>
 </body>
 </html>
