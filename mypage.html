@@ -126,20 +126,29 @@
                 document.getElementById("list-empty").classList.add("hidden");
 
                 data.forEach(item => {
-                    // ステータスごとの色分けと進捗バーの進み具合
-                    let statusText = "受付";
-                    let stepClass = "w-1/3";
-                    let statusColor = "bg-blue-500";
-                    
-                    if (item.status === "検討中") {
-                        statusText = "先生方で検討中";
-                        stepClass = "w-2/3";
-                        statusColor = "bg-yellow-500";
-                    } else if (item.status === "回答完了") {
-                        statusText = "回答・対応完了";
-                        stepClass = "w-full";
-                        statusColor = "bg-green-500";
-                    }
+    // ステータスごとの色分けと進捗バーの進み具合
+    let statusText = "受付";
+    let stepClass = "w-1/3";
+    let statusColor = "bg-blue-500";
+    
+    // 🌟【変更】「生徒会検討中」の場合
+    if (item.status === "生徒会検討中") {
+        statusText = "生徒会で検討中";
+        stepClass = "w-2/3";          // バーの長さは検討中ステップ（3分の2）
+        statusColor = "bg-yellow-500"; // 生徒会はお馴染みのイエロー
+    } 
+    // 🌟【追加】「先生方検討中」の場合
+    else if (item.status === "先生方検討中") {
+        statusText = "先生方で検討中";
+        stepClass = "w-2/3";          // バーの長さは同じく3分の2でストップ
+        statusColor = "bg-purple-500"; // 先生方は威厳のあるパープルに！
+    } 
+    // 回答完了の場合
+    else if (item.status === "回答完了") {
+        statusText = "回答・対応完了";
+        stepClass = "w-full";
+        statusColor = "bg-green-500";
+    }
 
                     // 未読チャットバッジ（🔴）の判定
                     const unreadBadge = item.hasUnread 
