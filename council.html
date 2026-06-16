@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル目安箱 - 生徒会管理ポータル</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .brand-bg { background-color: #130182; }
+        .brand-text { color: #130182; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
+
+    <nav class="brand-bg text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-user-shield text-xl"></i>
+                <span class="font-bold tracking-wider">生徒会・管理者専用ポータル</span>
+            </div>
+            <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+                ログアウト
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">届いた意見・要望の管理</h1>
+                <p class="text-xs text-gray-500 mt-0.5">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
+            </div>
+            <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
+                <i class="fas fa-sync-alt"></i>
+                <span>一覧を更新</span>
+            </button>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-gray-100 text-xs font-bold text-gray-500 tracking-wider">
+                            <th class="p-4 w-24">投稿日</th>
+                            <th class="p-4 w-28">カテゴリ</th>
+                            <th class="p-4">タイトル / 内容の要約</th>
+                            <th class="p-4 w-32">対応ステータス</th>
+                            <th class="p-4 w-28 text-center">対話チャット</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suggestion-table-body" class="divide-y divide-gray-50 text-sm text-gray-700">
+                        <tr id="table-loading">
+                            <td colspan="5" class="text-center py-12 text-gray-400">
+                                <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                                <span class="text-xs">目安箱のデータを取得中...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+
+        // 権限チェック (生徒会 council または 管理者 admin のみアクセス可)
+        const userRole = sessionStorage.getItem("user_role");
+        const userEmail = sessionStorage.getItem("user_email");
+        if (!userEmail || (userRole !== "council" && userRole !== "admin")) {
+            alert("このページへのアクセス権限がありません。");
+            window.location.href = "index.html";
+        }
+
+        const tableBody = document.getElementById("suggestion-table-body");
+
+        // ==========================================
+        // 1. 生徒会用の一覧データをGASから取得して描画
+        // ==========================================
+        async function loadCouncilData() {
+            tableBody.innerHTML = `
+                <tr id="table-loading">
+                    <td colspan="5" class="text-center py-12 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                        <span class="text-xs">目安箱のデータを取得中...</span>
+                    </td>
+                </tr>`;
+
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+
+                if (data.status === "error") {
+                    alert("データ取得エラー: " + data.message);
+                    return;
+                }
+
+                tableBody.innerHTML = ""; // クリア
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、届いている意見はありません。</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-slate-50/80 transition-colors";
+
+                    // ステータスに応じたセレクトボックスの色
+                    let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
+                    if (item.status === "検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+                    if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
+
+                    tr.innerHTML = `
+                        <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600">${item.category}</span>
+                        </td>
+                        <td class="p-4 max-w-xs md:max-w-md">
+                            <div class="font-bold text-gray-800 truncate">${item.title}</div>
+                            <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
+                        </td>
+                        <td class="p-4 whitespace-nowrap">
+                            <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
+                                <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
+                                <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
+                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回回答完了</option>
+                            </select>
+                        </td>
+                        <td class="p-4 text-center whitespace-nowrap">
+                            <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                                <i class="fas fa-comments text-sm"></i>
+                                ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // 2. ステータスを「その場」で変更する処理
+        // ==========================================
+        async function updateStatus(suggestionId, selectElement) {
+            const newStatus = selectElement.value;
+            selectElement.disabled = true;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateStatus",
+                        suggestionId: suggestionId,
+                        status: newStatus,
+                        email: userEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    // 色のリフレッシュ
+                    selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
+                    if (newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
+                    if (newStatus === "検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
+                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+                } else {
+                    alert("変更に失敗しました: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("通信エラーが発生しました。");
+            } finally {
+                selectElement.disabled = false;
+            }
+        }
+
+        // 生徒会用チャット画面へ遷移（※この後作成します）
+        function openCouncilChat(id) {
+            window.location.href = `council_chat.html?id=${id}`;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // 起動時にロード
+        window.onload = loadCouncilData;
+    </script>
+</body>
+</html>
