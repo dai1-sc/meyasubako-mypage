@@ -107,13 +107,11 @@
 
                     // 3. 役割に応じてリダイレクト
                     setTimeout(() => {
-                        if (result.role === "admin") {
-                            window.location.href = "admin.html";
-                        } else if (result.role === "council") {
-                            window.location.href = "council.html";
-                        } else {
-                            window.location.href = "mypage.html";
-                        }
+if (res.role === "council" || res.role === "admin" || res.role === "vice_president" || res.role === "teacher") {
+    window.location.href = "council.html"; // 全員生徒会画面へ進む
+} else {
+    window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
+}
                     }, 800);
                 } else {
                     showAlert("サーバー側でエラーが発生しました: " + result.message, "error");
