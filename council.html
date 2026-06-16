@@ -116,52 +116,75 @@
                     const tr = document.createElement("tr");
                     tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
 
-                    // ステータスに応じたセレクトボックスの色分け
+                    // ステータスに応じたセレクトボックスの色
                     let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
                     if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
                     if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
+                    if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200"; // 👑 追加
                     if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
 
-                    // 🚨 🌟【新機能】ここから追加：承認権限を持つ特定アカウントの判定
-                    // ⚠️【要書き換え】実際の学校のメールアドレスに変更してください！
-                    const VICE_PRESIDENT_EMAIL = "fukukaicho@g.bears.ed.jp"; // 副会長のアドレス
-                    const TEACHER_EMAIL = "teacher-in-charge@g.bears.ed.jp";  // 担当教師のアドレス
+                    const VICE_PRESIDENT_EMAIL = "fukukaicho@g.bears.ed.jp"; 
+                    const TEACHER_EMAIL = "teacher-in-charge@g.bears.ed.jp";  
 
-                    // ログイン中の変数名が「userEmail」や「userRole」であると仮定しています
-                    // (もし動かない場合は、お手元のログイン情報が保持されている変数名に合わせてください)
                     const isVPUser = (typeof userEmail !== 'undefined' && userEmail === VICE_PRESIDENT_EMAIL);
                     const isTeacherUser = (typeof userEmail !== 'undefined' && userEmail === TEACHER_EMAIL);
                     const isAdminUser = (typeof userRole !== 'undefined' && userRole === "admin");
 
-                    // 承認パネルのHTMLを動的に作成
-                    let approvalControlsHTML = `
-                        <div class="mt-2.5 p-2 bg-slate-50 border border-gray-200 rounded-lg text-[10px] space-y-1 max-w-xs">
-                            <div class="font-bold text-gray-500 mb-1 flex items-center gap-1">
-                                <i class="fas fa-shield-alt"></i> アドレス開示 3者承認状況
+                    // 👑 🌟【変更】ステータスが「開示請求」のときだけ承認パネルを生成する
+                    let approvalControlsHTML = "";
+                    if (item.status === "開示請求") {
+                        approvalControlsHTML = `
+                            <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs">
+                                <div class="font-bold text-red-700 mb-1 flex items-center gap-1 animate-pulse">
+                                    <i class="fas fa-shield-alt"></i> 🚨 本名開示請求・3者承認状況
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">副会長: ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
+                                    ${(!item.approvals?.vice_president && isVPUser) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : ''}
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">管理者: ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
+                                    ${(!item.approvals?.admin && isAdminUser) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : ''}
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">担 当: ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
+                                    ${(!item.approvals?.teacher && isTeacherUser) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold">承認</button>` : ''}
+                                </div>
                             </div>
-                            
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">副会長: ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                ${(!item.approvals?.vice_president && isVPUser) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded-md hover:bg-blue-700 font-bold shadow-sm">承認する</button>` : ''}
-                            </div>
-                            
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">管理者: ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                ${(!item.approvals?.admin && isAdminUser) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded-md hover:bg-red-700 font-bold shadow-sm">承認する</button>` : ''}
-                            </div>
-                            
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">担 当: ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : '<span class="text-gray-400">⏳ 未承認</span>'}</span>
-                                ${(!item.approvals?.teacher && isTeacherUser) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded-md hover:bg-purple-700 font-bold shadow-sm">承認する</button>` : ''}
+                        `;
+                    }
+
+                    // 👑 🌟【新機能】担当委員会のドロップダウンHTML
+                    let committeeSelectHTML = `
+                        <select onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
+                            <option value="未割り当て" ${item.committee === '未割り当て' ? 'selected' : ''}>❓ 未割り当て</option>
+                            <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
+                            <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
+                            <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
+                            <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
+                            <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
+                            <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
+                        </select>
+                    `;
+
+                    // 👑 🌟【新機能】回答下書きメモのHTML
+                    let memoHTML = `
+                        <div class="mt-2.5 max-w-xs md:max-w-md">
+                            <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
+                            <div class="flex gap-1.5">
+                                <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo}</textarea>
+                                <button onclick="saveCommitteeAndMemo('${item.id}', document.querySelector('select[onchange*=\"saveCommitteeAndMemo\"][onchange*=\"${item.id}\"]').value, document.getElementById('memo-${item.id}').value)" class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">保存</button>
                             </div>
                         </div>
                     `;
-                    // 🚨 🌟【新機能】ここまで追加
 
                     tr.innerHTML = `
                         <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
                         <td class="p-4 whitespace-nowrap">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600">${item.category}</span>
+                            <div class="space-y-1.5">
+                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600 block text-center w-max">${item.category}</span>
+                                <div class="text-[10px] font-bold text-gray-400">担当：${committeeSelectHTML}</div>
+                            </div>
                         </td>
                         <td class="p-4 max-w-xs md:max-w-md">
                             <div class="font-bold text-gray-800 truncate">${item.title}</div>
@@ -179,12 +202,14 @@
                             ` : ''}
 
                             ${approvalControlsHTML}
+                            ${memoHTML}
                         </td>
                         <td class="p-4 whitespace-nowrap">
                             <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
                                 <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
                                 <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
                                 <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
+                                <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 🔴 開示請求</option>
                                 <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
                             </select>
                         </td>
@@ -283,6 +308,31 @@ async function approveRequest(suggestionId, role) {
     } catch (e) {
         console.error(e);
         alert("通信エラーが発生しました。");
+    }
+}
+        // 👑 委員会とメモをGAS経由でスプレッドシートに保存する関数
+async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
+    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
+    try {
+        const response = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "updateCommitteeAndMemo",
+                email: senderEmail,
+                suggestionId: suggestionId,
+                committee: committee,
+                replyMemo: replyMemo
+            })
+        });
+        const res = await response.json();
+        if (res.status === "success") {
+            // 保存成功時は、通知を出さずに背景を一瞬光らせるか、簡易ログのみにすると操作の邪魔になりません
+            console.log("委員会・メモを保存しました。");
+        } else {
+            alert("保存エラー: " + res.message);
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
     </script>
