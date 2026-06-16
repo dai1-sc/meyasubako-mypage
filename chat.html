@@ -110,24 +110,38 @@
                     chatContainer.appendChild(infoMsg);
                 } else {
                     data.chats.forEach(chat => {
-                        const isMe = (chat.sender === "student"); // 生徒自身からの発言か
-                        const wrapper = document.createElement("div");
-                        wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
+    const isMe = (chat.sender === "student"); // 生徒自身からの発言か
+    const wrapper = document.createElement("div");
+    wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
 
-                        // 送信者名の表示ラベル
-                        const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${isMe ? 'あなた（匿名）' : '生徒会役員'}</span>`;
-                        
-                        // メッセージの泡（吹き出し）
-                        const bubble = `
-                            <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${isMe ? 'bg-indigo-900 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'}">
-                                <p class="whitespace-pre-wrap">${chat.message}</p>
-                            </div>
-                            <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
-                        `;
-                        
-                        wrapper.innerHTML = nameLabel + bubble;
-                        chatContainer.appendChild(wrapper);
-                    });
+    // 発言者によって名前と色を分ける
+    let nameText = "あなた（匿名）";
+    let bubbleClass = "bg-indigo-900 text-white rounded-tr-none"; // 自分（生徒）の吹き出し
+
+    if (!isMe) {
+        if (chat.sender === "admin") {
+            // 👑 管理者降臨用の特別仕様！
+            nameText = "システム管理者（先生・担当者） 👑";
+            bubbleClass = "bg-amber-50 text-amber-950 rounded-tl-none border-2 border-amber-400 shadow-md font-bold animate-fade-in"; 
+            // 高級感のあるゴールド風枠線＋太文字で上位存在感を演出
+        } else {
+            // 通常の生徒会
+            nameText = "生徒会役員";
+            bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
+        }
+    }
+    
+    const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
+    const bubble = `
+        <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
+            <p class="whitespace-pre-wrap">${chat.message}</p>
+        </div>
+        <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
+    `;
+    
+    wrapper.innerHTML = nameLabel + bubble;
+    chatContainer.appendChild(wrapper);
+});
                 }
 
                 // チャットの一番下まで自動スクロール
