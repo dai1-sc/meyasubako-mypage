@@ -67,11 +67,16 @@
         // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
-        // 権限チェック (生徒会 council または 管理者 admin のみアクセス可)
+        // セッションからログイン情報を取得
         const userRole = sessionStorage.getItem("user_role");
         const userEmail = sessionStorage.getItem("user_email");
+        
+        // 開発・テスト用の簡易ログチェック
+        console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
+
+        // ログイン・権限チェック (生徒会 council または 管理者 admin のみアクセス可)
         if (!userEmail || (userRole !== "council" && userRole !== "admin")) {
-            alert("このページへのアクセス権限がありません。");
+            alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
             window.location.href = "index.html";
         }
 
@@ -90,6 +95,7 @@
                 </tr>`;
 
             try {
+                // GASに「生徒会用のデータ一覧をちょうだい」とリクエスト
                 const res = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
@@ -98,18 +104,19 @@
                     return;
                 }
 
-                tableBody.innerHTML = ""; // クリア
+                tableBody.innerHTML = ""; // ローディング表示を消去
 
                 if (data.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、届いている意見はありません。</td></tr>`;
                     return;
                 }
 
+                // スプレッドシートから届いた配列データを1件ずつテーブルの行として組み立てる
                 data.forEach(item => {
                     const tr = document.createElement("tr");
-                    tr.className = "hover:bg-slate-50/80 transition-colors";
+                    tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
 
-                    // ステータスに応じたセレクトボックスの色
+                    // ステータスに応じたセレクトボックスの色分け
                     let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
                     if (item.status === "検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
                     if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
@@ -127,7 +134,7 @@
                             <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
                                 <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
                                 <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
-                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回回答完了</option>
+                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
                             </select>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
@@ -142,12 +149,12 @@
 
             } catch (error) {
                 console.error(error);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。GASのURLやデプロイを確認してください。</td></tr>`;
             }
         }
 
         // ==========================================
-        // 2. ステータスを「その場」で変更する処理
+        // 2. ステータスを「その場」で変更してGAS（スプレッドシート）に反映
         // ==========================================
         async function updateStatus(suggestionId, selectElement) {
             const newStatus = selectElement.value;
@@ -166,7 +173,7 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    // 色のリフレッシュ
+                    // 変更成功時にセレクトボックスの色を動的にリフレッシュ
                     selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
                     if (newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
                     if (newStatus === "検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
@@ -182,7 +189,7 @@
             }
         }
 
-        // 生徒会用チャット画面へ遷移（※この後作成します）
+        // 生徒会用チャット画面へ遷移
         function openCouncilChat(id) {
             window.location.href = `council_chat.html?id=${id}`;
         }
@@ -192,7 +199,7 @@
             window.location.href = "index.html";
         }
 
-        // 起動時にロード
+        // ページ起動時に自動でGASからデータをロード
         window.onload = loadCouncilData;
     </script>
 </body>
