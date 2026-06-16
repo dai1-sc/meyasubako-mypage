@@ -108,8 +108,10 @@ async function handleCredentialResponse(response) {
 
             // 3. 役割に応じてリダイレクト
             setTimeout(() => {
-                if (result.role === "council" || result.role === "admin" || result.role === "vice_president" || result.role === "teacher") {
-                    window.location.href = "council.html"; // 役職者は全員生徒会画面へ
+                if (result.role === "admin") {
+                    window.location.href = "admin.html";   // 👑 管理者は最高権限画面へ
+                } else if (result.role === "council" || result.role === "vice_president" || result.role === "teacher") {
+                    window.location.href = "council.html"; // 役職メンバーは生徒会画面へ
                 } else {
                     window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
                 }
