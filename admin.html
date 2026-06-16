@@ -115,9 +115,10 @@
                     tr.className = "hover:bg-purple-50/30 transition-colors border-b border-gray-100";
 
                     // ステータスに応じたセレクトボックスの色
-                    let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
-                    if (item.status === "検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
-                    if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
+                   let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
+if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
+if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
 
                     tr.innerHTML = `
                         <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
