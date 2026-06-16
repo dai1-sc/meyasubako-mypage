@@ -82,48 +82,46 @@
         }
 
         // Googleログインが成功した時に自動で呼ばれるコールバック関数
-        async function handleCredentialResponse(response) {
-            showAlert("学校アカウントを確認中...", "info");
-            
-            try {
-                // 1. Googleから届いたデータを解析してメールアドレスを取得
-                const responsePayload = decodeJwt(response.credential);
-                const email = responsePayload.email;
-
-                // 2. GASのAPIにメールアドレスを送信してロール（権限）を問い合わせる
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ email: email })
-                });
-                
-                const result = await res.json();
-
-                if (result.status === "success") {
-    showAlert("認証成功！画面を切り替えます...", "info");
+        // Googleログインが成功した時に自動で呼ばれるコールバック関数
+async function handleCredentialResponse(response) {
+    showAlert("学校アカウントを確認中...", "info");
     
-    // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
-    sessionStorage.setItem("user_email", email);
-    sessionStorage.setItem("user_role", result.role);
+    try {
+        // 1. Googleから届いたデータを解析してメールアドレスを取得
+        const responsePayload = decodeJwt(response.credential);
+        const email = responsePayload.email;
 
-    // 3. 役割に応じてリダイレクト
-    setTimeout(() => {
-        // 👑【修正】 res.role ➔ result.role に書き換えました！
-        if (result.role === "council" || result.role === "admin" || result.role === "vice_president" || result.role === "teacher") {
-            window.location.href = "council.html"; // 全員生徒会画面へ進む
-        } else {
-            window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
-        }
-    }, 800);
-}
+        // 2. GASのAPIにメールアドレスを送信してロール（権限）を問い合わせる
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({ email: email })
+        });
+        
+        const result = await res.json();
+
+        if (result.status === "success") {
+            showAlert("認証成功！画面を切り替えます...", "info");
+            
+            // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
+            sessionStorage.setItem("user_email", email);
+            sessionStorage.setItem("user_role", result.role);
+
+            // 3. 役割に応じてリダイレクト
+            setTimeout(() => {
+                if (result.role === "council" || result.role === "admin" || result.role === "vice_president" || result.role === "teacher") {
+                    window.location.href = "council.html"; // 役職者は全員生徒会画面へ
                 } else {
-                    showAlert("サーバー側でエラーが発生しました: " + result.message, "error");
+                    window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
                 }
-
-            } catch (error) {
-                console.error(error);
-                showAlert("サインイン処理中に通信エラーが発生しました。", "error");
-            }
+            }, 800);
+        } else {
+            showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
         }
+    } catch (error) {
+        console.error(error);
+        showAlert("エラーが発生しました。通信環境を確認してください。", "error");
+    }
+}
     </script>
 </body>
 </html>
