@@ -155,29 +155,34 @@
                     }
 
                     // 👑 🌟【新機能】担当委員会のドロップダウンHTML
-                    let committeeSelectHTML = `
-                        <select onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
-                            <option value="未割り当て" ${item.committee === '未割り当て' ? 'selected' : ''}>❓ 未割り当て</option>
-                            <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
-                            <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
-                            <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
-                            <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
-                            <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
-                            <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
-                        </select>
-                    `;
+                    // 🔄 council.html の該当箇所をこれに差し替えてみてください
+let committeeSelectHTML = `
+    <select id="commit-${item.id}" 
+            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" 
+            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
+        <option value="未割り当て" ${item.committee === '未割り当て' ? 'selected' : ''}>❓ 未割り当て</option>
+        <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
+        <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
+        <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
+        <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
+        <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
+        <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
+    </select>
+`;
 
                     // 👑 🌟【新機能】回答下書きメモのHTML
                     let memoHTML = `
-                        <div class="mt-2.5 max-w-xs md:max-w-md">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
-                            <div class="flex gap-1.5">
-                                <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo}</textarea>
-                                <button onclick="saveCommitteeAndMemo('${item.id}', document.querySelector('select[onchange*=\"saveCommitteeAndMemo\"][onchange*=\"${item.id}\"]').value, document.getElementById('memo-${item.id}').value)" class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">保存</button>
-                            </div>
-                        </div>
-                    `;
-
+    <div class="mt-2.5 max-w-xs md:max-w-md">
+        <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
+        <div class="flex gap-1.5">
+            <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo}</textarea>
+            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)" 
+                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">
+                保存
+            </button>
+        </div>
+    </div>
+`;
                     tr.innerHTML = `
                         <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
                         <td class="p-4 whitespace-nowrap">
