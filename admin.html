@@ -130,11 +130,6 @@ if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 borde
                             <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
                         </td>
                         <td class="p-4 whitespace-nowrap">
-                            <select onchange="updateStatus('${item.id}', this)" ...>
-    <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
-    <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
-    <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
-</select>
 
 <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
     <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
