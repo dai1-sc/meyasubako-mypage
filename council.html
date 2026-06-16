@@ -75,7 +75,7 @@
         console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
 
         // ログイン・権限チェック (生徒会 council または 管理者 admin のみアクセス可)
-if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher") {
+if (userRole !== "council"  && userRole !== "vice_president" && userRole !== "teacher") {
             alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
             window.location.href = "index.html";
         }
