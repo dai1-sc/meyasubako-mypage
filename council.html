@@ -131,11 +131,18 @@ if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 borde
                             <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
                         </td>
                         <td class="p-4 whitespace-nowrap">
-                            <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
-                                <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
-                                <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
-                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
-                            </select>
+                           <select onchange="updateStatus('${item.id}', this)" ...>
+    <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
+    <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
+    <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
+</select>
+
+<select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
+    <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
+    <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
+    <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
+    <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
+</select>
                         </td>
                         <td class="p-4 text-center whitespace-nowrap">
                             <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
@@ -176,8 +183,9 @@ if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 borde
                     // 変更成功時にセレクトボックスの色を動的にリフレッシュ
                     selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
                     if (newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
-                    if (newStatus === "検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
-                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
+if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
+if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
                 } else {
                     alert("変更に失敗しました: " + result.message);
                 }
