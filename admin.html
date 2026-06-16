@@ -3,106 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デジタル目安箱 - 生徒会・管理者ダッシュボード</title>
+    <title>デジタル目安箱 - システム管理者ポータル</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .brand-bg { background-color: #130182; }
-        .brand-text { color: #130182; }
+        /* 管理者専用の重厚感あるプレミアムカラー（深みのある赤紫） */
+        .admin-bg { background-color: #4a042e; }
+        .admin-text { color: #4a042e; }
     </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-slate-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <i class="fas fa-user-shield text-2xl text-indigo-400"></i>
-            <h1 class="text-xl font-bold tracking-wider">目安箱 運営管理システム</h1>
+    <nav class="admin-bg text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-crown text-amber-400 text-xl animate-bounce"></i>
+                <span class="font-bold tracking-wider text-amber-200">最高システム管理者・先生専用ポータル</span>
+            </div>
+            <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+                ログアウト
+            </button>
         </div>
-        <div class="flex items-center space-x-4">
-            <span class="text-sm bg-red-600/80 text-white px-3 py-1 rounded-full font-bold">
-                <i class="fas fa-crown mr-1"></i>最高管理者 (Admin)
-            </span>
-            <button class="text-sm text-slate-400 hover:text-white"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
-        </div>
-    </header>
+    </nav>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
         
-        <div class="lg:col-span-1 space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-gray-800 mb-2">現在の権限：管理者</h3>
-                <p class="text-xs text-gray-500">全ての役員が送信しているチャットおよび投書への詳細質問状況をリアルタイムで横断監視・把握できます。</p>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl shadow-sm border-l-4 border-amber-500">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    全校目安箱 統括コントロールパネル
+                </h1>
+                <p class="text-xs text-gray-500 mt-0.5">全ての生徒からの投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。</p>
             </div>
-
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-sm text-gray-400 uppercase tracking-wider mb-3">案件一覧</h3>
-                <div class="space-y-2">
-                    <div class="p-3 bg-indigo-50 border-l-4 border-indigo-700 rounded-r-lg cursor-pointer">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="font-bold text-indigo-900">#tk-8492 (髪型校則)</span>
-                            <span class="text-gray-400">担当: 役員A</span>
-                        </div>
-                        <p class="text-xs text-gray-600 line-clamp-1">「先週の頭髪検査の際、複数の担任の先生から...」</p>
-                    </div>
-                    <div class="p-3 hover:bg-slate-50 border-l-4 border-gray-300 rounded-r-lg cursor-pointer">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span class="font-bold text-gray-800">#tk-7721 (学食メニュー)</span>
-                            <span class="text-gray-400">担当: 役員B</span>
-                        </div>
-                        <p class="text-xs text-gray-600 line-clamp-1">生徒会からの質問に回答待ち状態</p>
-                    </div>
-                </div>
-            </div>
+            <button onclick="loadAdminData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
+                <i class="fas fa-sync-alt"></i>
+                <span>全データを同期更新</span>
+            </button>
         </div>
 
-        <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[80vh]">
-            
-            <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl grid grid-cols-3 gap-2 text-xs">
-                <div class="p-2 bg-white rounded border">
-                    <span class="block font-bold text-gray-400">シート②：進捗状況</span>
-                    <span class="text-amber-600 font-bold">● 生徒会検討中</span>
-                </div>
-                <div class="p-2 bg-white rounded border">
-                    <span class="block font-bold text-gray-400">シート③：先生回答</span>
-                    <span class="text-gray-400">未転送（先生検討中ではない）</span>
-                </div>
-                <div class="p-2 bg-white rounded border">
-                    <span class="block font-bold text-gray-400">シート④：メール閲覧申請</span>
-                    <span class="text-gray-500"><i class="far fa-square"></i> 未申請</span>
-                </div>
-            </div>
-
-            <div class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/30">
-                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-900">
-                    <i class="fas fa-user-secret mr-1"></i> <strong>匿名安全システム作動中:</strong> 生徒の氏名・アドレス、および送信した役員の氏名は相互にマスクされ、「生徒会」として一元送信されます。
-                </div>
-
-                <div class="flex items-start space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-400 text-white flex items-center justify-center text-xs font-bold">
-                        投
-                    </div>
-                    <div class="bg-white p-3 rounded-xl rounded-tl-none shadow-sm border border-slate-200 max-w-xl">
-                        <span class="block text-[10px] text-gray-400 mb-1">投稿者（匿名）</span>
-                        <p class="text-sm text-gray-800">先週の頭髪検査の際、複数の担任の先生から「一律で禁止だから」という理由だけで指導を受けました。</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start space-x-2 justify-end">
-                    <div class="bg-slate-800 text-white p-3 rounded-xl rounded-tr-none shadow-sm max-w-xl">
-                        <span class="block text-[10px] text-slate-400 mb-1">送信元表示: 生徒会 (ログ記録: 役員A)</span>
-                        <p class="text-sm">貴重なご意見ありがとうございます。生徒会でも現在この議題について話し合っています...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 border-t border-slate-100 bg-white rounded-b-xl flex space-x-2">
-                <input type="text" placeholder="「生徒会」としてメッセージを返信..." class="flex-1 border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-slate-800">
-                <button class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-gray-100 text-xs font-bold text-gray-500 tracking-wider">
+                            <th class="p-4 w-24">投稿日</th>
+                            <th class="p-4 w-28">カテゴリ</th>
+                            <th class="p-4">タイトル / 内容の要約</th>
+                            <th class="p-4 w-32">対応ステータス</th>
+                            <th class="p-4 w-28 text-center">特権チャット</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suggestion-table-body" class="divide-y divide-gray-50 text-sm text-gray-700">
+                        <tr id="table-loading">
+                            <td colspan="5" class="text-center py-12 text-gray-400">
+                                <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                                <span class="text-xs">スプレッドシートから全意見を取得中...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-
     </main>
+
+    <script>
+        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+
+        // 厳重な権限チェック (admin のみアクセス可)
+        const userRole = sessionStorage.getItem("user_role");
+        const userEmail = sessionStorage.getItem("user_email");
+        
+        if (!userEmail || userRole !== "admin") {
+            alert("このページは最高管理者(admin)専用です。アクセス権限がありません。");
+            window.location.href = "index.html";
+        }
+
+        const tableBody = document.getElementById("suggestion-table-body");
+
+        // ==========================================
+        // 1. 管理者として全データをGASから取得して描画
+        // ==========================================
+        async function loadAdminData() {
+            tableBody.innerHTML = `
+                <tr id="table-loading">
+                    <td colspan="5" class="text-center py-12 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                        <span class="text-xs">最高権限でデータを同期中...</span>
+                    </td>
+                </tr>`;
+
+            try {
+                // 生徒会と同じAPIアクション(getCouncilData)を利用（GAS側でadminも許可しているため）
+                const res = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+
+                if (data.status === "error") {
+                    alert("データ取得エラー: " + data.message);
+                    return;
+                }
+
+                tableBody.innerHTML = ""; // ローディング消去
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、目安箱に届いている意見はありません。</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    const tr = document.createElement("tr");
+                    tr.className = "hover:bg-purple-50/30 transition-colors border-b border-gray-100";
+
+                    // ステータスに応じたセレクトボックスの色
+                    let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
+                    if (item.status === "検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+                    if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
+
+                    tr.innerHTML = `
+                        <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600">${item.category}</span>
+                        </td>
+                        <td class="p-4 max-w-xs md:max-w-md">
+                            <div class="font-bold text-gray-800 truncate">${item.title}</div>
+                            <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
+                        </td>
+                        <td class="p-4 whitespace-nowrap">
+                            <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
+                                <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
+                                <option value="検討中" ${item.status === '検討中' ? 'selected' : ''}>🟡 検討中</option>
+                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
+                            </select>
+                        </td>
+                        <td class="p-4 text-center whitespace-nowrap">
+                            <button onclick="openAdminChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl transition shadow-sm">
+                                <i class="fas fa-comments text-sm"></i>
+                                ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // 2. ステータス変更をGASに反映
+        // ==========================================
+        async function updateStatus(suggestionId, selectElement) {
+            const newStatus = selectElement.value;
+            selectElement.disabled = true;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateStatus",
+                        suggestionId: suggestionId,
+                        status: newStatus,
+                        email: userEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
+                    if (newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
+                    if (newStatus === "検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
+                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+                } else {
+                    alert("変更に失敗しました: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("通信エラーが発生しました。");
+            } finally {
+                selectElement.disabled = false;
+            }
+        }
+
+        // 管理者として共通のチャットルームに遷移
+        function openAdminChat(id) {
+            window.location.href = `council_chat.html?id=${id}`;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // 起動時に自動ロード
+        window.onload = loadAdminData;
+    </script>
 </body>
 </html>
