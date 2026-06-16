@@ -135,25 +135,45 @@ chatInput.addEventListener("keydown", function(e) {
                     chatContainer.appendChild(infoMsg);
                 } else {
                     data.chats.forEach(chat => {
-                        // 生徒会側画面では、自分が「council」、相手が「student」
-                        const isMe = (chat.sender === "council"); 
-                        const wrapper = document.createElement("div");
-                        wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
+    // 自分が送信したメッセージかどうか（adminもcouncilも自分側の右側に表示）
+    const isMe = (chat.sender === "council" || chat.sender === "admin"); 
+    const wrapper = document.createElement("div");
+    wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
 
-                        // 送信者ラベル
-                        const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${isMe ? 'あなた（生徒会役員）' : '生徒（匿名）'}</span>`;
-                        
-                        // 吹き出し
-                        const bubble = `
-                            <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${isMe ? 'bg-indigo-900 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'}">
-                                <p class="whitespace-pre-wrap">${chat.message}</p>
-                            </div>
-                            <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
-                        `;
-                        
-                        wrapper.innerHTML = nameLabel + bubble;
-                        chatContainer.appendChild(wrapper);
-                    });
+    // 発言者によって名前と色を分ける
+    let nameText = "生徒（匿名）";
+    let bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none"; // 通常の生徒（左側）
+
+    if (isMe) {
+        if (chat.sender === "admin") {
+            nameText = "あなた（システム管理者 👑）";
+            bubbleClass = "bg-red-900 text-white rounded-tr-none shadow-md font-medium border border-red-700"; // 管理者は威厳のある赤紫
+        } else {
+            nameText = "あなた（生徒会役員）";
+            bubbleClass = "bg-indigo-900 text-white rounded-tr-none"; // 生徒会は青
+        }
+    } else {
+        // 万が一、別の管理者が打った文字を別の生徒会が見た場合などのケア
+        if (chat.sender === "admin") {
+            nameText = "システム管理者 👑";
+            bubbleClass = "bg-red-50 text-red-950 rounded-tl-none border border-red-200 font-medium";
+        } else if (chat.sender === "council") {
+            nameText = "生徒会役員";
+        }
+    }
+    
+    // 吹き出しの組み立て
+    const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
+    const bubble = `
+        <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
+            <p class="whitespace-pre-wrap">${chat.message}</p>
+        </div>
+        <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
+    `;
+    
+    wrapper.innerHTML = nameLabel + bubble;
+    chatContainer.appendChild(wrapper);
+});
                 }
 
                 // 一番下までスクロール
@@ -178,12 +198,12 @@ chatInput.addEventListener("keydown", function(e) {
             chatInput.disabled = true;
 
             const payload = {
-                action: "sendChatMessage",
-                suggestionId: suggestionId,
-                email: userEmail,
-                sender: "council", // 生徒会からの返信
-                message: messageText
-            };
+    action: "sendChatMessage",
+    suggestionId: suggestionId,
+    email: userEmail,
+    sender: userRole, // 👈 これで admin の時は 'admin' としてスプレッドシートに書き込まれます
+    message: messageText
+};
 
             try {
                 const res = await fetch(GAS_API_URL, {
