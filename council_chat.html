@@ -69,6 +69,30 @@
         const chatContainer = document.getElementById("chat-container");
         const chatForm = document.getElementById("chat-form");
         const chatInput = document.getElementById("chat-input");
+        // 🌟 [Enter] で送信、[Shift + Enter] で改行するマジック
+chatInput.addEventListener("keydown", function(e) {
+    // 1. 日本語の「変換確定」の時のEnterは無視する
+    if (e.isComposing || e.keyCode === 229) {
+        return;
+    }
+
+    // 2. Enterキーが押された時
+    if (e.key === "Enter") {
+        if (e.shiftKey) {
+            // Shiftが同時に押されているなら、通常の改行を許可（何もしない）
+            return;
+        } else {
+            // ShiftなしのEnterなら、通常の改行（送信）をキャンセルしてフォームを送信
+            e.preventDefault();
+            
+            // 入力欄が空っぽじゃなければ送信イベントを発火させる
+            if (chatInput.value.trim() !== "") {
+                // 送信ボタン（フォームのsubmitイベント）を強制的に呼び出す
+                chatForm.requestSubmit(); 
+            }
+        }
+    }
+});
 
         // ==========================================
         // 1. チャット履歴＆意見を「生徒会用API」から取得
