@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル目安箱 - マイページ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .brand-bg { background-color: #130182; }
+        .brand-text { color: #130182; }
+        .brand-border { border-color: #130182; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen">
+
+    <nav class="brand-bg text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-inbox text-xl text-yellow-400"></i>
+                <span class="font-bold tracking-wider text-lg">デジタル目安箱</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="user-display" class="text-sm opacity-90 hidden md:inline">---</span>
+                <button id="btn-logout" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition">
+                    ログアウト
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">こんにちは！</h1>
+            <p class="text-sm text-gray-500 mt-1">ここでは、あなたの意見の進捗確認や、生徒会との相談ができます。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-pen-fancy brand-text mr-2"></i>意見を届ける
+                </h2>
+                <form id="suggestion-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">カテゴリ</label>
+                        <select id="form-category" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-900" required>
+                            <option value="校則・制服">校則・制服について</option>
+                            <option value="行事・イベント">行事・イベントについて</option>
+                            <option value="部活動">部活動について</option>
+                            <option value="施設・設備">学校の施設・設備について</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">意見のタイトル</label>
+                        <input type="text" id="form-title" placeholder="（例）購買のメニュー増やしてほしい" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-900" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">詳しい内容</label>
+                        <textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-900" required></textarea>
+                    </div>
+                    <button type="submit" id="btn-submit" class="w-full brand-bg text-white font-medium py-3 rounded-xl hover:bg-opacity-90 transition text-sm shadow-sm">
+                        匿名で送信する
+                    </button>
+                </form>
+            </div>
+
+            <div class="md:col-span-2 space-y-4">
+                <h2 class="text-lg font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-history brand-text mr-2"></i>あなたの投書と進捗
+                </h2>
+
+                <div id="list-loading" class="text-center py-12 text-gray-400">
+                    <i class="fas fa-spinner animate-spin text-2xl mb-2"></i>
+                    <p class="text-sm">データを読み込み中...</p>
+                </div>
+
+                <div id="list-empty" class="hidden bg-white p-12 rounded-2xl border border-dashed border-gray-200 text-center text-gray-400">
+                    <i class="fas fa-folder-open text-3xl mb-3"></i>
+                    <p class="text-sm">まだ投稿された意見はありません。</p>
+                </div>
+
+                <div id="suggestion-list" class="space-y-4">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+
+        // セッションからログイン中のメールアドレスを取得（なければログインへ強制送還）
+        const userEmail = sessionStorage.getItem("user_email");
+        if (!userEmail) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById("user-display").innerText = userEmail;
+        }
+
+        // ログアウト処理
+        document.getElementById("btn-logout").addEventListener("click", () => {
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        });
+
+        // ==========================================
+        // 1. 過去の投稿データをGASから取得して描画する
+        // ==========================================
+        async function loadSuggestions() {
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+                
+                document.getElementById("list-loading").classList.add("hidden");
+                const listContainer = document.getElementById("suggestion-list");
+                listContainer.innerHTML = ""; // 初期化
+
+                if (!data || data.length === 0) {
+                    document.getElementById("list-empty").classList.remove("hidden");
+                    return;
+                }
+
+                document.getElementById("list-empty").classList.add("hidden");
+
+                data.forEach(item => {
+                    // ステータスごとの色分けと進捗バーの進み具合
+                    let statusText = "受付";
+                    let stepClass = "w-1/3";
+                    let statusColor = "bg-blue-500";
+                    
+                    if (item.status === "検討中") {
+                        statusText = "先生方で検討中";
+                        stepClass = "w-2/3";
+                        statusColor = "bg-yellow-500";
+                    } else if (item.status === "回答完了") {
+                        statusText = "回答・対応完了";
+                        stepClass = "w-full";
+                        statusColor = "bg-green-500";
+                    }
+
+                    // 未読チャットバッジ（🔴）の判定
+                    const unreadBadge = item.hasUnread 
+                        ? `<span class="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse"><span class="w-1.5 h-1.5 bg-white rounded-full"></span>未読あり</span>`
+                        : '';
+
+                    const card = document.createElement("div");
+                    card.className = "bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-gray-300 transition cursor-pointer";
+                    // クリックしたら個別チャット画面（次回作成）に飛ぶようにする
+                    card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
+                    
+                    card.innerHTML = `
+                        ${unreadBadge}
+                        <div class="flex items-center space-x-2 text-xs font-bold text-gray-400 mb-2">
+                            <span class="bg-gray-100 px-2 py-1 rounded-md text-gray-600">${item.category}</span>
+                            <span>${item.date}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-gray-800 mb-2">${item.title}</h3>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-4">${item.content}</p>
+                        
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-[11px] font-bold text-gray-400">
+                                <span class="${item.status==='受付'?'brand-text':''}">① 受付完了</span>
+                                <span class="${item.status==='検討中'?'brand-text':''}">② 先生に確認中</span>
+                                <span class="${item.status==='回答完了'?'brand-text':''}">③ 回答公開</span>
+                            </div>
+                            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                <div class="${statusColor} h-full ${stepClass} transition-all duration-500"></div>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("list-loading").innerHTML = `<p class="text-sm text-red-500">データの読み込みに失敗しました。</p>`;
+            }
+        }
+
+        // ==========================================
+        // 2. 新規意見を送信する処理
+        // ==========================================
+        document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById("btn-submit");
+            
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "送信中...";
+
+            const payload = {
+                action: "submitSuggestion",
+                email: userEmail,
+                category: document.getElementById("form-category").value,
+                title: document.getElementById("form-title").value,
+                content: document.getElementById("form-content").value
+            };
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("意見を完全に匿名で受け付けました！生徒会からの返答をお待ちください。");
+                    document.getElementById("suggestion-form").reset();
+                    loadSuggestions(); // リストを再更新
+                } else {
+                    alert("送信エラー: " + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("通信エラーが発生しました。");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "匿名で送信する";
+            }
+        });
+
+        // ページ読み込み時に過去の投書一覧を取得
+        window.onload = loadSuggestions;
+    </script>
+</body>
+</html>
