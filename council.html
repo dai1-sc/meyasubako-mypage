@@ -253,6 +253,38 @@ if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "te
 
         // ページ起動時に自動でGASからデータをロード
         window.onload = loadCouncilData;
+        // 👑 council.html の下部に追加する通信関数
+async function approveRequest(suggestionId, role) {
+    if (!confirm("重大な事案（いじめ・誹謗中傷等）として、この投稿者のアドレス開示を承認しますか？")) return;
+    
+    // ログイン中のメアド変数名（userEmail）に合わせてリクエストを送ります
+    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
+
+    try {
+        // ※「GAS_API_URL」はすでにお手元で定義されているGASのWebアプリURL変数名に合わせてください
+        const response = await fetch(GAS_API_URL, { 
+            method: "POST",
+            body: JSON.stringify({
+                action: "approveDisclosure",
+                email: senderEmail,
+                suggestionId: suggestionId,
+                role: role
+            })
+        });
+        const res = await response.json();
+        if (res.status === "success") {
+            alert("承認を記録しました。");
+            // データを再読み込みする関数（おそらく loadCouncilData() など）をここで呼び出す
+            if (typeof loadCouncilData === 'function') loadCouncilData();
+            else location.reload(); // 見つからなければ安全に画面リロード
+        } else {
+            alert("エラー: " + res.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信エラーが発生しました。");
+    }
+}
     </script>
 </body>
 </html>
