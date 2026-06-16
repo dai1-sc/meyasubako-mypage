@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル目安箱 - 生徒会・管理者ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .brand-bg { background-color: #130182; }
+        .brand-text { color: #130182; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-user-shield text-2xl text-indigo-400"></i>
+            <h1 class="text-xl font-bold tracking-wider">目安箱 運営管理システム</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-sm bg-red-600/80 text-white px-3 py-1 rounded-full font-bold">
+                <i class="fas fa-crown mr-1"></i>最高管理者 (Admin)
+            </span>
+            <button class="text-sm text-slate-400 hover:text-white"><i class="fas fa-sign-out-alt"></i> ログアウト</button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <div class="lg:col-span-1 space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-gray-800 mb-2">現在の権限：管理者</h3>
+                <p class="text-xs text-gray-500">全ての役員が送信しているチャットおよび投書への詳細質問状況をリアルタイムで横断監視・把握できます。</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-sm text-gray-400 uppercase tracking-wider mb-3">案件一覧</h3>
+                <div class="space-y-2">
+                    <div class="p-3 bg-indigo-50 border-l-4 border-indigo-700 rounded-r-lg cursor-pointer">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-bold text-indigo-900">#tk-8492 (髪型校則)</span>
+                            <span class="text-gray-400">担当: 役員A</span>
+                        </div>
+                        <p class="text-xs text-gray-600 line-clamp-1">「先週の頭髪検査の際、複数の担任の先生から...」</p>
+                    </div>
+                    <div class="p-3 hover:bg-slate-50 border-l-4 border-gray-300 rounded-r-lg cursor-pointer">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-bold text-gray-800">#tk-7721 (学食メニュー)</span>
+                            <span class="text-gray-400">担当: 役員B</span>
+                        </div>
+                        <p class="text-xs text-gray-600 line-clamp-1">生徒会からの質問に回答待ち状態</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[80vh]">
+            
+            <div class="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl grid grid-cols-3 gap-2 text-xs">
+                <div class="p-2 bg-white rounded border">
+                    <span class="block font-bold text-gray-400">シート②：進捗状況</span>
+                    <span class="text-amber-600 font-bold">● 生徒会検討中</span>
+                </div>
+                <div class="p-2 bg-white rounded border">
+                    <span class="block font-bold text-gray-400">シート③：先生回答</span>
+                    <span class="text-gray-400">未転送（先生検討中ではない）</span>
+                </div>
+                <div class="p-2 bg-white rounded border">
+                    <span class="block font-bold text-gray-400">シート④：メール閲覧申請</span>
+                    <span class="text-gray-500"><i class="far fa-square"></i> 未申請</span>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/30">
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-900">
+                    <i class="fas fa-user-secret mr-1"></i> <strong>匿名安全システム作動中:</strong> 生徒の氏名・アドレス、および送信した役員の氏名は相互にマスクされ、「生徒会」として一元送信されます。
+                </div>
+
+                <div class="flex items-start space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-400 text-white flex items-center justify-center text-xs font-bold">
+                        投
+                    </div>
+                    <div class="bg-white p-3 rounded-xl rounded-tl-none shadow-sm border border-slate-200 max-w-xl">
+                        <span class="block text-[10px] text-gray-400 mb-1">投稿者（匿名）</span>
+                        <p class="text-sm text-gray-800">先週の頭髪検査の際、複数の担任の先生から「一律で禁止だから」という理由だけで指導を受けました。</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-2 justify-end">
+                    <div class="bg-slate-800 text-white p-3 rounded-xl rounded-tr-none shadow-sm max-w-xl">
+                        <span class="block text-[10px] text-slate-400 mb-1">送信元表示: 生徒会 (ログ記録: 役員A)</span>
+                        <p class="text-sm">貴重なご意見ありがとうございます。生徒会でも現在この議題について話し合っています...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 bg-white rounded-b-xl flex space-x-2">
+                <input type="text" placeholder="「生徒会」としてメッセージを返信..." class="flex-1 border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-slate-800">
+                <button class="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
