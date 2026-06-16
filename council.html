@@ -30,6 +30,33 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
             <div>
                 <h1 class="text-xl font-bold text-gray-800">届いた意見・要望の管理</h1>
+                <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-wrap gap-4 items-center">
+    <div class="flex items-center gap-2">
+        <label for="filter-status" class="text-xs font-bold text-gray-600 whitespace-nowrap">🔄 対応ステータス:</label>
+        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+            <option value="all">すべて表示（フィルターなし）</option>
+            <option value="新規受付">🔵 新規受付</option>
+            <option value="生徒会検討中">🟡 生徒会検討中</option>
+            <option value="先生方検討中">🟣 先生方検討中</option>
+            <option value="回答完了">🟢 回答完了</option>
+            <option value="開示請求">🔴 開示請求</option>
+        </select>
+    </div>
+
+    <div class="flex items-center gap-2">
+        <label for="filter-committee" class="text-xs font-bold text-gray-600 whitespace-nowrap">💼 担当委員会:</label>
+        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+            <option value="all">すべて表示（フィルターなし）</option>
+            <option value="未割り当て">⏳ 未割り当て（担当なし）</option>
+            <option value="総務委員会">💼 総務担当</option>
+            <option value="文化委員会">🎨 文化担当</option>
+            <option value="体育委員会">🏃 体育担当</option>
+            <option value="会計委員会">💰 会計担当</option>
+            <option value="生活委員会">📢 生活担当</option>
+            <option value="ボランティア委員会">🌱 ボランティア担当</option>
+        </select>
+    </div>
+</div>
                 <p class="text-xs text-gray-500 mt-0.5">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
             </div>
             <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
