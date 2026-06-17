@@ -106,13 +106,12 @@
         if (!userEmail) {
             window.location.href = "index.html";
         } else {
-            // アカウント表示要素が存在することを確認してからテキストを代入
             const userDisplay = document.getElementById("user-display");
             if (userDisplay) {
                 userDisplay.innerText = userEmail;
             }
             
-            // ✨ 生徒会役員・先生ならポータルへの切り替えボタンを表示する
+            // 生徒会役員・先生ならポータルへの切り替えボタンを表示する
             const councilBtn = document.getElementById("council-toggle-btn");
             if (councilBtn && (
                 userRole === "council" || 
@@ -174,13 +173,21 @@
                         statusColor = "bg-green-500";
                     }
 
-                    // 未読チャットバッジ（🔴）の判定
+                    // ✨【修正・デザイン強化】未読チャットバッジを目立たせる
+                    // カードの上部に「生徒会から新しい返信があります！」とオレンジで点滅表示させ、枠線もオレンジに強調します
                     const unreadBadge = item.hasUnread 
-                        ? `<span class="absolute top-4 right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse"><span class="w-1.5 h-1.5 bg-white rounded-full"></span>未読あり</span>`
+                        ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 animate-pulse shadow-sm">
+                             <i class="fas fa-comment-dots"></i> 生徒会から返信あり！
+                           </span>`
                         : '';
+                    
+                    // 未読がある場合はカードの境界線を amber-400 (オレンジ) にして目立たせる
+                    const borderClass = item.hasUnread 
+                        ? "border-amber-400 ring-1 ring-amber-400 bg-amber-50/10" 
+                        : "border-gray-100 hover:border-gray-300";
 
                     const card = document.createElement("div");
-                    card.className = "bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-gray-300 transition cursor-pointer";
+                    card.className = `bg-white p-6 rounded-2xl shadow-sm relative transition cursor-pointer ${borderClass}`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
                     
                     card.innerHTML = `
@@ -238,7 +245,7 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    alert("意見を完全に匿名で受け付けました！生徒会からの返答をお待ちください。");
+                    alert("意見を匿名で受け付けました！生徒会からの返答をお待ちください。");
                     document.getElementById("suggestion-form").reset();
                     loadSuggestions();
                 } else {
