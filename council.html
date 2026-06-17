@@ -439,6 +439,17 @@
         }
 
         window.onload = loadCouncilData;
+        // ==========================================
+// 🚪 ログアウト処理
+// ==========================================
+document.getElementById("btn-logout").addEventListener("click", () => {
+    if (confirm("ログアウトしますか？")) {
+        // ブラウザに保存されているログイン情報を完全に消去
+        sessionStorage.clear();
+        // ログイン画面へ強制リダイレクト
+        window.location.href = "index.html";
+    }
+});
     </script>
 </body>
 </html>
