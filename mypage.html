@@ -98,10 +98,25 @@
 
         // セッションからログイン中のメールアドレスを取得（なければログインへ強制送還）
         const userEmail = sessionStorage.getItem("user_email");
+        const userRole = sessionStorage.getItem("user_role"); // ✨ 役職も取得
+        
         if (!userEmail) {
             window.location.href = "index.html";
         } else {
             document.getElementById("user-display").innerText = userEmail;
+            
+            // ✨【追加】生徒会役員・先生ならポータルへの切り替えボタンを表示する
+            // ※ボタンの id が "council-toggle-btn" の場合
+            const councilBtn = document.getElementById("council-toggle-btn");
+            if (councilBtn && (
+                userRole === "council" || 
+                userRole === "chairperson" || 
+                userRole === "vice_president" || 
+                userRole === "teacher"
+            )) {
+                councilBtn.classList.remove("hidden");
+                councilBtn.classList.add("flex"); // Tailwindの表示用クラス
+            }
         }
 
         // ログアウト処理
