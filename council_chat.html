@@ -70,9 +70,16 @@
         const chatForm = document.getElementById("chat-form");
         const chatInput = document.getElementById("chat-input");
 
-        function goBack() {
-            window.location.href = (userRole === "admin") ? "admin.html" : "council.html";
-        }
+// ✨ 修正後（もし一般生徒 'mypage' の可能性もあるなら安全に分岐）
+function goBack() {
+    if (userRole === "admin") {
+        window.location.href = "admin.html";
+    } else if (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "council") {
+        window.location.href = "council.html";
+    } else {
+        window.location.href = "mypage.html";
+    }
+}
 
         // ==========================================
         // 1. チャット履歴＆意見を取得して描画
