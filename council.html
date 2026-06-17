@@ -16,9 +16,9 @@
     <nav class="brand-bg text-white shadow-md">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-    <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
-    <span class="font-bold tracking-wider">デジタル目安箱 生徒会専用管理ポータル</span>
-</div>
+                <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
+                <span class="font-bold tracking-wider">デジタル目安箱 生徒会専用管理ポータル</span>
+            </div>
             <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
                 ログアウト
             </button>
@@ -28,38 +28,39 @@
     <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
         
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <div>
-                <h1 class="text-xl font-bold text-gray-800">届いた意見・要望の管理</h1>
-                <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-wrap gap-4 items-center">
-    <div class="flex items-center gap-2">
-        <label for="filter-status" class="text-xs font-bold text-gray-600 whitespace-nowrap">🔄 対応ステータス:</label>
-        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
-            <option value="all">すべて表示（フィルターなし）</option>
-            <option value="新規受付">🔵 新規受付</option>
-            <option value="生徒会検討中">🟡 生徒会検討中</option>
-            <option value="先生方検討中">🟣 先生方検討中</option>
-            <option value="回答完了">🟢 回答完了</option>
-            <option value="開示請求">🔴 開示請求</option>
-        </select>
-    </div>
+            <div class="flex-1">
+                <h1 class="text-xl font-bold text-gray-800 mb-3">届いた意見・要望の管理</h1>
+                
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center gap-2">
+                        <label for="filter-status" class="text-xs font-bold text-gray-600 whitespace-nowrap">🔄 対応ステータス:</label>
+                        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+                            <option value="all">すべて表示（フィルターなし）</option>
+                            <option value="受付">🔵 受付</option>
+                            <option value="生徒会検討中">🟡 生徒会検討中</option>
+                            <option value="先生方検討中">🟣 先生方検討中</option>
+                            <option value="開示請求">🔴 開示請求</option>
+                            <option value="回答完了">🟢 回答完了</option>
+                        </select>
+                    </div>
 
-    <div class="flex items-center gap-2">
-        <label for="filter-committee" class="text-xs font-bold text-gray-600 whitespace-nowrap">💼 担当委員会:</label>
-        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
-            <option value="all">すべて表示（フィルターなし）</option>
-            <option value="未割り当て">⏳ 未割り当て（担当なし）</option>
-            <option value="総務委員会">💼 総務担当</option>
-            <option value="文化委員会">🎨 文化担当</option>
-            <option value="体育委員会">🏃 体育担当</option>
-            <option value="会計委員会">💰 会計担当</option>
-            <option value="生活委員会">📢 生活担当</option>
-            <option value="ボランティア委員会">🌱 ボランティア担当</option>
-        </select>
-    </div>
-</div>
-                <p class="text-xs text-gray-500 mt-0.5">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
+                    <div class="flex items-center gap-2">
+                        <label for="filter-committee" class="text-xs font-bold text-gray-600 whitespace-nowrap">💼 担当委員会:</label>
+                        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+                            <option value="all">すべて表示（フィルターなし）</option>
+                            <option value="未割り当て">⏳ 未割り当て（担当なし）</option>
+                            <option value="総務委員会">💼 総務担当</option>
+                            <option value="文化専門委員会">🎨 文化担当</option>
+                            <option value="体育専門委員会">🏃 体育担当</option>
+                            <option value="会計専門委員会">💰 会計担当</option>
+                            <option value="生活専門委員会">📢 生活担当</option>
+                            <option value="ボランティア専門委員会">🌱 ボランティア担当</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
             </div>
-            <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
+            <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shrink-0 h-max">
                 <i class="fas fa-sync-alt"></i>
                 <span>一覧を更新</span>
             </button>
@@ -98,11 +99,13 @@
         const userRole = sessionStorage.getItem("user_role");
         const userEmail = sessionStorage.getItem("user_email");
         
-        // 開発・テスト用の簡易ログチェック
+        // 取得した全データを保持するグローバル配列変数
+        let allData = [];
+
         console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
 
-        // ログイン・権限チェック (生徒会 council または 管理者 admin のみアクセス可)
-if (userRole !== "council"  && userRole !== "vice_president" && userRole !== "teacher") {
+        // ログイン・権限チェック
+        if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher") {
             alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
             window.location.href = "index.html";
         }
@@ -110,159 +113,37 @@ if (userRole !== "council"  && userRole !== "vice_president" && userRole !== "te
         const tableBody = document.getElementById("suggestion-table-body");
 
         // ==========================================
-        // 1. 生徒会用の一覧データをGASから取得して描画
+        // 1. 生徒会用の一覧データをGASから取得
         // ==========================================
-async function loadCouncilData() {
-    // sessionStorage から値をとってくる部分
-    const userEmail = sessionStorage.getItem("user_email");
-    const userRole = sessionStorage.getItem("user_role");
+        async function loadCouncilData() {
+            tableBody.innerHTML = `
+                <tr id="table-loading">
+                    <td colspan="5" class="text-center py-12 text-gray-400">
+                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                        <span class="text-xs">目安箱のデータを取得中...</span>
+                    </td>
+                </tr>`;
 
-    // 👑【重要修正】ここも副会長と先生の権限を追加して、データを取得できるようにします！
-    if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher") {
-        console.error("権限がありません");
-        return;
-    }
+            const userEmail = sessionStorage.getItem("user_email");
+            const userRole = sessionStorage.getItem("user_role");
 
-    try {
-        // GASへデータを引っ張りに行く通信
-        const response = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
-        const data = await response.json();
-        
-        // (以下、データをテーブルに組み立てる data.forEach などの処理が続く...)
+            if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher") {
+                console.error("権限がありません");
+                return;
+            }
 
+            try {
+                const response = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
+                const data = await response.json();
+                
                 if (data.status === "error") {
                     alert("データ取得エラー: " + data.message);
                     return;
                 }
 
-                tableBody.innerHTML = ""; // ローディング表示を消去
-
-                if (data.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、届いている意見はありません。</td></tr>`;
-                    return;
-                }
-
-                // スプレッドシートから届いた配列データを1件ずつテーブルの行として組み立てる
-                data.forEach(item => {
-                    const tr = document.createElement("tr");
-                    tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
-
-                    // ステータスに応じたセレクトボックスの色
-                    let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
-                    if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
-                    if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
-                    if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200"; // 👑 追加
-                    if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
-
-                    const VICE_PRESIDENT_EMAIL = "fukukaicho@g.bears.ed.jp"; 
-                    const TEACHER_EMAIL = "teacher-in-charge@g.bears.ed.jp";  
-
-                    const isVPUser = (typeof userEmail !== 'undefined' && userEmail === VICE_PRESIDENT_EMAIL);
-                    const isTeacherUser = (typeof userEmail !== 'undefined' && userEmail === TEACHER_EMAIL);
-                    const isAdminUser = (typeof userRole !== 'undefined' && userRole === "admin");
-
-                    // 👑 🌟【変更】ステータスが「開示請求」のときだけ承認パネルを生成する
-                    let approvalControlsHTML = "";
-                    if (item.status === "開示請求") {
-                        approvalControlsHTML = `
-                            <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs">
-                                <div class="font-bold text-red-700 mb-1 flex items-center gap-1 animate-pulse">
-                                 <div class="flex items-center justify-between">
-    <span class="text-gray-600">副会長:</span>
-    <div>
-        ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-    </div>
-</div>
-<div class="flex items-center justify-between">
-    <span class="text-gray-600">管理者:</span>
-    <div>
-        ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-    </div>
-</div>
-<div class="flex items-center justify-between">
-    <span class="text-gray-600">担 当:</span>
-    <div>
-        ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-    </div>
-</div>
-</div>
-                            </div>
-                        `;
-                    }
-
-                    // 👑 🌟【新機能】担当委員会のドロップダウンHTML
-                    // 🔄 council.html の該当箇所をこれに差し替えてみてください
-let committeeSelectHTML = `
-    <select id="commit-${item.id}" 
-            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" 
-            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
-        <option value="未割り当て" ${item.committee === '未割り当て' ? 'selected' : ''}>❓ 未割り当て</option>
-        <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
-        <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
-        <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
-        <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
-        <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
-        <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
-    </select>
-`;
-
-                    // 👑 🌟【新機能】回答下書きメモのHTML
-                    let memoHTML = `
-    <div class="mt-2.5 max-w-xs md:max-w-md">
-        <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
-        <div class="flex gap-1.5">
-            <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo}</textarea>
-            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)" 
-                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">
-                保存
-            </button>
-        </div>
-    </div>
-`;
-                    tr.innerHTML = `
-                        <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
-                        <td class="p-4 whitespace-nowrap">
-                            <div class="space-y-1.5">
-                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600 block text-center w-max">${item.category}</span>
-                                <div class="text-[10px] font-bold text-gray-400">担当：${committeeSelectHTML}</div>
-                            </div>
-                        </td>
-                        <td class="p-4 max-w-xs md:max-w-md">
-                            <div class="font-bold text-gray-800 truncate">${item.title}</div>
-                            <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
-                            
-                            ${item.hasTeacherResponse ? `
-                                <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg">
-                                    <div class="text-[11px] font-bold text-purple-700 flex items-center gap-1">
-                                        <i class="fas fa-comment-medical"></i> 先生方からの共有回答あり
-                                    </div>
-                                    <div class="text-xs text-purple-900 mt-1 bg-white p-2 rounded border border-purple-100 whitespace-pre-wrap font-medium">
-                                        ${item.teacherResponseText}
-                                    </div>
-                                </div>
-                            ` : ''}
-
-                            ${approvalControlsHTML}
-                            ${memoHTML}
-                        </td>
-                        <td class="p-4 whitespace-nowrap">
-                            <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
-                                <option value="受付" ${item.status === '受付' ? 'selected' : ''}>🔵 受付</option>
-                                <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
-                                <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
-                                <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 開示請求</option>
-                                <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
-                            </select>
-                        </td>
-                        <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
-                                <i class="fas fa-comments text-sm"></i>
-                                ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
+                // 👑【最重要】取得データを外の変数にキープして、フィルター関数を呼び出す
+                allData = data; 
+                filterAndRenderData();
 
             } catch (error) {
                 console.error(error);
@@ -271,7 +152,161 @@ let committeeSelectHTML = `
         }
 
         // ==========================================
-        // 2. ステータスを「その場」で変更してGAS（スプレッドシート）に反映
+        // 🌟【新機能】データを絞り込んでテーブルを描画する関数
+        // ==========================================
+        function filterAndRenderData() {
+            const statusFilter = document.getElementById("filter-status").value;
+            const committeeFilter = document.getElementById("filter-committee").value;
+
+            tableBody.innerHTML = ""; // テーブルを初期化
+
+            // 1. フィルター絞り込み
+            const filteredData = allData.filter(item => {
+                let matchStatus = true;
+                if (statusFilter !== "all") {
+                    // 「受付」と「新規受付」の表記揺れに対応
+                    if (statusFilter === "受付") {
+                        matchStatus = (item.status === "受付" || item.status === "新規受付");
+                    } else {
+                        matchStatus = (item.status === statusFilter);
+                    }
+                }
+
+                let matchCommittee = true;
+                if (committeeFilter !== "all") {
+                    if (committeeFilter === "未割り当て") {
+                        matchCommittee = (!item.committee || item.committee === "" || item.committee === "未割り当て");
+                    } else {
+                        matchCommittee = (item.committee === committeeFilter);
+                    }
+                }
+                return matchStatus && matchCommittee;
+            });
+
+            // 2. 絞り込み結果が0件の場合
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">該当する意見・要望はありません。</td></tr>`;
+                return;
+            }
+
+            // 3. テーブルのHTML組み立て
+            filteredData.forEach(item => {
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
+
+                let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
+                if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
+                if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
+                if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200";
+                if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
+
+                // 承認パネルの組み立て
+                let approvalControlsHTML = "";
+                if (item.status === "開示請求") {
+                    approvalControlsHTML = `
+                        <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs">
+                            <div class="font-bold text-red-700 mb-1 flex items-center gap-1">
+                                <i class="fas fa-shield-alt"></i> 本名開示請求・3者承認状況
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">副会長:</span>
+                                <div>
+                                    ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">管理者:</span>
+                                <div>
+                                    ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">担 当:</span>
+                                <div>
+                                    ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 担当委員会セレクトボックス
+                let committeeSelectHTML = `
+                    <select id="commit-${item.id}" 
+                            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" 
+                            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
+                        <option value="未割り当て" ${(!item.committee || item.committee === '未割り当て') ? 'selected' : ''}>❓ 未割り当て</option>
+                        <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
+                        <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
+                        <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
+                        <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
+                        <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
+                        <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
+                    </select>
+                `;
+
+                // 回答下書きメモ
+                let memoHTML = `
+                    <div class="mt-2.5 max-w-xs md:max-w-md">
+                        <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
+                        <div class="flex gap-1.5">
+                            <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo || ''}</textarea>
+                            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)" 
+                                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">
+                                保存
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                tr.innerHTML = `
+                    <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
+                    <td class="p-4 whitespace-nowrap">
+                        <div class="space-y-1.5">
+                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600 block text-center w-max">${item.category}</span>
+                            <div class="text-[10px] font-bold text-gray-400">担当：${committeeSelectHTML}</div>
+                        </div>
+                    </td>
+                    <td class="p-4 max-w-xs md:max-w-md">
+                        <div class="font-bold text-gray-800 truncate">${item.title}</div>
+                        <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
+                        
+                        ${item.hasTeacherResponse ? `
+                            <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg">
+                                <div class="text-[11px] font-bold text-purple-700 flex items-center gap-1">
+                                    <i class="fas fa-comment-medical"></i> 先生方からの共有回答あり
+                                </div>
+                                <div class="text-xs text-purple-900 mt-1 bg-white p-2 rounded border border-purple-100 whitespace-pre-wrap font-medium">
+                                    ${item.teacherResponseText}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${approvalControlsHTML}
+                        ${memoHTML}
+                    </td>
+                    <td class="p-4 whitespace-nowrap">
+                        <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
+                            <option value="受付" ${item.status === '受付' || item.status === '新規受付' ? 'selected' : ''}>🔵 受付</option>
+                            <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
+                            <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
+                            <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 開示請求</option>
+                            <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
+                        </select>
+                    </td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                            <i class="fas fa-comments text-sm"></i>
+                            ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // 2. ステータスを「その場」で変更して反映
         // ==========================================
         async function updateStatus(suggestionId, selectElement) {
             const newStatus = selectElement.value;
@@ -290,12 +325,18 @@ let committeeSelectHTML = `
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    // 変更成功時にセレクトボックスの色を動的にリフレッシュ
+                    // allData 内のステータスもローカルで書き換えておく（再描画時に引き継ぐため）
+                    const targetIdx = allData.findIndex(item => item.id === suggestionId);
+                    if (targetIdx !== -1) allData[targetIdx].status = newStatus;
+
                     selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
-                    if (newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
-if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
-if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
-if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+                    if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
+                    if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
+                    if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
+                    if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
+                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+                    
+                    filterAndRenderData(); // 最新状態に再描画
                 } else {
                     alert("変更に失敗しました: " + result.message);
                 }
@@ -307,7 +348,65 @@ if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "te
             }
         }
 
-        // 生徒会用チャット画面へ遷移
+        // 開示請求の承認
+        async function approveRequest(suggestionId, roleToApprove) {
+            if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
+            const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "approveDisclosure",
+                        email: senderEmail,
+                        suggestionId: suggestionId,
+                        role: roleToApprove
+                    })
+                });
+                const res = await response.json();
+                if (res.status === "success") {
+                    alert("承認を記録しました！");
+                    loadCouncilData(); // 全再同期
+                } else {
+                    alert("エラー: " + res.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("通信に失敗しました。");
+            }
+        }
+
+        // 委員会とメモの保存
+        async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
+            const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
+            try {
+                // 保存時、ローカル変数 allData にも即時反映
+                const targetIdx = allData.findIndex(item => item.id === suggestionId);
+                if (targetIdx !== -1) {
+                    allData[targetIdx].committee = committee;
+                    allData[targetIdx].replyMemo = replyMemo;
+                }
+
+                const response = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateCommitteeAndMemo",
+                        email: senderEmail,
+                        suggestionId: suggestionId,
+                        committee: committee,
+                        replyMemo: replyMemo
+                    })
+                });
+                const res = await response.json();
+                if (res.status === "success") {
+                    console.log("委員会・メモを保存しました。");
+                } else {
+                    alert("保存エラー: " + res.message);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         function openCouncilChat(id) {
             window.location.href = `council_chat.html?id=${id}`;
         }
@@ -317,62 +416,7 @@ if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "te
             window.location.href = "index.html";
         }
 
-        // ページ起動時に自動でGASからデータをロード
         window.onload = loadCouncilData;
-        // 👑 council.html の下部に追加する通信関数
-// 👑 ボタンが押されたらGASの「approveDisclosure」アクションを呼び出す関数
-async function approveRequest(suggestionId, roleToApprove) {
-    if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
-    
-    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
-    
-    try {
-        const response = await fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "approveDisclosure",
-                email: senderEmail,
-                suggestionId: suggestionId,
-                role: roleToApprove // "vice_president", "admin", "teacher" のいずれか
-            })
-        });
-        const res = await response.json();
-        if (res.status === "success") {
-            alert("承認を記録しました！");
-            loadCouncilData(); // 画面を最新状態にリフレッシュする
-        } else {
-            alert("エラー: " + res.message);
-        }
-    } catch (e) {
-        console.error(e);
-        alert("通信に失敗しました。");
-    }
-}
-        // 👑 委員会とメモをGAS経由でスプレッドシートに保存する関数
-async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
-    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
-    try {
-        const response = await fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "updateCommitteeAndMemo",
-                email: senderEmail,
-                suggestionId: suggestionId,
-                committee: committee,
-                replyMemo: replyMemo
-            })
-        });
-        const res = await response.json();
-        if (res.status === "success") {
-            // 保存成功時は、通知を出さずに背景を一瞬光らせるか、簡易ログのみにすると操作の邪魔になりません
-            console.log("委員会・メモを保存しました。");
-        } else {
-            alert("保存エラー: " + res.message);
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}
     </script>
 </body>
 </html>
