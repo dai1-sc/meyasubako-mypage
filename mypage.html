@@ -20,11 +20,15 @@
     <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
     <span class="font-bold tracking-wider">デジタル目安箱</span>
 </div>
-            <div class="flex items-center space-x-4">
-                <span id="user-display" class="text-sm opacity-90 hidden md:inline">---</span>
-                <button id="btn-logout" class="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition">
-                    ログアウト
-                </button>
+           <div class="flex items-center space-x-2">
+    <button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm items-center gap-1">
+        <i class="fas fa-users-cog"></i> 生徒会用ページへ
+    </button>
+    
+    <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+        ログアウト
+    </button>
+</div>
             </div>
         </div>
     </nav>
