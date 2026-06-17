@@ -119,6 +119,7 @@
                     if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
                     if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
                     if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
+                    if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200";
 
                     // 開示請求承認パネルの組み立て
                     let approvalControlsHTML = "";
@@ -180,7 +181,7 @@
                             ${disclosureHTML}
                         </td>
                         <td class="p-4 whitespace-nowrap">
-                            <select id="status-${item.id}" onchange="updateStatus('${item.id}', this.value)" class="${selectBg} text-xs font-bold px-2 py-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all cursor-pointer">
+                            <select id="status-${item.id}" onchange="updateStatus('${item.id}', this)" class="${selectBg} text-xs font-bold px-2 py-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all cursor-pointer">
                                 <option value="新規受付" ${item.status === '新規受付' ? 'selected' : ''}>🔵 新規受付</option>
                                 <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
                                 <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
@@ -206,7 +207,7 @@
         }
 
         // ==========================================
-        // 2. ステータス変更をGASに反映
+        // 2. ステータス変更をGASに反映（修正版）
         // ==========================================
         async function updateStatus(suggestionId, selectElement) {
             const newStatus = selectElement.value;
@@ -225,24 +226,39 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
-                    if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
+                    // 全種類の色クラスを一括削除
+                    selectElement.classList.remove(
+                        "bg-blue-50", "text-blue-700", "border-blue-200",
+                        "bg-yellow-50", "text-yellow-700", "border-yellow-200",
+                        "bg-purple-50", "text-purple-700", "border-purple-200",
+                        "bg-green-50", "text-green-700", "border-green-200",
+                        "bg-red-50", "text-red-700", "border-red-200"
+                    );
+
+                    // 変更後のステータスに合わせてスタイルを再適用
+                    if (newStatus === "新規受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
                     if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
                     if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
                     if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
                     if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
+                    
+                    // 「先生方検討中」や「開示請求」への変更時は、関連シートの状況を同期するため再読み込み
+                    if (newStatus === "先生方検討中" || newStatus === "開示請求") {
+                        loadAdminData();
+                    }
                 } else {
                     alert("変更に失敗しました: " + result.message);
+                    loadAdminData(); // 失敗した場合は元の状態に戻すため再読込
                 }
             } catch (error) {
                 console.error(error);
                 alert("通信エラーが発生しました。");
+                loadAdminData();
             } finally {
                 selectElement.disabled = false;
             }
         }
 
-        // ✨【修正箇所】呼び出しボタンに合わせて関数名を openChatModal に変更
         function openChatModal(id) {
             window.location.href = `council_chat.html?id=${id}`;
         }
