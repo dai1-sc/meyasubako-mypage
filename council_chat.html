@@ -62,7 +62,7 @@
         const userRole = sessionStorage.getItem("user_role");
 
         if (!userEmail || !suggestionId || 
-    (userRole !== "chairperson" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "admin")) {
+    (userRole !== "chairperson" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "admin" && userRole !== "council")) {
     window.location.href = "index.html";
 }
 
@@ -70,16 +70,15 @@
         const chatForm = document.getElementById("chat-form");
         const chatInput = document.getElementById("chat-input");
 
-// ✨ 修正後（もし一般生徒 'mypage' の可能性もあるなら安全に分岐）
-function goBack() {
-    if (userRole === "admin") {
-        window.location.href = "admin.html";
-    } else if (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "council") {
-        window.location.href = "council.html";
-    } else {
-        window.location.href = "mypage.html";
-    }
-}
+        function goBack() {
+            if (userRole === "admin") {
+                window.location.href = "admin.html";
+            } else if (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "council") {
+                window.location.href = "council.html";
+            } else {
+                window.location.href = "mypage.html";
+            }
+        }
 
         // ==========================================
         // 1. チャット履歴＆意見を取得して描画
@@ -102,10 +101,11 @@ function goBack() {
                 
                 const statusBadge = document.getElementById("sum-status");
                 statusBadge.innerText = data.suggestion.status;
-               if (data.suggestion.status === "受付") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-blue-500 ml-auto";
-if (data.suggestion.status === "生徒会検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-yellow-500 ml-auto";
-if (data.suggestion.status === "先生方検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-purple-500 ml-auto";
-if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-green-500 ml-auto";
+                if (data.suggestion.status === "受付") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-blue-500 ml-auto";
+                if (data.suggestion.status === "生徒会検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-yellow-500 ml-auto";
+                if (data.suggestion.status === "先生方検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-purple-500 ml-auto";
+                if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-green-500 ml-auto";
+                
                 document.getElementById("chat-loading").classList.add("hidden");
                 
                 const existingMsgs = chatContainer.querySelectorAll('.msg-bubble');
@@ -123,29 +123,52 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                     if(noInfo) noInfo.remove();
 
                     data.chats.forEach(chat => {
-                        const isMe = (chat.sender === "council" || chat.sender === "admin"); 
+                        // ✨【修正】自分（閲覧中の役員）が送った発言かどうかを厳密に判定
+                        // chat.sender が "student" 以外（＝役員・先生・管理者）であり、かつ自分のロールまたは一般役員ロールと一致するかどうか
+                        const isMe = (chat.sender === "admin" && userRole === "admin") || 
+                                     (chat.sender === "teacher" && userRole === "teacher") ||
+                                     (chat.sender === "chairperson" && userRole === "chairperson") ||
+                                     (chat.sender === "vice_president" && userRole === "vice_president") ||
+                                     (chat.sender === "council" && userRole === "council");
+                        
                         const wrapper = document.createElement("div");
+                        // LINE風の左右配置：自分が送ったら ml-auto(右寄せ) と items-end、相手なら items-start(左寄せ)
                         wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
 
+                        // ✨【修正】発言者の役職（role/sender）に応じて名前のテキストを分岐
                         let nameText = "生徒（匿名）";
                         let bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none"; 
 
                         if (isMe) {
+                            // 自分が送信したメッセージの表示（右側）
                             if (chat.sender === "admin") {
                                 nameText = "あなた（システム管理者 👑）";
                                 bubbleClass = "bg-red-900 text-white rounded-tr-none shadow-md font-medium border border-red-700";
+                            } else if (chat.sender === "teacher") {
+                                nameText = "あなた（先生）";
+                                bubbleClass = "bg-purple-900 text-white rounded-tr-none";
                             } else {
                                 nameText = "あなた（生徒会役員）";
                                 bubbleClass = "bg-indigo-900 text-white rounded-tr-none";
                             }
                         } else {
+                            // 相手（生徒、あるいは他の役職者）が送信したメッセージの表示（左側）
                             if (chat.sender === "admin") {
                                 nameText = "システム管理者 👑";
                                 bubbleClass = "bg-red-50 text-red-950 rounded-tl-none border border-red-200 font-medium";
+                            } else if (chat.sender === "teacher") {
+                                nameText = "先生";
+                                bubbleClass = "bg-purple-50 text-purple-950 rounded-tl-none border border-purple-200";
+                            } else if (chat.sender === "council" || chat.sender === "chairperson" || chat.sender === "vice_president") {
+                                nameText = "生徒会役員";
+                                bubbleClass = "bg-indigo-50 text-indigo-950 rounded-tl-none border border-indigo-200";
+                            } else {
+                                nameText = "生徒（匿名）";
+                                bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
                             }
                         }
                         
-                        // 👑 admin専用：削除・編集ボタンのHTMLを動的に仕込む
+                        // 👑 admin専用：削除・編集ボタンのHTML
                         let adminButtonsHTML = "";
                         if (userRole === "admin" && chat.id) {
                             adminButtonsHTML = `
@@ -165,14 +188,13 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                             <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
                                 <p class="whitespace-pre-wrap">${chat.message}</p>
                             </div>
-                            <div class="flex items-center space-x-1 justify-between w-full">
+                            <div class="flex items-center space-x-1 justify-between w-full ${isMe ? 'justify-end' : ''}">
                                 <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
                             </div>
                         `;
                         
                         wrapper.innerHTML = nameLabel + bubble;
                         if(adminButtonsHTML) {
-                            // admin用ボタンを追加
                             const btnContainer = document.createElement("div");
                             btnContainer.innerHTML = adminButtonsHTML;
                             wrapper.appendChild(btnContainer);
@@ -207,7 +229,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                         action: "sendChatMessage",
                         suggestionId: suggestionId,
                         email: userEmail,
-                        sender: userRole,
+                        sender: userRole, // ✨ 現在ログインしている正しい役職（chairperson や vice_president 等）を送信
                         message: messageText
                     })
                 });
@@ -228,7 +250,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
             }
         });
 
-        // 🌟 Shift+Enterで改行、Enterで送信制御
+        // Shift+Enterで改行、Enterで送信制御
         chatInput.addEventListener("keydown", function(e) {
             if (e.isComposing || e.keyCode === 229) return;
             if (e.key === "Enter") {
@@ -245,7 +267,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
             const oldMessage = decodeURIComponent(oldMessageEncoded);
             const newMessage = prompt("メッセージを編集します。新しい内容を入力してください：", oldMessage);
             
-            if (newMessage === null) return; // キャンセル
+            if (newMessage === null) return;
             if (newMessage.trim() === "") {
                 alert("空のメッセージには編集できません。消去したい場合は「削除」を使用してください。");
                 return;
@@ -263,7 +285,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    loadCouncilChatLog(); // 画面リフレッシュ
+                    loadCouncilChatLog();
                 } else {
                     alert("編集に失敗しました: " + result.message);
                 }
@@ -289,7 +311,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    loadCouncilChatLog(); // 画面リフレッシュ
+                    loadCouncilChatLog();
                 } else {
                     alert("削除に失敗しました: " + result.message);
                 }
