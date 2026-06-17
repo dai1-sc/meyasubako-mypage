@@ -123,6 +123,7 @@ async function handleCredentialResponse(response) {
         console.error(error);
         showAlert("エラーが発生しました。通信環境を確認してください。", "error");
     }
+    console.log("GASから返ってきた役職:", result.role);
 }
     </script>
 </body>
