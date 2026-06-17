@@ -104,8 +104,8 @@
 
         console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
 
-        // ログイン・権限チェック
-        if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher") {
+        // 👑 🌟【修正】ログインチェックに新役職 chairperson を追加
+        if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson" && userRole !== "admin") {
             alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
             window.location.href = "index.html";
         }
@@ -127,7 +127,8 @@
             const userEmail = sessionStorage.getItem("user_email");
             const userRole = sessionStorage.getItem("user_role");
 
-            if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher") {
+            // 👑 🌟【修正】データ要求元の権限チェックにも chairperson と admin を追加
+            if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson") {
                 console.error("権限がありません");
                 return;
             }
@@ -164,7 +165,6 @@
             const filteredData = allData.filter(item => {
                 let matchStatus = true;
                 if (statusFilter !== "all") {
-                    // 「受付」と「新規受付」の表記揺れに対応
                     if (statusFilter === "受付") {
                         matchStatus = (item.status === "受付" || item.status === "新規受付");
                     } else {
@@ -259,6 +259,27 @@
                     </div>
                 `;
 
+                // 👑 🌟【新機能】チャット権限の判定（委員長、副会長、先生、管理者はOK、一般生徒会メンバーはNG）
+                const canChat = (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "admin");
+                
+                let chatButtonHTML = "";
+                if (canChat) {
+                    // チャット可能な役職：通常通り押せるボタン
+                    chatButtonHTML = `
+                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                            <i class="fas fa-comments text-sm"></i>
+                            ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
+                        </button>
+                    `;
+                } else {
+                    // チャット不可の役職（council等）：グレーアウトして鍵マークになるボタン
+                    chatButtonHTML = `
+                        <button disabled class="inline-flex items-center justify-center w-9 h-9 bg-gray-100 text-gray-300 rounded-xl cursor-not-allowed" title="チャット権限がありません（委員長・役員以上のみ）">
+                            <i class="fas fa-lock text-sm"></i>
+                        </button>
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
                     <td class="p-4 whitespace-nowrap">
@@ -295,10 +316,7 @@
                         </select>
                     </td>
                     <td class="p-4 text-center whitespace-nowrap">
-                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
-                            <i class="fas fa-comments text-sm"></i>
-                            ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
-                        </button>
+                        ${chatButtonHTML}
                     </td>
                 `;
                 tableBody.appendChild(tr);
@@ -325,7 +343,6 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    // allData 内のステータスもローカルで書き換えておく（再描画時に引き継ぐため）
                     const targetIdx = allData.findIndex(item => item.id === suggestionId);
                     if (targetIdx !== -1) allData[targetIdx].status = newStatus;
 
@@ -379,7 +396,6 @@
         async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
             const senderEmail = typeof userEmail !== 'undefined' ? userEmail : "";
             try {
-                // 保存時、ローカル変数 allData にも即時反映
                 const targetIdx = allData.findIndex(item => item.id === suggestionId);
                 if (targetIdx !== -1) {
                     allData[targetIdx].committee = committee;
