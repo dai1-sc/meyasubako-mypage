@@ -58,7 +58,7 @@
     <footer class="mt-8 text-xs text-gray-400">&copy; 2026 Digital Meyasubako System</footer>
 
     <script>
-        // ⚠️【要書き換え】先ほどデプロイしたGASのWebアプリURLを入力
+        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
         const alertBox = document.getElementById("alert-box");
@@ -97,24 +97,23 @@
                 });
                 
                 const result = await res.json();
-                console.log("GASから返ってきた役職:", result.role); // 安全なtryブロック内に移動
+                console.log("GASから返ってきた役職:", result.role);
 
                 if (result.status === "success") {
                     showAlert("認証成功！画面を切り替えます...", "info");
                     
-                    // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
+                    // ブラウザのメモリに一時的にユーザー情報を保存
                     sessionStorage.setItem("user_email", result.email || email);
                     sessionStorage.setItem("user_role", result.role);
 
-                    // ✨ 3. 役割に応じてリダイレクト（ルールを調整）
-                    // ✨ 役割に応じてリダイレクト（ルールを調整）
-setTimeout(() => {
-    if (result.role === "admin") {
-        window.location.href = "admin.html";      // 👑 管理者は直接、最高権限画面へ
-    } else {
-        window.location.href = "mypage.html";     // 👤 役員（委員長・副会長・先生・一般役員）＆ 一般生徒は全員マイページへ
-    }
-}, 800);
+                    // ✨ 3. 役割に応じてリダイレクト（管理者はadminへ、他は全員マイページへ！）
+                    setTimeout(() => {
+                        if (result.role === "admin") {
+                            window.location.href = "admin.html";
+                        } else {
+                            window.location.href = "mypage.html";
+                        }
+                    }, 800);
                 } else {
                     showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
                 }
