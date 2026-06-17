@@ -61,9 +61,10 @@
         const userEmail = sessionStorage.getItem("user_email");
         const userRole = sessionStorage.getItem("user_role");
 
-        if (!userEmail || (userRole !== "council" && userRole !== "admin") || !suggestionId) {
-            window.location.href = "index.html";
-        }
+        if (!userEmail || !suggestionId || 
+    (userRole !== "chairperson" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "admin")) {
+    window.location.href = "index.html";
+}
 
         const chatContainer = document.getElementById("chat-container");
         const chatForm = document.getElementById("chat-form");
