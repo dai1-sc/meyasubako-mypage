@@ -21,8 +21,8 @@
     <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full text-center">
         
         <div class="flex justify-center mb-6">
-    <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-30 h-30 object-contain">
-</div>
+            <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-30 h-30 object-contain">
+        </div>
 
         <h1 class="text-2xl font-bold text-gray-800 tracking-wide mb-2">デジタル目安箱</h1>
         <p class="text-sm text-gray-500 mb-8">学校アカウント（Google）でログインしてください</p>
@@ -82,49 +82,48 @@
         }
 
         // Googleログインが成功した時に自動で呼ばれるコールバック関数
-async function handleCredentialResponse(response) {
-    showAlert("学校アカウントを確認中...", "info");
-    
-    try {
-        // 1. Googleから届いたデータを解析してメールアドレスを取得
-        const responsePayload = decodeJwt(response.credential);
-        const email = responsePayload.email;
-
-        // 2. GASのAPIにメールアドレスを送信してロール（権限）を問い合わせる
-        const res = await fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify({ email: email })
-        });
-        
-        const result = await res.json();
-
-        if (result.status === "success") {
-            showAlert("認証成功！画面を切り替えます...", "info");
+        async function handleCredentialResponse(response) {
+            showAlert("学校アカウントを確認中...", "info");
             
-            // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
-            sessionStorage.setItem("user_email", result.email || email);
-            sessionStorage.setItem("user_role", result.role);
+            try {
+                // 1. Googleから届いたデータを解析してメールアドレスを取得
+                const responsePayload = decodeJwt(response.credential);
+                const email = responsePayload.email;
 
-            // 3. 役割に応じてリダイレクト
-            
-            setTimeout(() => {
-                if (result.role === "admin") {
-                    window.location.href = "admin.html";   // 👑 管理者は最高権限画面へ
-                } else if (result.role === "council" || result.role === "vice_president" || result.role === "teacher" || result.role ==="chairperson") {
-                    window.location.href = "council.html"; // 役職メンバーは生徒会画面へ
+                // 2. GASのAPIにメールアドレスを送信してロール（権限）を問い合わせる
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const result = await res.json();
+                console.log("GASから返ってきた役職:", result.role); // 安全なtryブロック内に移動
+
+                if (result.status === "success") {
+                    showAlert("認証成功！画面を切り替えます...", "info");
+                    
+                    // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
+                    sessionStorage.setItem("user_email", result.email || email);
+                    sessionStorage.setItem("user_role", result.role);
+
+                    // ✨ 3. 役割に応じてリダイレクト（ルールを調整）
+                    setTimeout(() => {
+                        if (result.role === "admin") {
+                            window.location.href = "admin.html";      // 👑 管理者は最高権限画面へ
+                        } else if (result.role === "vice_president" || result.role === "teacher" || result.role === "chairperson") {
+                            window.location.href = "council.html";    // 👑 特権メンバーは直接生徒会画面へ
+                        } else {
+                            window.location.href = "mypage.html";     // 👤 一般生徒 ＆ 一般生徒会(council)はマイページへ
+                        }
+                    }, 800);
                 } else {
-                    window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
+                    showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
                 }
-            }, 800);
-        } else {
-            showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
+            } catch (error) {
+                console.error(error);
+                showAlert("エラーが発生しました。通信環境を確認してください。", "error");
+            }
         }
-    } catch (error) {
-        console.error(error);
-        showAlert("エラーが発生しました。通信環境を確認してください。", "error");
-    }
-    console.log("GASから返ってきた役職:", result.role);
-}
     </script>
 </body>
 </html>
