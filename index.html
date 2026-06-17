@@ -110,7 +110,7 @@ async function handleCredentialResponse(response) {
             setTimeout(() => {
                 if (result.role === "admin") {
                     window.location.href = "admin.html";   // 👑 管理者は最高権限画面へ
-                } else if (result.role === "council" || result.role === "vice_president" || result.role === "teacher") {
+                } else if (result.role === "council" || result.role === "vice_president" || result.role === "teacher" || result.role ==="chairperson") {
                     window.location.href = "council.html"; // 役職メンバーは生徒会画面へ
                 } else {
                     window.location.href = "mypage.html";   // それ以外の一般生徒はマイページへ
