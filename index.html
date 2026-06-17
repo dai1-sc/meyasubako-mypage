@@ -107,15 +107,14 @@
                     sessionStorage.setItem("user_role", result.role);
 
                     // ✨ 3. 役割に応じてリダイレクト（ルールを調整）
-                    setTimeout(() => {
-                        if (result.role === "admin") {
-                            window.location.href = "admin.html";      // 👑 管理者は最高権限画面へ
-                        } else if (result.role === "vice_president" || result.role === "teacher" || result.role === "chairperson") {
-                            window.location.href = "council.html";    // 👑 特権メンバーは直接生徒会画面へ
-                        } else {
-                            window.location.href = "mypage.html";     // 👤 一般生徒 ＆ 一般生徒会(council)はマイページへ
-                        }
-                    }, 800);
+                    // ✨ 役割に応じてリダイレクト（ルールを調整）
+setTimeout(() => {
+    if (result.role === "admin") {
+        window.location.href = "admin.html";      // 👑 管理者は直接、最高権限画面へ
+    } else {
+        window.location.href = "mypage.html";     // 👤 役員（委員長・副会長・先生・一般役員）＆ 一般生徒は全員マイページへ
+    }
+}, 800);
                 } else {
                     showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
                 }
