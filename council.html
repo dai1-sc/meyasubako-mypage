@@ -19,9 +19,15 @@
                 <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
                 <span class="font-bold tracking-wider">デジタル目安箱 生徒会専用管理ポータル</span>
             </div>
-            <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
-                ログアウト
-            </button>
+           <div class="flex items-center space-x-2">
+    <button onclick="window.location.href='mypage.html'" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1">
+        <i class="fas fa-pen"></i> マイページへ
+    </button>
+    
+    <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+        ログアウト
+    </button>
+</div>
         </div>
     </nav>
 
