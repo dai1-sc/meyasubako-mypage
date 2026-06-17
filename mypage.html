@@ -17,27 +17,31 @@
     <nav class="brand-bg text-white shadow-md">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-    <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
-    <span class="font-bold tracking-wider">デジタル目安箱</span>
-</div>
-           <div class="flex items-center space-x-2">
-    <button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm items-center gap-1">
-        <i class="fas fa-users-cog"></i> 生徒会用ページへ
-    </button>
-    
-    <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
-        ログアウト
-    </button>
-</div>
+                <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
+                <span class="font-bold tracking-wider">デジタル目安箱</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm items-center gap-1">
+                    <i class="fas fa-users-cog"></i> 生徒会用ページへ
+                </button>
+                
+                <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+                    ログアウト
+                </button>
             </div>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 py-8">
         
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800">こんにちは！</h1>
-            <p class="text-sm text-gray-500 mt-1">ここでは、あなたの意見の進捗確認や、生徒会との相談ができます。</p>
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">こんにちは！</h1>
+                <p class="text-sm text-gray-500 mt-1">ここでは、あなたの意見の進捗確認や、生徒会との相談ができます。</p>
+            </div>
+            <div class="text-xs text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg self-start md:self-auto">
+                <i class="fas fa-user-circle mr-1"></i><span id="user-display">---</span>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -86,8 +90,7 @@
                     <p class="text-sm">まだ投稿された意見はありません。</p>
                 </div>
 
-                <div id="suggestion-list" class="space-y-4">
-                    </div>
+                <div id="suggestion-list" class="space-y-4"></div>
             </div>
         </div>
     </main>
@@ -98,15 +101,18 @@
 
         // セッションからログイン中のメールアドレスを取得（なければログインへ強制送還）
         const userEmail = sessionStorage.getItem("user_email");
-        const userRole = sessionStorage.getItem("user_role"); // ✨ 役職も取得
+        const userRole = sessionStorage.getItem("user_role");
         
         if (!userEmail) {
             window.location.href = "index.html";
         } else {
-            document.getElementById("user-display").innerText = userEmail;
+            // アカウント表示要素が存在することを確認してからテキストを代入
+            const userDisplay = document.getElementById("user-display");
+            if (userDisplay) {
+                userDisplay.innerText = userEmail;
+            }
             
-            // ✨【追加】生徒会役員・先生ならポータルへの切り替えボタンを表示する
-            // ※ボタンの id が "council-toggle-btn" の場合
+            // ✨ 生徒会役員・先生ならポータルへの切り替えボタンを表示する
             const councilBtn = document.getElementById("council-toggle-btn");
             if (councilBtn && (
                 userRole === "council" || 
@@ -115,15 +121,18 @@
                 userRole === "teacher"
             )) {
                 councilBtn.classList.remove("hidden");
-                councilBtn.classList.add("flex"); // Tailwindの表示用クラス
+                councilBtn.classList.add("flex");
             }
         }
 
         // ログアウト処理
-        document.getElementById("btn-logout").addEventListener("click", () => {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        });
+        const logoutBtn = document.getElementById("btn-logout");
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                sessionStorage.clear();
+                window.location.href = "index.html";
+            });
+        }
 
         // ==========================================
         // 1. 過去の投稿データをGASから取得して描画する
@@ -145,29 +154,25 @@
                 document.getElementById("list-empty").classList.add("hidden");
 
                 data.forEach(item => {
-    // ステータスごとの色分けと進捗バーの進み具合
-    let statusText = "受付";
-    let stepClass = "w-1/3";
-    let statusColor = "bg-blue-500";
-    
-    // 🌟【変更】「生徒会検討中」の場合
-    if (item.status === "生徒会検討中") {
-        statusText = "生徒会で検討中";
-        stepClass = "w-2/3";          // バーの長さは検討中ステップ（3分の2）
-        statusColor = "bg-yellow-500"; // 生徒会はお馴染みのイエロー
-    } 
-    // 🌟【追加】「先生方検討中」の場合
-    else if (item.status === "先生方検討中") {
-        statusText = "先生方で検討中";
-        stepClass = "w-2/3";          // バーの長さは同じく3分の2でストップ
-        statusColor = "bg-purple-500"; // 先生方は威厳のあるパープルに！
-    } 
-    // 回答完了の場合
-    else if (item.status === "回答完了") {
-        statusText = "回答・対応完了";
-        stepClass = "w-full";
-        statusColor = "bg-green-500";
-    }
+                    let statusText = "受付";
+                    let stepClass = "w-1/3";
+                    let statusColor = "bg-blue-500";
+                    
+                    if (item.status === "生徒会検討中") {
+                        statusText = "生徒会で検討中";
+                        stepClass = "w-2/3";
+                        statusColor = "bg-yellow-500";
+                    } 
+                    else if (item.status === "先生方検討中") {
+                        statusText = "先生方で検討中";
+                        stepClass = "w-2/3";
+                        statusColor = "bg-purple-500";
+                    } 
+                    else if (item.status === "回答完了") {
+                        statusText = "回答・対応完了";
+                        stepClass = "w-full";
+                        statusColor = "bg-green-500";
+                    }
 
                     // 未読チャットバッジ（🔴）の判定
                     const unreadBadge = item.hasUnread 
@@ -176,7 +181,6 @@
 
                     const card = document.createElement("div");
                     card.className = "bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative hover:border-gray-300 transition cursor-pointer";
-                    // クリックしたら個別チャット画面（次回作成）に飛ぶようにする
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
                     
                     card.innerHTML = `
@@ -190,9 +194,9 @@
                         
                         <div class="space-y-1">
                             <div class="flex justify-between text-[11px] font-bold text-gray-400">
-                                <span class="${item.status==='受付'?'brand-text':''}">① 受付完了</span>
-                                <span class="${item.status==='検討中'?'brand-text':''}">② 生徒会・先生方で検討中</span>
-                                <span class="${item.status==='回答完了'?'brand-text':''}">③ 回答公開済み</span>
+                                <span class="${item.status==='新規受付' || item.status==='受付' ? 'brand-text' : ''}">① 受付完了</span>
+                                <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'brand-text' : ''}">② 検討中</span>
+                                <span class="${item.status==='回答完了' ? 'brand-text' : ''}">③ 回答公開済み</span>
                             </div>
                             <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                                 <div class="${statusColor} h-full ${stepClass} transition-all duration-500"></div>
@@ -236,7 +240,7 @@
                 if (result.status === "success") {
                     alert("意見を完全に匿名で受け付けました！生徒会からの返答をお待ちください。");
                     document.getElementById("suggestion-form").reset();
-                    loadSuggestions(); // リストを再更新
+                    loadSuggestions();
                 } else {
                     alert("送信エラー: " + result.message);
                 }
@@ -249,7 +253,7 @@
             }
         });
 
-        // ページ読み込み時に過去の投書一覧を取得
+        // 起動時に自動ロード
         window.onload = loadSuggestions;
     </script>
 </body>
