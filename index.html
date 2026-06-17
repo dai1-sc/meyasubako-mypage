@@ -82,7 +82,6 @@
         }
 
         // Googleログインが成功した時に自動で呼ばれるコールバック関数
-        // Googleログインが成功した時に自動で呼ばれるコールバック関数
 async function handleCredentialResponse(response) {
     showAlert("学校アカウントを確認中...", "info");
     
@@ -103,10 +102,11 @@ async function handleCredentialResponse(response) {
             showAlert("認証成功！画面を切り替えます...", "info");
             
             // ブラウザのメモリに一時的にユーザー情報を保存（次のページで使うため）
-            sessionStorage.setItem("user_email", email);
+            sessionStorage.setItem("user_email", result.email || email);
             sessionStorage.setItem("user_role", result.role);
 
             // 3. 役割に応じてリダイレクト
+            
             setTimeout(() => {
                 if (result.role === "admin") {
                     window.location.href = "admin.html";   // 👑 管理者は最高権限画面へ
