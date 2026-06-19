@@ -739,6 +739,30 @@ data.list.forEach(item => {
                 alert("通信に失敗しました。");
             }
         }
+        async function toggleSystem(status) {
+            const statusText = status === 'active' ? '【通常稼働（受付中）】' : '【一時受付停止（メンテナンス）】';
+            if (!confirm(`システムを ${statusText} に切り替えますか？`)) return;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "toggleSystemStatus",
+                        email: userEmail,
+                        newStatus: status
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert(`システムを正常に ${statusText} へ切り替えました。`);
+                } else {
+                    alert("設定変更エラー: " + result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("通信に失敗しました。");
+            }
+        }
     </script>
 </body>
 </html>
