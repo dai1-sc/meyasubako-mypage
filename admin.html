@@ -36,44 +36,124 @@
                 </h1>
                 <p class="text-xs text-gray-500 mt-0.5">全ての生徒からの投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。</p>
             </div>
-            <button onclick="loadAdminData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
+            <button onclick="loadAllAdminData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
                 <i class="fas fa-sync-alt"></i>
                 <span>全データを同期更新</span>
             </button>
         </div>
 
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-red-100 flex flex-col md:flex-row gap-6">
-            <div class="md:w-1/3 space-y-3">
-                <h2 class="text-sm font-bold text-red-700 flex items-center gap-1.5">
-                    <i class="fas fa-ban"></i> 新規投稿ブロック登録
-                </h2>
-                <p class="text-xs text-gray-500">悪質な嫌がらせやスパムを行う生徒のアドレスを登録すると、該当アカウントからの新規の目安箱投稿を完全にブロックします。</p>
-                <div class="flex flex-col gap-2">
-                    <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="w-full text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200">
-                    <button onclick="addBlocklist()" class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
-                        指定アドレスをブロック
-                    </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">総投書数</p>
+                    <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                    <i class="fas fa-inbox text-lg"></i>
                 </div>
             </div>
-            <div class="flex-1 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 flex flex-col">
+            
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">未対応（受付）</p>
+                    <h3 id="stat-pending" class="text-2xl font-bold text-amber-600 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                    <i class="fas fa-envelope text-lg"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">現在検討中</p>
+                    <h3 id="stat-progress" class="text-2xl font-bold text-purple-600 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                    <i class="fas fa-spinner text-lg"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">回答完了率</p>
+                    <h3 id="stat-completion" class="text-2xl font-bold text-green-600 mt-1">-- <span class="text-xs font-normal text-gray-400">%</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">
+                    <i class="fas fa-check-circle text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-5">
+                <div class="space-y-3">
+                    <h2 class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                        <i class="fas fa-user-cog text-blue-600"></i> ユーザーアカウント権限設定
+                    </h2>
+                    <p class="text-xs text-gray-500">学内アカウントの権限ロール（一般生徒・生徒会・先生・管理者など）を画面上で変更・上書き登録します。</p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="email" id="role-email-input" placeholder="student@school.ed.jp" class="flex-1 text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200">
+                        <select id="role-select" class="text-xs border border-gray-200 p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 font-bold">
+                            <option value="student">一般生徒 (student)</option>
+                            <option value="council">生徒会役員 (council)</option>
+                            <option value="teacher">担当の先生 (teacher)</option>
+                            <option value="vice_president">副会長 (vice_president)</option>
+                            <option value="admin">最高管理者 (admin)</option>
+                        </select>
+                    </div>
+                    <button onclick="updateUserRole()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
+                        アカウントの権限を適用・変更する
+                    </button>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <div class="space-y-3">
+                    <h2 class="text-sm font-bold text-red-700 flex items-center gap-1.5">
+                        <i class="fas fa-ban"></i> 新規投稿ブロック登録
+                    </h2>
+                    <p class="text-xs text-gray-500">悪質な嫌がらせやスパムを行う生徒のアドレスを登録すると、該当アカウントからの新規の目安箱投稿を完全にブロックします。</p>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="flex-1 text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200">
+                        <button onclick="addBlocklist()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm shrink-0">
+                            ブロック登録
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-red-50 flex flex-col">
                 <h2 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5">
                     <i class="fas fa-list-ul"></i> 現在のブロックリスト一覧
                 </h2>
-                <div class="overflow-y-auto max-h-36 border border-gray-50 rounded-lg flex-1">
+                <div class="overflow-y-auto max-h-56 border border-gray-50 rounded-lg flex-1 bg-slate-50/50">
                     <table class="w-full text-left text-xs text-gray-600">
-                        <thead class="bg-slate-50 text-gray-500 sticky top-0">
+                        <thead class="bg-slate-100 text-gray-500 sticky top-0">
                             <tr>
                                 <th class="p-2.5">ブロック対象メールアドレス</th>
-                                <th class="p-2.5 w-32">登録日時</th>
-                                <th class="p-2.5 w-16 text-center">解除</th>
+                                <th class="p-2.5 w-28">登録日時</th>
+                                <th class="p-2.5 w-14 text-center">解除</th>
                             </tr>
                         </thead>
-                        <tbody id="blocklist-table-body" class="divide-y divide-gray-50">
+                        <tbody id="blocklist-table-body" class="divide-y divide-gray-100 bg-white">
                             <tr><td colspan="3" class="text-center py-6 text-gray-400">読み込み中...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+                    <i class="fas fa-archive text-amber-500"></i> 完了済みデータのアーカイブ整理
+                </h2>
+                <p class="text-xs text-gray-400 mt-1">「回答完了」ステータスになっている古い投書データを、一覧画面から非表示（アーカイブ状態）にしてデータベースを軽量化します。</p>
+            </div>
+            <button onclick="archiveCompletedSuggestions()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5 shrink-0 self-start md:self-auto">
+                <i class="fas fa-box-open"></i> 回答完了データをアーカイブする
+            </button>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
@@ -124,7 +204,7 @@
         }
 
         // ==========================================
-        // 1. 管理者として全データをGASから取得して描画
+        // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
         // ==========================================
         async function loadAdminData() {
             tableBody.innerHTML = `
@@ -146,12 +226,28 @@
 
                 tableBody.innerHTML = ""; // ローディング消去
 
-                if (data.length === 0) {
+                // 📊 簡易ダッシュボード用の集計カウンター
+                let totalCount = data.length;
+                let pendingCount = 0;
+                let progressCount = 0;
+                let completedCount = 0;
+
+                if (totalCount === 0) {
                     tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、目安箱に届いている意見はありません。</td></tr>`;
+                    updateDashboard(0, 0, 0, 0);
                     return;
                 }
 
                 data.forEach(item => {
+                    // 各ステータスのカウント処理
+                    if (item.status === "新規受付") {
+                        pendingCount++;
+                    } else if (item.status === "生徒会検討中" || item.status === "先生方検討中" || item.status === "開示請求") {
+                        progressCount++;
+                    } else if (item.status === "回答完了") {
+                        completedCount++;
+                    }
+
                     const tr = document.createElement("tr");
                     tr.className = "hover:bg-purple-50/30 transition-colors border-b border-gray-100";
 
@@ -234,14 +330,89 @@
                     `;
                     tableBody.appendChild(tr);
                 });
+
+                // ダッシュボードウィジェットへ数値を流し込み
+                const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+                updateDashboard(totalCount, pendingCount, progressCount, completionRate);
+
             } catch (error) {
                 console.error(error);
                 tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの同期に失敗しました。再読み込みしてください。</td></tr>`;
             }
         }
 
+        // ダッシュボード数値を画面表示に上書きする補助関数
+        function updateDashboard(total, pending, progress, rate) {
+            document.getElementById("stat-total").innerHTML = `${total} <span class="text-xs font-normal text-gray-400">件</span>`;
+            document.getElementById("stat-pending").innerHTML = `${pending} <span class="text-xs font-normal text-gray-400">件</span>`;
+            document.getElementById("stat-progress").innerHTML = `${progress} <span class="text-xs font-normal text-gray-400">件</span>`;
+            document.getElementById("stat-completion").innerHTML = `${rate} <span class="text-xs font-normal text-gray-400">%</span>`;
+        }
+
         // ==========================================
-        // 2. ブロックリストの取得と描画（新機能）
+        // 2. [新機能] ユーザーアカウントの権限変更変更をGASへリクエスト
+        // ==========================================
+        async function updateUserRole() {
+            const emailInput = document.getElementById("role-email-input");
+            const roleSelect = document.getElementById("role-select");
+            const targetEmail = emailInput.value.trim();
+            const selectedRole = roleSelect.value;
+
+            if (!targetEmail) return alert("変更対象のメールアドレスを入力してください。");
+            if (!confirm(`本当にアカウント [ ${targetEmail} ] の権限を「${selectedRole}」に変更しますか？`)) return;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateUserRole",
+                        email: userEmail, // 操作を行っている管理者自身のメール
+                        targetEmail: targetEmail, // 変更される側のメール
+                        newRole: selectedRole
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert(`アカウント権限を「${selectedRole}」に正常にアップデートしました。`);
+                    emailInput.value = "";
+                } else {
+                    alert("変更エラー: " + result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("通信に失敗しました。GAS側に「updateUserRole」のアクション処理が実装されているかご確認ください。");
+            }
+        }
+
+        // ==========================================
+        // 3. [新機能] 完了済みデータのアーカイブ処理
+        // ==========================================
+        async function archiveCompletedSuggestions() {
+            if (!confirm("「回答完了」ステータスになっているすべての投稿データをアーカイブ（非表示化）しますか？\n※この操作は元に戻せません。")) return;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "archiveCompleted",
+                        email: userEmail
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert(`正常に完了データをアーカイブしました！\n処理件数: ${result.archivedCount || 0} 件`);
+                    loadAdminData(); // リスト再読み込み
+                } else {
+                    alert("アーカイブエラー: " + result.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("通信に失敗しました。GAS側に「archiveCompleted」のアクション処理が実装されているかご確認ください。");
+            }
+        }
+
+        // ==========================================
+        // ブロックリストの取得と描画
         // ==========================================
         async function loadBlocklistData() {
             blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">同期中...</td></tr>`;
@@ -275,9 +446,7 @@
             }
         }
 
-        // ==========================================
-        // 3. ブロックリストの追加登録（新機能）
-        // ==========================================
+        // ブロックリストの追加登録
         async function addBlocklist() {
             const input = document.getElementById("block-email-input");
             const targetEmail = input.value.trim();
@@ -307,9 +476,7 @@
             }
         }
 
-        // ==========================================
-        // 4. ブロックリストの削除解除（新機能）
-        // ==========================================
+        // ブロックリストの削除解除
         async function removeBlocklist(targetEmail) {
             if(!confirm(`アドレス ${targetEmail} のブロックを解除しますか？`)) return;
             try {
@@ -334,9 +501,7 @@
             }
         }
 
-        // ==========================================
-        // 5. ステータス変更をGASに反映
-        // ==========================================
+        // ステータス変更をGASに反映
         async function updateStatus(suggestionId, selectElement) {
             const newStatus = selectElement.value;
             selectElement.disabled = true;
@@ -368,9 +533,8 @@
                     if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
                     if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
                     
-                    if (newStatus === "先生方検討中" || newStatus === "開示請求") {
-                        loadAdminData();
-                    }
+                    // ダッシュボード値や再計算のために全更新
+                    loadAdminData();
                 } else {
                     alert("変更に失敗しました: " + result.message);
                     loadAdminData();
@@ -401,7 +565,7 @@
             if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
             const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
             try {
-                const response = await fetch(GAS_API_URL, {
+                const response = await fetch(GAS, {
                     method: "POST",
                     body: JSON.stringify({
                         action: "approveDisclosure",
