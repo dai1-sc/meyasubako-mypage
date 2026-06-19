@@ -82,6 +82,10 @@
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">詳しい内容</label>
                         <textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-900" required></textarea>
                     </div>
+                    <div id="maintenance-alert" class="hidden bg-red-50 border border-red-200 text-red-600 text-xs p-3 rounded-xl font-bold flex items-start gap-1.5 animate-pulse">
+                        <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                        <span>現在、生徒会目安箱は受付停止期間（またはメンテナンス中）のため、新しい意見の送信はできません。</span>
+                    </div>
                     <button type="submit" id="btn-submit" class="w-full brand-bg text-white font-medium py-3 rounded-xl hover:bg-opacity-90 transition text-sm shadow-sm">
                         匿名で送信する
                     </button>
@@ -302,9 +306,32 @@
 
         // 起動時にデータを一括ロード
         window.onload = function() {
+            checkSystemStatus();       // ⚙️ システムが動いているかチェック！
             loadLatestAnnouncement(); // 最新のお知らせを取得
             loadSuggestions();         // 自分の投書一覧を取得
         };
+        // ==========================================
+        // ⚙️ 新機能: システムが受付停止中かチェックする
+        // ==========================================
+        async function checkSystemStatus() {
+            const alertEl = document.getElementById("maintenance-alert");
+            const btnSubmit = document.getElementById("btn-submit");
+            
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
+                const data = await res.json();
+                
+                if (data.status === "success" && data.systemStatus === "maintenance") {
+                    // メンテナンス中の場合
+                    alertEl.classList.remove("hidden"); // 警告を表示
+                    btnSubmit.disabled = true;          // ボタンを押せなくする
+                    btnSubmit.className = "w-full bg-gray-300 text-gray-500 font-medium py-3 rounded-xl text-sm shadow-sm cursor-not-allowed";
+                    btnSubmit.innerText = "ただいま受付停止中です";
+                }
+            } catch (e) {
+                console.error("システムステータスの取得に失敗しました:", e);
+            }
+        }
     </script>
 </body>
 </html>
