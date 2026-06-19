@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - 相談チャット</title>
-        <link rel="icon" href="log.png" type="image/png">
+    <link rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -21,7 +21,8 @@
                 <span>戻る</span>
             </button>
             <span class="font-bold tracking-wider">相談チャットルーム</span>
-            <div class="w-16"></div> </div>
+            <div class="w-16"></div> 
+        </div>
     </nav>
 
     <main class="max-w-3xl w-full mx-auto flex-1 flex flex-col overflow-hidden p-4 space-y-4">
@@ -44,7 +45,7 @@
         </div>
 
         <form id="chat-form" class="flex items-center space-x-2 shrink-0">
-            <input type="text" id="chat-input" placeholder="メッセージを入力してください..." autocomplete="off" class="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-900 shadow-sm" required>
+            <input type="text" id="chat-input" placeholder="メッセージを入力してください..." autocomplete="off" class="flex-1 bg-white border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-900 shadow-sm" required>
             <button type="submit" id="btn-send" class="brand-bg text-white w-12 h-12 rounded-xl hover:bg-opacity-90 transition flex items-center justify-center shadow-sm shrink-0">
                 <i class="fas fa-paper-plane text-sm"></i>
             </button>
@@ -78,8 +79,9 @@
                 const res = await fetch(`${GAS_API_URL}?action=getChatLog&suggestionId=${suggestionId}&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
                 
+                // 🚨【ブロック対応】アクセス制限エラーが返ってきたらマイページへ強制送還
                 if (data.status === "error") {
-                    alert("アクセス権限がないか、エラーが発生しました。");
+                    alert(data.message || "アクセス権限がないか、エラーが発生しました。");
                     window.location.href = "mypage.html";
                     return;
                 }
@@ -92,10 +94,10 @@
                 
                 const statusBadge = document.getElementById("sum-status");
                 statusBadge.innerText = data.suggestion.status;
-               if (data.suggestion.status === "受付") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-blue-500 ml-auto";
-if (data.suggestion.status === "生徒会検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-yellow-500 ml-auto";
-if (data.suggestion.status === "先生方検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-purple-500 ml-auto";
-if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-green-500 ml-auto";
+                if (data.suggestion.status === "受付") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-blue-500 ml-auto";
+                if (data.suggestion.status === "生徒会検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-yellow-500 ml-auto";
+                if (data.suggestion.status === "先生方検討中") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-purple-500 ml-auto";
+                if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-0.5 rounded text-white text-[10px] font-bold bg-green-500 ml-auto";
 
                 // ② チャットタイムラインをセット
                 document.getElementById("chat-loading").classList.add("hidden");
@@ -112,38 +114,35 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                     chatContainer.appendChild(infoMsg);
                 } else {
                     data.chats.forEach(chat => {
-    const isMe = (chat.sender === "student"); // 生徒自身からの発言か
-    const wrapper = document.createElement("div");
-    wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
+                        const isMe = (chat.sender === "student"); // 生徒自身からの発言か
+                        const wrapper = document.createElement("div");
+                        wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
 
-    // 発言者によって名前と色を分ける
-    let nameText = "あなた（匿名）";
-    let bubbleClass = "bg-indigo-900 text-white rounded-tr-none"; // 自分（生徒）の吹き出し
+                        // 発言者によって名前と色を分ける
+                        let nameText = "あなた（匿名）";
+                        let bubbleClass = "bg-indigo-900 text-white rounded-tr-none"; // 自分（生徒）の吹き出し
 
-    if (!isMe) {
-        if (chat.sender === "admin") {
-            // 👑 管理者降臨用の特別仕様！
-            nameText = "システム管理者（先生・担当者） 👑";
-            bubbleClass = "bg-amber-50 text-amber-950 rounded-tl-none border-2 border-amber-400 shadow-md font-bold animate-fade-in"; 
-            // 高級感のあるゴールド風枠線＋太文字で上位存在感を演出
-        } else {
-            // 通常の生徒会
-            nameText = "生徒会役員";
-            bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
-        }
-    }
-    
-    const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
-    const bubble = `
-        <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
-            <p class="whitespace-pre-wrap">${chat.message}</p>
-        </div>
-        <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
-    `;
-    
-    wrapper.innerHTML = nameLabel + bubble;
-    chatContainer.appendChild(wrapper);
-});
+                        if (!isMe) {
+                            if (chat.sender === "admin") {
+                                nameText = "システム管理者（先生・担当者） 👑";
+                                bubbleClass = "bg-amber-50 text-amber-950 rounded-tl-none border-2 border-amber-400 shadow-md font-bold animate-fade-in"; 
+                            } else {
+                                nameText = "生徒会役員";
+                                bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
+                            }
+                        }
+                        
+                        const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
+                        const bubble = `
+                            <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
+                                <p class="whitespace-pre-wrap">${chat.message}</p>
+                            </div>
+                            <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
+                        `;
+                        
+                        wrapper.innerHTML = nameLabel + bubble;
+                        chatContainer.appendChild(wrapper);
+                    });
                 }
 
                 // チャットの一番下まで自動スクロール
@@ -186,7 +185,11 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
                     chatInput.value = ""; // 入力欄をクリア
                     loadChatLog(); // タイムラインを更新
                 } else {
-                    alert("送信失敗: " + result.message);
+                    // 🚨【ブロック対応】送信拒否された場合はアラートを出して戻す
+                    alert(result.message);
+                    if (result.message.includes("停止")) {
+                        window.location.href = "mypage.html";
+                    }
                 }
             } catch (error) {
                 console.error(error);
@@ -201,7 +204,7 @@ if (data.suggestion.status === "回答完了") statusBadge.className = "px-2 py-
         // ページ起動時にチャットを読み込む
         window.onload = loadChatLog;
         
-        // 【おまけ】30秒ごとに自動でチャットを最新状態にする（リアルタイム化）
+        // 10秒ごとに自動でチャットを最新状態にする（リアルタイム化）
         setInterval(loadChatLog, 10000);
     </script>
 </body>
