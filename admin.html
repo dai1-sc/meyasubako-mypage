@@ -660,23 +660,30 @@
                         historyBox.innerHTML = `<div class="text-center py-6 text-gray-400">現在、配信中のアナウンスはありません。</div>`;
                         return;
                     }
-                    data.list.forEach(item => {
-                        const div = document.createElement("div");
-                        div.className = "p-2.5 bg-slate-50 border border-gray-100 rounded-lg relative group flex justify-between items-start gap-4";
-                        div.innerHTML = `
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start mb-1">
-                                    <span class="font-bold text-gray-800">${item.title}</span>
-                                    <span class="text-[10px] text-gray-400 font-mono">${item.date}</span>
-                                </div>
-                                <p class="text-gray-600 whitespace-pre-wrap">${item.content}</p>
-                            </div>
-                            <button onclick="deleteAnnouncement('${item.id}')" class="text-gray-400 hover:text-red-500 p-1 transition" title="このアナウンスを削除">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        `;
-                        historyBox.appendChild(div);
-                    });
+                    // アナウンス履歴を読み込む関数の中のループ部分
+data.list.forEach(item => {
+    // 💡 配信者の表示を「管理者」に固定する（または item.email を使わず直接「管理者」と書く）
+    const displaySender = "管理者"; 
+
+    const div = document.createElement("div");
+    div.className = "p-2.5 bg-slate-50 border border-gray-100 rounded-lg relative group flex justify-between items-start gap-4";
+    div.innerHTML = `
+        <div class="flex-1">
+            <div class="flex justify-between items-start mb-1">
+                <div>
+                    <span class="font-bold text-gray-800">${item.title}</span>
+                    <span class="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded ml-2">${displaySender}</span>
+                </div>
+                <span class="text-[10px] text-gray-400 font-mono">${item.date}</span>
+            </div>
+            <p class="text-gray-600 whitespace-pre-wrap text-xs">${item.content}</p>
+        </div>
+        <button onclick="deleteAnnouncement('${item.id}')" class="text-gray-400 hover:text-red-500 p-1 transition" title="このアナウンスを削除">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    `;
+    historyBox.appendChild(div);
+});
                 }
             } catch (e) {
                 console.error(e);
