@@ -45,6 +45,18 @@
             </div>
         </div>
 
+        <div id="announcement-banner" class="hidden mb-8 space-y-3">
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-600 p-4 rounded-r-2xl shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-bullhorn text-indigo-600 animate-bounce"></i>
+                    <span class="text-xs font-bold text-indigo-800 tracking-wider bg-indigo-100 px-2 py-0.5 rounded-full">生徒会からのお知らせ</span>
+                    <span id="student-announcement-date" class="text-[10px] text-gray-400 ml-auto font-mono">--/-- --:--</span>
+                </div>
+                <h3 id="student-announcement-title" class="text-sm font-bold text-gray-800 mb-1">読み込み中...</h3>
+                <p id="student-announcement-content" class="text-xs text-gray-600 whitespace-pre-wrap leading-relaxed">お知らせを取得しています。</p>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
@@ -135,6 +147,34 @@
         }
 
         // ==========================================
+        // [新機能] 最新のアナウンスをGASから取得して表示する
+        // ==========================================
+        async function loadLatestAnnouncement() {
+            const banner = document.getElementById("announcement-banner");
+            const titleEl = document.getElementById("student-announcement-title");
+            const contentEl = document.getElementById("student-announcement-content");
+            const dateEl = document.getElementById("student-announcement-date");
+
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getAnnouncements`);
+                const data = await res.json();
+
+                if (data.status === "success" && data.list && data.list.length > 0) {
+                    const latest = data.list[0]; // 一番最新の1件を取得
+                    titleEl.textContent = latest.title;
+                    contentEl.textContent = latest.content;
+                    dateEl.textContent = latest.date;
+                    banner.classList.remove("hidden"); // アナウンスがある時だけ表示
+                } else {
+                    banner.classList.add("hidden");
+                }
+            } catch (e) {
+                console.error("アナウンスの取得に失敗しました:", e);
+                if (banner) banner.classList.add("hidden");
+            }
+        }
+
+        // ==========================================
         // 1. 過去の投稿データをGASから取得して描画する
         // ==========================================
         async function loadSuggestions() {
@@ -175,7 +215,6 @@
                     }
 
                     // ✨【修正・デザイン強化】未読チャットバッジを目立たせる
-                    // カードの上部に「生徒会から新しい返信があります！」とオレンジで点滅表示させ、枠線もオレンジに強調します
                     const unreadBadge = item.hasUnread 
                         ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 animate-pulse shadow-sm">
                              <i class="fas fa-comment-dots"></i> 生徒会から返信あり！
@@ -261,8 +300,11 @@
             }
         });
 
-        // 起動時に自動ロード
-        window.onload = loadSuggestions;
+        // 起動時にデータを一括ロード
+        window.onload = function() {
+            loadLatestAnnouncement(); // 最新のお知らせを取得
+            loadSuggestions();         // 自分の投書一覧を取得
+        };
     </script>
 </body>
 </html>
