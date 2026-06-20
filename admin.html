@@ -278,7 +278,7 @@
 
                 data.forEach(item => {
                     // 各ステータスのカウント処理
-                    if (item.status === "新規受付") {
+                    if (item.status === "受付") {
                         pendingCount++;
                     } else if (item.status === "生徒会検討中" || item.status === "先生方検討中" || item.status === "開示請求") {
                         progressCount++;
