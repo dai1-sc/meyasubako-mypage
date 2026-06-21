@@ -788,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("通信に失敗しました。");
             }
         }
-// ==========================================
+        // ==========================================
         // 🚨【対応完了ボタン付き】自分（@admin）宛てのメンションSOSをロードする
         // ==========================================
         async function loadAdminMentions() {
@@ -796,9 +796,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const countEl = document.getElementById("mention-count");
             const listEl = document.getElementById("mention-list");
 
+            // 👇 【追加】HTMLの枠がちゃんと見つかっているか確認
+            console.log("HTMLの枠チェック:", { panel, countEl, listEl });
+
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getAdminMentions&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
+
+                // 👇 【追加】GASからどんなデータが届いたか確認
+                console.log("GASからのデータチェック:", data);
 
                 if (data.status === "success" && data.list.length > 0) {
                     panel.classList.remove("hidden");
