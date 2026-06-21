@@ -41,7 +41,16 @@
                 <span>全データを同期更新</span>
             </button>
         </div>
-
+        
+<div id="mention-panel" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm mb-6 animate-fade-in">
+            <h2 class="text-sm font-bold text-amber-800 mb-2 flex items-center gap-1.5">
+                <i class="fas fa-exclamation-circle text-amber-600 animate-pulse"></i> 
+                管理者へのヘルプ・メンション（@admin）が届いています！ (<span id="mention-count">0</span>件)
+            </h2>
+            <div id="mention-list" class="space-y-2 max-h-48 overflow-y-auto mt-3">
+                </div>
+        </div>
+        
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
@@ -711,6 +720,7 @@ data.list.forEach(item => {
             loadAdminData();
             loadBlocklistData();
             loadAnnouncementHistory(); // ← これを追加！
+            loadAdminMentions();
         }
         // ==========================================
         // 新機能: アナウンスの削除
@@ -762,6 +772,58 @@ data.list.forEach(item => {
                 console.error(e);
                 alert("通信に失敗しました。");
             }
+        }
+        // ==========================================
+        // 🚨 新機能: 自分（@admin）宛てのメンションSOSをロードする
+        // ==========================================
+        async function loadAdminMentions() {
+            const panel = document.getElementById("mention-panel");
+            const countEl = document.getElementById("mention-count");
+            const listEl = document.getElementById("mention-list");
+
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getAdminMentions&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+
+                if (data.status === "success" && data.list.length > 0) {
+                    panel.classList.remove("hidden"); // メンションがあれば表示
+                    countEl.innerText = data.list.length;
+                    listEl.innerHTML = ""; // 初期化
+
+                    data.list.forEach(item => {
+                        const div = document.createElement("div");
+                        div.className = "p-3 bg-white border border-amber-200 rounded-lg text-xs flex justify-between items-start gap-4 shadow-sm";
+                        
+                        // 発言者の肩書きと言い換え
+                        let senderBadge = item.senderRole === 'student' ? '👤 生徒' : '🎗️ 生徒会役員';
+                        
+                        div.innerHTML = `
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-amber-900">${senderBadge}</span>
+                                    <span class="text-[10px] text-gray-400 font-mono">${item.date}</span>
+                                    <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold">対象：${item.suggestionTitle}</span>
+                                </div>
+                                <p class="text-gray-700 font-medium whitespace-pre-wrap bg-amber-50/50 p-2 rounded mt-1 border border-amber-100/50">${item.message}</p>
+                            </div>
+                            <button onclick="openChatFromMention('${item.suggestionId}')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2.5 py-1.5 rounded transition whitespace-nowrap shadow-sm">
+                                会話を見る <i class="fas fa-chevron-right text-[10px]"></i>
+                            </button>
+                        `;
+                        listEl.appendChild(div);
+                    });
+                } else {
+                    panel.classList.add("hidden"); // なければ隠す
+                }
+            } catch (e) {
+                console.error("メンションの取得に失敗しました:", e);
+            }
+        }
+
+        // メンションの「会話を見る」を押した時、生徒会用チャット画面にそのIDで飛ばす関数
+        function openChatFromMention(suggestionId) {
+            // 管理者がチャットを見るための画面（council_chat.html 等、お使いの生徒会チャット画面のファイル名に合わせてください）
+            window.location.href = `council_chat.html?id=${suggestionId}`;
         }
     </script>
 </body>
