@@ -613,8 +613,6 @@
             window.location.href = "index.html";
         }
 
-        // 起動時に自動ロード
-        window.onload = loadAllAdminData;
 
         // 3者承認用関数
         async function approveRequest(suggestionId, roleToApprove) {
@@ -724,14 +722,21 @@ data.list.forEach(item => {
         }
 
         // 既存の一括ロード関数にお知らせ読み込みを組み込む
-        // window.onload で呼ばれる loadAllAdminData を以下に書き換え
-        async function loadAllAdminData() {
-            loadAdminData();
-            loadBlocklistData();
-            loadAnnouncementHistory(); // ← これを追加！
-            loadAdminMentions();
-            loadBugReports();
-        }
+// 既存の window.onload はすべて削除し、これ1つに統一します
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. 基本データのロード
+    if (typeof loadAllAdminData === "function") {
+        try { loadAllAdminData(); } catch(e) { console.error("基本データ読込エラー:", e); }
+    }
+
+    // 2. ブロックリスト・アナウンス履歴
+    try { if (typeof loadBlocklist === "function") loadBlocklist(); } catch(e) { console.error(e); }
+    try { if (typeof loadAnnouncementHistory === "function") loadAnnouncementHistory(); } catch(e) { console.error(e); }
+    
+    // 3. 🚨 メンションSOSと不具合報告の即時チェック
+    try { loadAdminMentions(); } catch(e) { console.error("メンション取得エラー:", e); }
+    try { loadBugReports(); } catch(e) { console.error("不具合報告取得エラー:", e); }
+});
         // ==========================================
         // 新機能: アナウンスの削除
         // ==========================================
