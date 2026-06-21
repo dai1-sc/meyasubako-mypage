@@ -50,6 +50,15 @@
             <div id="mention-list" class="space-y-2 max-h-48 overflow-y-auto mt-3">
                 </div>
         </div>
+
+        <div id="bug-panel" class="hidden bg-red-50 border-2 border-red-400 p-5 rounded-xl shadow-sm mb-6 animate-fade-in">
+            <h2 class="text-sm font-bold text-red-800 mb-2 flex items-center gap-1.5">
+                <i class="fas fa-bug text-red-600 animate-bounce"></i> 
+                生徒からシステム不具合報告（バグ報告）が届いています！ (<span id="bug-count">0</span>件)
+            </h2>
+            <div id="bug-list" class="space-y-2 max-h-48 overflow-y-auto mt-3">
+                </div>
+        </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
@@ -824,6 +833,45 @@ data.list.forEach(item => {
         function openChatFromMention(suggestionId) {
             // 管理者がチャットを見るための画面（council_chat.html 等、お使いの生徒会チャット画面のファイル名に合わせてください）
             window.location.href = `council_chat.html?id=${suggestionId}`;
+        }
+        // ==========================================
+        // 🪲 新機能: 未対応の不具合報告をロードする
+        // ==========================================
+        async function loadBugReports() {
+            const panel = document.getElementById("bug-panel");
+            const countEl = document.getElementById("bug-count");
+            const listEl = document.getElementById("bug-list");
+
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
+
+                if (data.status === "success" && data.list.length > 0) {
+                    panel.classList.remove("hidden");
+                    countEl.innerText = data.list.length;
+                    listEl.innerHTML = "";
+
+                    data.list.forEach(item => {
+                        const div = document.createElement("div");
+                        div.className = "p-3 bg-white border border-red-200 rounded-lg text-xs flex flex-col gap-1 shadow-sm";
+                        div.innerHTML = `
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-1 mb-1">
+                                <span class="font-bold text-red-900"><i class="fas fa-user-circle"></i> 報告者: ${item.reporter}</span>
+                                <span class="text-[10px] text-gray-400 font-mono">${item.date}</span>
+                            </div>
+                            <p class="text-gray-700 font-medium whitespace-pre-wrap bg-red-50/30 p-2 rounded">${item.content}</p>
+                            <div class="text-[9px] text-gray-400 font-mono mt-1 bg-slate-50 p-1 rounded truncate" title="${item.userAgent}">
+                                🖥️ 環境情報: ${item.userAgent}
+                            </div>
+                        `;
+                        listEl.appendChild(div);
+                    });
+                } else {
+                    panel.classList.add("hidden");
+                }
+            } catch (e) {
+                console.error("不具合報告の取得に失敗しました:", e);
+            }
         }
     </script>
 </body>
