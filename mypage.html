@@ -110,6 +110,29 @@
                 <div id="suggestion-list" class="space-y-4"></div>
             </div>
         </div>
+        <button onclick="toggleBugModal()" class="fixed bottom-5 right-5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2.5 rounded-full shadow-lg transition flex items-center gap-1 z-40">
+        <i class="fas fa-bug text-red-400"></i> 不具合を報告
+    </button>
+
+    <div id="bug-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-xl border border-gray-100">
+            <h3 class="font-bold text-gray-800 text-sm mb-1 flex items-center gap-1.5">
+                <i class="fas fa-bug text-red-500"></i> システムの不具合・バグ報告
+            </h3>
+            <p class="text-[11px] text-gray-500 mb-4">ボタンが動かない、画面が崩れるなど、目安箱システムの不具合を開発者（管理者）に直接報告できます。</p>
+            
+            <textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-3 text-xs focus:outline-none focus:border-slate-800 resize-none mb-3" required></textarea>
+            
+            <div class="flex gap-2">
+                <button onclick="toggleBugModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold py-2 rounded-lg transition">
+                    キャンセル
+                </button>
+                <button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
+                    報告を送信する
+                </button>
+            </div>
+        </div>
+    </div>
     </main>
 
     <script>
@@ -330,6 +353,47 @@
                 }
             } catch (e) {
                 console.error("システムステータスの取得に失敗しました:", e);
+            }
+        }
+        // 🪲 不具合報告モーダルの開閉
+        function toggleBugModal() {
+            const modal = document.getElementById("bug-modal");
+            document.getElementById("bug-content").value = "";
+            modal.classList.toggle("hidden");
+        }
+
+        // 🪲 不具合報告の送信処理
+        async function submitBugReport() {
+            const content = document.getElementById("bug-content").value.trim();
+            if (!content) { alert("報告内容を入力してください。"); return; }
+
+            const btn = document.getElementById("btn-bug-submit");
+            btn.disabled = true;
+            btn.innerText = "送信中...";
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "reportBug",
+                        email: userEmail,
+                        content: content,
+                        userAgent: navigator.userAgent // 💡 生徒のスマホ機種やブラウザ情報を自動取得してバグ特定を楽にする
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert("不具合報告を管理者に送信しました。ご協力ありがとうございました！");
+                    toggleBugModal();
+                } else {
+                    alert("送信に失敗しました。");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("通信エラーが発生しました。");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "報告を送信する";
             }
         }
     </script>
