@@ -850,11 +850,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // ==========================================
-        // 🪲【対応完了ボタン付き】未対応の不具合報告をロードする
-        // ==========================================
-        // メインデータロード（目安箱・メンション・ブロックなど）
-        // ==========================================
-        // 🪲 未対応の不具合報告をロードする
+        // 🪲 未対応の不具合報告をロードする（重複排除＆画像全対応版）
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("bug-panel");
@@ -873,24 +869,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 console.log("【最新版デバッグ】GASから取得したデータ:", data);
 
-                // あなたのGAS API構造に合わせてデータを取得
                 const reportList = data.bugs || data.list || [];
 
-                const countEl = document.getElementById("bug-count");
-                if (countEl) countEl.textContent = reportList.length;
-
                 if (reportList && reportList.length > 0) {
-                    if (panel) panel.classList.remove("hidden");
-                    
+                    // 💡 【超重要】すでに画面に描画したIDを記録して、2個目は完全に無視する仕組み（重複ガード）
+                    const renderedIds = new Set();
+                    let realCount = 0;
+
                     reportList.forEach((item, index) => {
-                        const id = item.id || "不明なID";
+                        const id = item.id || `bug-${index}`; // IDがない場合はインデックスで代用
+
+                        // 💡 もしすでに同じID、または「同じ時間＋同じ人＋同じ内容」のものが処理されていたらスキップ！
+                        const uniqueKey = item.id || `${item.date}-${item.reporter}-${item.content}`;
+                        if (renderedIds.has(uniqueKey)) {
+                            console.log(`【重複スキップ】このデータはすでに描画されているため無視します:`, item);
+                            return; 
+                        }
+                        renderedIds.add(uniqueKey);
+                        realCount++; // 本物の件数だけをカウント
+
                         const date = item.date || "日時不明";
                         const email = item.reporter || "不明な送信者";
                         const content = item.content || "内容なし";
                         const env = item.userAgent || "環境不明";
                         
-                        // 画像URLの取得（imageまたはその他のキーに対応）
-                        let url = item.image || item.attachmentUrl || item.url || "";
+                        // 💡 【画像全対応】GASがどの名前でURLを送ってきても絶対にキャッチする
+                        let url = item.attachmentUrl || item.image || item.url || item.fileUrl || "";
 
                         let imageButton = "";
                         if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
@@ -930,6 +934,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                         listEl.appendChild(div);
                     });
+
+                    // 正確な件数をバッジに反映
+                    const countEl = document.getElementById("bug-count");
+                    if (countEl) countEl.textContent = realCount;
+
+                    if (realCount > 0) {
+                        if (panel) panel.classList.remove("hidden");
+                    } else {
+                        if (panel) panel.classList.add("hidden");
+                    }
                 } else {
                     if (panel) panel.classList.add("hidden");
                 }
