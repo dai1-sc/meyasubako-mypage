@@ -850,25 +850,58 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("admin-bug-panel");
-            // 💡 ID名を「admin-bug-list」から正しい「admin-error-list」に変更しました
             const listEl = document.getElementById("admin-error-list");
-            if (!listEl) return; // 安全対策：要素がなければ処理を抜ける
+            if (!listEl) {
+                console.error("【エラー】admin-error-list というIDの要素がHTML内に見つかりません。");
+                return;
+            }
             listEl.innerHTML = "";
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
-                if (data.status === "success" && data.list && data.list.length > 0) {
-                    panel.classList.remove("hidden");
-                    data.list.forEach(item => {
-                        // 📷 7列目(配列のインデックス6)に画像URLが入っているかチェック
+                // 🔍 デバッグ用：GASから実際に届いたデータをコンソールに詳しく出力します
+                console.log("【デバッグ】GASから取得した生データ:", data);
+
+                // データが正しく取得できているかチェック
+                if (!data) {
+                    console.warn("【警告】GASからのレスポンスが空(nullまたはundefined)です。");
+                    return;
+                }
+
+                // listデータの判定（配列、またはオブジェクトの中身があるか）
+                const reportList = data.list || data.data || [];
+                console.log("【デバッグ】解析対象のリスト一覧:", reportList);
+
+                if (reportList && reportList.length > 0) {
+                    if (panel) panel.classList.remove("hidden");
+                    
+                    reportList.forEach((item, index) => {
+                        console.log(`【デバッグ】行データ [${index}]:`, item);
+
+                        // 各列のデータを安全に取得（データが足りない場合の予防）
+                        const id = item[0] || "不明なID";
+                        const date = item[1] || "日時不明";
+                        const email = item[2] || "不明な送信者";
+                        const content = item[3] || "内容なし";
+                        const env = item[4] || "環境不明";
+                        const url = item[6] || ""; // 7列目（画像URL、またはエラー文字）
+
+                        // 📷 添付画像の判定（「画像保存エラー」という文字が含まれていなくても、URLっぽければボタンを出す）
                         let imageButton = "";
-                        if (item[6] && item[6].startsWith("http")) {
+                        if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
                             imageButton = `
-                                <a href="${item[6]}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-md transition mt-2">
+                                <a href="${url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-md transition mt-2">
                                     <i class="fas fa-image"></i> 📷 添付画像を確認
                                 </a>
+                            `;
+                        } else if (url && url.includes("エラー")) {
+                            // もしシートにエラー文字が残っている場合は、それも管理者画面で確認できるようにする
+                            imageButton = `
+                                <span class="inline-block text-[10px] text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-md mt-2">
+                                    ⚠️ ${url}
+                                </span>
                             `;
                         }
 
@@ -877,23 +910,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         div.innerHTML = `
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${item[1]}</span>
-                                    <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${item[2]}</span>
+                                    <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${date}</span>
+                                    <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
                                 </div>
-                                <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">${item[3]}</p>
-                                <div class="text-[9px] text-gray-400 mt-1 font-mono">環境: ${item[4]}</div>
-                                ${imageButton} </div>
-                            <button onclick="resolveAlert('bug', '${item[0]}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap self-end md:self-auto">
+                                <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">${content}</p>
+                                <div class="text-[9px] text-gray-400 mt-1 font-mono">環境: ${env}</div>
+                                ${imageButton}
+                            </div>
+                            <button onclick="resolveAlert('bug', '${id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap self-end md:self-auto">
                                 <i class="fas fa-check"></i> 完了
                             </button>
                         `;
                         listEl.appendChild(div);
                     });
                 } else {
-                    panel.classList.add("hidden");
+                    console.log("【情報】不具合報告のリストが空っぽ（0件）のため、パネルを非表示にします。");
+                    if (panel) panel.classList.add("hidden");
                 }
             } catch (e) {
-                console.error("不具合報告の取得に失敗しました:", e);
+                console.error("【重大なエラー】不具合報告の取得または描画処理で例外が発生しました:", e);
             }
         }
         // ==========================================
