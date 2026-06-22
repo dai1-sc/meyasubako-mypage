@@ -850,45 +850,47 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("admin-bug-panel");
-            const listEl = document.getElementById("admin-error-list");
+            
+            // 💡 HTML内に存在する可能性のあるID候補を自動で片っ端から探します
+            let listEl = document.getElementById("admin-error-list") || 
+                         document.getElementById("admin-bug-list") || 
+                         document.getElementById("bug-report-list") || 
+                         document.getElementById("bug-reports-list") ||
+                         document.getElementById("bug-list");
+                         
+            // 💡 もしIDで見つからない場合、クラス名や、パネル内の一番下のdivを自動で探す超強力なバックアップ
+            if (!listEl && panel) {
+                listEl = panel.querySelector(".space-y-4") || panel.querySelector("div:last-child");
+            }
+
             if (!listEl) {
-                console.error("【エラー】admin-error-list というIDの要素がHTML内に見つかりません。");
+                console.error("【エラー】不具合報告を表示するためのHTMLエリア（要素）がどうしても見つかりません。");
                 return;
             }
+            
+            console.log("【デバッグ】自動発見した表示ターゲット要素:", listEl);
             listEl.innerHTML = "";
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
-                // 🔍 デバッグ用：GASから実際に届いたデータをコンソールに詳しく出力します
                 console.log("【デバッグ】GASから取得した生データ:", data);
 
-                // データが正しく取得できているかチェック
-                if (!data) {
-                    console.warn("【警告】GASからのレスポンスが空(nullまたはundefined)です。");
-                    return;
-                }
-
-                // listデータの判定（配列、またはオブジェクトの中身があるか）
+                if (!data) return;
                 const reportList = data.list || data.data || [];
-                console.log("【デバッグ】解析対象のリスト一覧:", reportList);
 
                 if (reportList && reportList.length > 0) {
                     if (panel) panel.classList.remove("hidden");
                     
                     reportList.forEach((item, index) => {
-                        console.log(`【デバッグ】行データ [${index}]:`, item);
-
-                        // 各列のデータを安全に取得（データが足りない場合の予防）
                         const id = item[0] || "不明なID";
                         const date = item[1] || "日時不明";
                         const email = item[2] || "不明な送信者";
                         const content = item[3] || "内容なし";
                         const env = item[4] || "環境不明";
-                        const url = item[6] || ""; // 7列目（画像URL、またはエラー文字）
+                        const url = item[6] || ""; 
 
-                        // 📷 添付画像の判定（「画像保存エラー」という文字が含まれていなくても、URLっぽければボタンを出す）
                         let imageButton = "";
                         if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
                             imageButton = `
@@ -897,7 +899,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </a>
                             `;
                         } else if (url && url.includes("エラー")) {
-                            // もしシートにエラー文字が残っている場合は、それも管理者画面で確認できるようにする
                             imageButton = `
                                 <span class="inline-block text-[10px] text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-md mt-2">
                                     ⚠️ ${url}
@@ -906,7 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         const div = document.createElement("div");
-                        div.className = "p-3 bg-red-50/50 border border-red-100 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm";
+                        div.className = "p-3 bg-red-50/50 border border-red-100 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm mb-3";
                         div.innerHTML = `
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
@@ -924,11 +925,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         listEl.appendChild(div);
                     });
                 } else {
-                    console.log("【情報】不具合報告のリストが空っぽ（0件）のため、パネルを非表示にします。");
                     if (panel) panel.classList.add("hidden");
                 }
             } catch (e) {
-                console.error("【重大なエラー】不具合報告の取得または描画処理で例外が発生しました:", e);
+                console.error("【重大なエラー】不具合報告の処理で例外が発生しました:", e);
             }
         }
         // ==========================================
