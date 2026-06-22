@@ -264,6 +264,9 @@
         // ==========================================
         // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
         // ==========================================
+        // ==========================================
+        // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
+        // ==========================================
         async function loadAdminData() {
             tableBody.innerHTML = `
                 <tr id="table-loading">
@@ -331,7 +334,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">管理者:</span>
                                     <div>
-                                        ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                        ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-between">
@@ -850,75 +853,88 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🪲【対応完了ボタン付き】未対応の不具合報告をロードする
         // ==========================================
         // メインデータロード（目安箱・メンション・ブロックなど）
-        async function loadAdminData() {
-            const container = document.getElementById("posts-container");
-            const mentionPanel = document.getElementById("admin-mention-panel");
-            const mentionList = document.getElementById("admin-mention-list");
-            const countEl = document.getElementById("admin-post-count");
-
-            if (!container) return;
-            container.innerHTML = `<div class="text-center py-8 text-gray-500"><i class="fas fa-spinner animate-spin mr-2"></i>データを読み込み中...</div>`;
+        // ==========================================
+        // 🪲 未対応の不具合報告をロードする
+        // ==========================================
+        async function loadBugReports() {
+            const panel = document.getElementById("bug-panel");
+            const listEl = document.getElementById("bug-list");
+                         
+            if (!listEl) {
+                console.error("【エラー】不具合報告を表示するためのHTMLエリア（#bug-list）が見つかりません。");
+                return;
+            }
+            
+            listEl.innerHTML = "";
 
             try {
-                const res = await fetch(`${GAS_API_URL}?action=getAdminData&email=${encodeURIComponent(userEmail)}`);
+                const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
-                if (data.status !== "success") {
-                    container.innerHTML = `<div class="text-center py-8 text-red-500">データの取得に失敗しました</div>`;
-                    return;
-                }
+                console.log("【最新版デバッグ】GASから取得したデータ:", data);
 
-                // 投稿数の反映
-                if (countEl) countEl.textContent = data.posts ? data.posts.length : 0;
+                // あなたのGAS API構造に合わせてデータを取得
+                const reportList = data.bugs || data.list || [];
 
-                // 1. 目安箱の投稿一覧描画 (通常投稿)
-                container.innerHTML = "";
-                if (data.posts && data.posts.length > 0) {
-                    data.posts.forEach(post => {
-                        const card = createPostCard(post);
-                        container.appendChild(card);
-                    });
-                } else {
-                    container.innerHTML = `<div class="text-center py-12 text-gray-400 bg-white rounded-2xl border border-slate-100 shadow-sm"><i class="fas fa-folder-open text-3xl mb-2 text-slate-300"></i><p class="text-xs font-bold">投稿はまだありません</p></div>`;
-                }
+                const countEl = document.getElementById("bug-count");
+                if (countEl) countEl.textContent = reportList.length;
 
-                // 2. メンション（連絡）アラートの描画
-                if (mentionList) mentionList.innerHTML = "";
-                if (data.mentions && data.mentions.length > 0) {
-                    if (mentionPanel) mentionPanel.classList.remove("hidden");
-                    data.mentions.forEach(item => {
+                if (reportList && reportList.length > 0) {
+                    if (panel) panel.classList.remove("hidden");
+                    
+                    reportList.forEach((item, index) => {
+                        const id = item.id || "不明なID";
+                        const date = item.date || "日時不明";
+                        const email = item.reporter || "不明な送信者";
+                        const content = item.content || "内容なし";
+                        const env = item.userAgent || "環境不明";
+                        
+                        // 画像URLの取得（imageまたはその他のキーに対応）
+                        let url = item.image || item.attachmentUrl || item.url || "";
+
+                        let imageButton = "";
+                        if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
+                            imageButton = `
+                                <a href="${url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-md transition mt-2">
+                                    <i class="fas fa-image"></i> 📷 添付画像を確認
+                                </a>
+                            `;
+                        } else if (url && (url.includes("エラー") || url.includes("拒否") || url.includes("DriveApp"))) {
+                            imageButton = `
+                                <span class="inline-block text-[10px] text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-md mt-2">
+                                    ⚠️ ドライブ保存エラー（権限設定前に送信されたデータです）
+                                </span>
+                            `;
+                        }
+
                         const div = document.createElement("div");
-                        div.className = "p-3 bg-amber-50/50 border border-amber-100 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm";
+                        div.className = "p-3 bg-white border border-red-100 rounded-xl block shadow-sm mb-3";
+                        
                         div.innerHTML = `
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${item.date}</span>
-                                    <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${item.reporter}</span>
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${date}</span>
+                                        <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
+                                    </div>
                                 </div>
-                                <p class="text-xs text-gray-700 leading-relaxed">コメントでメンションされました: <span class="bg-amber-100 px-1 rounded font-bold">@${item.target}</span></p>
-                                <p class="text-[11px] text-gray-500 italic mt-1 border-l-2 border-amber-300 pl-2">"${item.comment}"</p>
+                                <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">${content}</p>
+                                <div class="text-[9px] text-gray-400 mt-1 font-mono">環境: ${env}</div>
+                                ${imageButton}
                             </div>
-                            <div class="flex items-center gap-2 self-end md:self-auto">
-                                <button onclick="openChatFromMention('${item.suggestionId}')" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap">
-                                    <i class="fas fa-comments"></i> 会話を見る
-                                </button>
-                                <button onclick="resolveAlert('mention', '${item.id}')" class="text-xs bg-slate-600 hover:bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap">
+                            <div class="mt-3 text-right">
+                                <button onclick="resolveAlert('bug', '${id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm">
                                     <i class="fas fa-check"></i> 完了
                                 </button>
                             </div>
                         `;
-                        mentionList.appendChild(div);
+                        listEl.appendChild(div);
                     });
                 } else {
-                    if (mentionPanel) mentionPanel.classList.add("hidden");
+                    if (panel) panel.classList.add("hidden");
                 }
-
-                // 💡 【超重要】3. ここにあった古いバグ報告の描画処理（重複の原因）を完全に削除しました！
-                // 不具合報告は、下にある専用の「loadBugReports()」が1回だけ正しく行うため、ここでは何もしません。
-
             } catch (e) {
-                console.error("データロード中にエラーが発生しました:", e);
-                container.innerHTML = `<div class="text-center py-8 text-red-500">通信エラーが発生しました</div>`;
+                console.error("【重大なエラー】描画処理で例外が発生しました:", e);
             }
         }
         // ==========================================
