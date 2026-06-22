@@ -850,17 +850,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("admin-bug-panel");
-            
-            let listEl = document.getElementById("bug-list") || 
-                         document.getElementById("admin-error-list") || 
-                         document.getElementById("admin-bug-list");
+            const listEl = document.getElementById("bug-list");
                          
-            if (!listEl && panel) {
-                listEl = panel.querySelector(".space-y-4") || panel.querySelector("div:last-child");
-            }
-
             if (!listEl) {
-                console.error("【エラー】不具合報告を表示するためのHTMLエリアが見つかりません。");
+                console.error("【エラー】不具合報告を表示するためのHTMLエリア（#bug-list）が見つかりません。");
                 return;
             }
             
@@ -872,20 +865,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 console.log("【最新版デバッグ】GASから取得したデータ:", data);
 
-                const reportList = data.list || data.data || [];
+                // 💡 あなたのシステムに完全対応：data.bugs からリストを正しく引き抜きます
+                const reportList = data.bugs || data.list || [];
 
                 if (reportList && reportList.length > 0) {
+                    // データが存在するなら、確実にパネルを表示
                     if (panel) panel.classList.remove("hidden");
                     
                     reportList.forEach((item, index) => {
                         console.log(`【展開チェック】行データ [${index}]:`, item);
 
+                        // オブジェクトのキー名（id, date, content等）に合わせて取得
                         const id = item.id || "不明なID";
                         const date = item.date || "日時不明";
                         const email = item.reporter || "不明な送信者";
                         const content = item.content || "内容なし";
                         const env = item.userAgent || "環境不明";
                         
+                        // 画像URL、またはエラーメッセージの判定
                         let url = item.attachmentUrl || item.url || "";
                         if (!url && item[6]) url = item[6]; 
 
@@ -905,11 +902,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
                         const div = document.createElement("div");
-                        // 💡 【修正】クラス名から「flex」を削除し、縦並びのブロック要素として描画されるようにしました
                         div.className = "p-3 bg-red-50/50 border border-red-100 rounded-xl block shadow-sm mb-3";
                         
                         div.innerHTML = `
-                            <div class="flex-1">
+                            <div>
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${date}</span>
                                     <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
@@ -919,7 +915,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ${imageButton}
                             </div>
                             <div class="mt-3 text-right">
-                                <button onclick="resolveAlert('bug', '${id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap">
+                                <button onclick="resolveAlert('bug', '${id}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm">
                                     <i class="fas fa-check"></i> 完了
                                 </button>
                             </div>
