@@ -852,6 +852,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         // 🪲 未対応の不具合報告をロードする（重複排除＆画像全対応版）
         // ==========================================
+        // ==========================================
+        // 🪲 未対応の不具合報告をロードする（2回呼び出し完全防御＆画像超自動検知版）
+        // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("bug-panel");
             const listEl = document.getElementById("bug-list");
@@ -860,8 +863,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("【エラー】不具合報告を表示するためのHTMLエリア（#bug-list）が見つかりません。");
                 return;
             }
-            
-            listEl.innerHTML = "";
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
@@ -871,30 +872,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const reportList = data.bugs || data.list || [];
 
+                // 💡 【超強力重複ガード】データを追加する直前でリストを一回完全に空っぽにします！
+                // これにより、たとえこの関数が同時に何回実行されても、最後に終わった1回分だけが画面に残ります。
+                listEl.innerHTML = "";
+
                 if (reportList && reportList.length > 0) {
-                    // 💡 【超重要】すでに画面に描画したIDを記録して、2個目は完全に無視する仕組み（重複ガード）
                     const renderedIds = new Set();
                     let realCount = 0;
 
                     reportList.forEach((item, index) => {
-                        const id = item.id || `bug-${index}`; // IDがない場合はインデックスで代用
-
-                        // 💡 もしすでに同じID、または「同じ時間＋同じ人＋同じ内容」のものが処理されていたらスキップ！
                         const uniqueKey = item.id || `${item.date}-${item.reporter}-${item.content}`;
-                        if (renderedIds.has(uniqueKey)) {
-                            console.log(`【重複スキップ】このデータはすでに描画されているため無視します:`, item);
-                            return; 
-                        }
+                        if (renderedIds.has(uniqueKey)) return; 
                         renderedIds.add(uniqueKey);
-                        realCount++; // 本物の件数だけをカウント
+                        realCount++;
 
+                        const id = item.id || `bug-${index}`;
                         const date = item.date || "日時不明";
                         const email = item.reporter || "不明な送信者";
                         const content = item.content || "内容なし";
                         const env = item.userAgent || "環境不明";
                         
-                        // 💡 【画像全対応】GASがどの名前でURLを送ってきても絶対にキャッチする
-                        let url = item.attachmentUrl || item.image || item.url || item.fileUrl || "";
+                        // 🔍 【全自動画像検知システム】
+                        // GASがどんなキー名で画像URLを送ってきていても、オブジェクトの中から
+                        // httpから始まる文字列、または「DriveApp/エラー/拒否」という文字を全自動で探し出します。
+                        let url = "";
+                        
+                        // まずよくあるキー名を確認
+                        let possibleUrl = item.image || item.attachmentUrl || item.url || item.fileUrl || item.file || "";
+                        
+                        if (typeof possibleUrl === "string" && possibleUrl.length > 0) {
+                            url = possibleUrl;
+                        } else {
+                            // もし見つからなければ、itemの中身を全探索する
+                            for (let key in item) {
+                                if (typeof item[key] === "string" && (item[key].startsWith("http") || item[key].includes("drive.google.com") || item[key].includes("エラー") || item[key].includes("拒否") || item[key].includes("DriveApp"))) {
+                                    url = item[key];
+                                    break;
+                                } else if (typeof item[key] === "object" && item[key] !== null) {
+                                    // もし画像データがさらにオブジェクトの階層（{url: "..."}など）に入っていた場合の救済
+                                    if (item[key].url && typeof item[key].url === "string") {
+                                        url = item[key].url;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         let imageButton = "";
                         if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
@@ -935,7 +957,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         listEl.appendChild(div);
                     });
 
-                    // 正確な件数をバッジに反映
                     const countEl = document.getElementById("bug-count");
                     if (countEl) countEl.textContent = realCount;
 
@@ -945,6 +966,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (panel) panel.classList.add("hidden");
                     }
                 } else {
+                    listEl.innerHTML = "";
                     if (panel) panel.classList.add("hidden");
                 }
             } catch (e) {
