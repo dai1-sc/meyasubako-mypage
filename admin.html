@@ -849,34 +849,39 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🪲【対応完了ボタン付き】未対応の不具合報告をロードする
         // ==========================================
         async function loadBugReports() {
-            const panel = document.getElementById("bug-panel");
-            const countEl = document.getElementById("bug-count");
-            const listEl = document.getElementById("bug-list");
+            const panel = document.getElementById("admin-bug-panel");
+            const listEl = document.getElementById("admin-bug-list");
+            listEl.innerHTML = "";
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
-                if (data.status === "success" && data.list.length > 0) {
+                if (data.status === "success" && data.list && data.list.length > 0) {
                     panel.classList.remove("hidden");
-                    countEl.innerText = data.list.length;
-                    listEl.innerHTML = "";
-
                     data.list.forEach(item => {
+                        // 📷 7列目(配列のインデックス6)に画像URLが入っているかチェック
+                        let imageButton = "";
+                        if (item[6] && item[6].startsWith("http")) {
+                            imageButton = `
+                                <a href="${item[6]}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-md transition mt-2">
+                                    <i class="fas fa-image"></i> 📷 添付画像を確認
+                                </a>
+                            `;
+                        }
+
                         const div = document.createElement("div");
-                        div.className = "p-3 bg-white border border-red-200 rounded-lg text-xs flex justify-between items-start gap-4 shadow-sm";
+                        div.className = "p-3 bg-red-50/50 border border-red-100 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm";
                         div.innerHTML = `
                             <div class="flex-1">
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-1 mb-1">
-                                    <span class="font-bold text-red-900"><i class="fas fa-user-circle"></i> 報告者: ${item.reporter}</span>
-                                    <span class="text-[10px] text-gray-400 font-mono">${item.date}</span>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${item[1]}</span>
+                                    <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${item[2]}</span>
                                 </div>
-                                <p class="text-gray-700 font-medium whitespace-pre-wrap bg-red-50/30 p-2 rounded">${item.content}</p>
-                                <div class="text-[9px] text-gray-400 font-mono mt-1 bg-slate-50 p-1 rounded truncate" title="${item.userAgent}">
-                                    🖥️ 環境: ${item.userAgent}
-                                </div>
-                            </div>
-                            <button onclick="resolveAlert('bug', '${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded transition whitespace-nowrap shadow-sm text-[11px] self-center">
+                                <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">${item[3]}</p>
+                                <div class="text-[9px] text-gray-400 mt-1 font-mono">環境: ${item[4]}</div>
+                                ${imageButton} </div>
+                            <button onclick="resolveAlert('bug', '${item[0]}')" class="text-xs bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap self-end md:self-auto">
                                 <i class="fas fa-check"></i> 完了
                             </button>
                         `;
