@@ -258,6 +258,7 @@
         async function loadAllAdminData() {
             loadAdminData();
             loadBlocklistData();
+            loadBugReports();     // 💡【追加】不具合報告も同時に読み込むようにします！
         }
 
         // ==========================================
@@ -849,7 +850,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🪲【対応完了ボタン付き】未対応の不具合報告をロードする
         // ==========================================
         async function loadBugReports() {
-            const panel = document.getElementById("admin-bug-panel");
+            // 💡 あなたのHTML（571行目、572行目）の正しいIDに完全に一致させました
+            const panel = document.getElementById("bug-panel");
             const listEl = document.getElementById("bug-list");
                          
             if (!listEl) {
@@ -865,26 +867,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 console.log("【最新版デバッグ】GASから取得したデータ:", data);
 
-                // 💡 あなたのシステムに完全対応：data.bugs からリストを正しく引き抜きます
                 const reportList = data.bugs || data.list || [];
 
+                // バグの件数をバッジ（#bug-count）に反映
+                const countEl = document.getElementById("bug-count");
+                if (countEl) countEl.textContent = reportList.length;
+
                 if (reportList && reportList.length > 0) {
-                    // データが存在するなら、確実にパネルを表示
+                    // データが存在するなら、隠しクラス(hidden)を外してパネルを絶対に出す
                     if (panel) panel.classList.remove("hidden");
                     
                     reportList.forEach((item, index) => {
                         console.log(`【展開チェック】行データ [${index}]:`, item);
 
-                        // オブジェクトのキー名（id, date, content等）に合わせて取得
                         const id = item.id || "不明なID";
                         const date = item.date || "日時不明";
                         const email = item.reporter || "不明な送信者";
                         const content = item.content || "内容なし";
                         const env = item.userAgent || "環境不明";
                         
-                        // 画像URL、またはエラーメッセージの判定
-                        let url = item.attachmentUrl || item.url || "";
-                        if (!url && item[6]) url = item[6]; 
+                        let url = item.image || item.attachmentUrl || item.url || "";
 
                         let imageButton = "";
                         if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
@@ -893,22 +895,24 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <i class="fas fa-image"></i> 📷 添付画像を確認
                                 </a>
                             `;
-                        } else if (url && (url.includes("エラー") || url.includes("拒否"))) {
+                        } else if (url && (url.includes("エラー") || url.includes("拒否") || url.includes("DriveApp"))) {
                             imageButton = `
                                 <span class="inline-block text-[10px] text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-md mt-2">
-                                    ⚠️ シート記録: ${url}
+                                    ⚠️ ドライブ保存エラー（権限設定前に送信されたデータです）
                                 </span>
                             `;
                         }
 
                         const div = document.createElement("div");
-                        div.className = "p-3 bg-red-50/50 border border-red-100 rounded-xl block shadow-sm mb-3";
+                        div.className = "p-3 bg-white border border-red-100 rounded-xl block shadow-sm mb-3";
                         
                         div.innerHTML = `
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${date}</span>
-                                    <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">${date}</span>
+                                        <span class="text-[10px] text-slate-500 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
+                                    </div>
                                 </div>
                                 <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">${content}</p>
                                 <div class="text-[9px] text-gray-400 mt-1 font-mono">環境: ${env}</div>
@@ -923,6 +927,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         listEl.appendChild(div);
                     });
                 } else {
+                    // データが0件なら非表示にする
                     if (panel) panel.classList.add("hidden");
                 }
             } catch (e) {
