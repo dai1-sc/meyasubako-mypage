@@ -850,7 +850,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("admin-bug-panel");
-            const listEl = document.getElementById("admin-bug-list");
+            // 💡 ID名を「admin-bug-list」から正しい「admin-error-list」に変更しました
+            const listEl = document.getElementById("admin-error-list");
+            if (!listEl) return; // 安全対策：要素がなければ処理を抜ける
             listEl.innerHTML = "";
 
             try {
