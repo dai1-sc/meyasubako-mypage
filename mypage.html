@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - マイページ</title>
-    <link rel="icon" href="log.png" type="image/png">
+    <link class="w-8 h-8 object-contain" rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -110,29 +110,35 @@
                 <div id="suggestion-list" class="space-y-4"></div>
             </div>
         </div>
-        <button onclick="toggleBugModal()" class="fixed bottom-5 right-5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2.5 rounded-full shadow-lg transition flex items-center gap-1 z-40">
-        <i class="fas fa-bug text-red-400"></i> 不具合を報告
-    </button>
 
-    <div id="bug-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-        <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-xl border border-gray-100">
-            <h3 class="font-bold text-gray-800 text-sm mb-1 flex items-center gap-1.5">
-                <i class="fas fa-bug text-red-500"></i> システムの不具合・バグ報告
-            </h3>
-            <p class="text-[11px] text-gray-500 mb-4">ボタンが動かない、画面が崩れるなど、目安箱システムの不具合を開発者（管理者）に直接報告できます。</p>
-            
-            <textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-3 text-xs focus:outline-none focus:border-slate-800 resize-none mb-3" required></textarea>
-            
-            <div class="flex gap-2">
-                <button onclick="toggleBugModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold py-2 rounded-lg transition">
-                    キャンセル
-                </button>
-                <button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
-                    報告を送信する
-                </button>
+        <button onclick="toggleBugModal()" class="fixed bottom-5 right-5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2.5 rounded-full shadow-lg transition flex items-center gap-1 z-40">
+            <i class="fas fa-bug text-red-400"></i> 不具合を報告
+        </button>
+
+        <div id="bug-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-xl border border-gray-100">
+                <h3 class="font-bold text-gray-800 text-sm mb-1 flex items-center gap-1.5">
+                    <i class="fas fa-bug text-red-500"></i> システムの不具合・バグ報告
+                </h3>
+                <p class="text-[11px] text-gray-500 mb-4">ボタンが動かない、画面が崩れるなど、目安箱システムの不具合を開発者（管理者）に直接報告できます。</p>
+                
+                <textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-gray-200 rounded-xl p-3 text-xs focus:outline-none focus:border-slate-800 resize-none mb-3" required></textarea>
+                
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-gray-500 mb-1">スクリーンショット・画像を添付（任意）</label>
+                    <input type="file" id="bug-file" accept="image/*" class="w-full text-xs border border-gray-200 p-2 rounded-xl bg-slate-50 focus:outline-none file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300">
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="toggleBugModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold py-2 rounded-lg transition">
+                        キャンセル
+                    </button>
+                    <button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm">
+                        報告を送信する
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     </main>
 
     <script>
@@ -333,6 +339,7 @@
             loadLatestAnnouncement(); // 最新のお知らせを取得
             loadSuggestions();         // 自分の投書一覧を取得
         };
+
         // ==========================================
         // ⚙️ 新機能: システムが受付停止中かチェックする
         // ==========================================
@@ -355,21 +362,39 @@
                 console.error("システムステータスの取得に失敗しました:", e);
             }
         }
+
         // 🪲 不具合報告モーダルの開閉
         function toggleBugModal() {
             const modal = document.getElementById("bug-modal");
             document.getElementById("bug-content").value = "";
+            document.getElementById("bug-file").value = ""; // ファイル選択欄もリセット
             modal.classList.toggle("hidden");
         }
 
-        // 🪲 不具合報告の送信処理
+        // 🪲 修正: 画像送信に対応した不具合報告の送信処理
         async function submitBugReport() {
             const content = document.getElementById("bug-content").value.trim();
             if (!content) { alert("報告内容を入力してください。"); return; }
 
+            const fileInput = document.getElementById("bug-file");
             const btn = document.getElementById("btn-bug-submit");
+            
             btn.disabled = true;
             btn.innerText = "送信中...";
+
+            let fileData = null;
+            let fileName = "";
+
+            // 📷 画像が選択されている場合、Base64形式の文字列へ変換する
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                fileName = file.name;
+                fileData = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            }
 
             try {
                 const res = await fetch(GAS_API_URL, {
@@ -378,15 +403,17 @@
                         action: "reportBug",
                         email: userEmail,
                         content: content,
-                        userAgent: navigator.userAgent // 💡 生徒のスマホ機種やブラウザ情報を自動取得してバグ特定を楽にする
+                        userAgent: navigator.userAgent, // 生徒のスマホ機種やブラウザ情報を自動取得
+                        fileData: fileData,            // 📷 追加: Base64にエンコードした画像テキスト
+                        fileName: fileName             // 📷 追加: 元のファイル名
                     })
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    alert("不具合報告を管理者に送信しました。ご協力ありがとうございました！");
+                    alert("不具合報告を管理者に送信しました（画像が添付されている場合はドライブへ保存されます）。ご協力ありがとうございました！");
                     toggleBugModal();
                 } else {
-                    alert("送信に失敗しました。");
+                    alert("送信に失敗しました: " + result.message);
                 }
             } catch (e) {
                 console.error(e);
