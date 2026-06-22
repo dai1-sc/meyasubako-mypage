@@ -917,6 +917,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("通信エラーが発生しました。");
             }
         }
+        // 💡 メンションアラートの「会話を見る」ボタンをチャット画面へ繋ぐ
+function openChatFromMention(suggestionId) {
+    openChatModal(suggestionId);
+}
     </script>
 </body>
 </html>
