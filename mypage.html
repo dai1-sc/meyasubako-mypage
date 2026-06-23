@@ -373,56 +373,60 @@
 
         // 🪲 修正: 画像送信に対応した不具合報告の送信処理
         async function submitBugReport() {
-            const content = document.getElementById("bug-content").value.trim();
-            if (!content) { alert("報告内容を入力してください。"); return; }
+    const content = document.getElementById("bug-content").value.trim();
+    if (!content) { alert("報告内容を入力してください。"); return; }
 
-            const fileInput = document.getElementById("bug-file");
-            const btn = document.getElementById("btn-bug-submit");
-            
-            btn.disabled = true;
-            btn.innerText = "送信中...";
+    const fileInput = document.getElementById("bug-file");
+    const btn = document.getElementById("btn-bug-submit");
+    
+    btn.disabled = true;
+    btn.innerText = "送信中...";
 
-            let fileData = null;
-            let fileName = "";
+    let imagePayload = null;
 
-            // 📷 画像が選択されている場合、Base64形式の文字列へ変換する
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                fileName = file.name;
-                fileData = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "reportBug",
-                        email: userEmail,
-                        content: content,
-                        userAgent: navigator.userAgent, // 生徒のスマホ機種やブラウザ情報を自動取得
-                        fileData: fileData,            // 📷 追加: Base64にエンコードした画像テキスト
-                        fileName: fileName             // 📷 追加: 元のファイル名
-                    })
-                });
-                const result = await res.json();
-                if (result.status === "success") {
-                    alert("不具合報告を管理者に送信しました（画像が添付されている場合はドライブへ保存されます）。ご協力ありがとうございました！");
-                    toggleBugModal();
-                } else {
-                    alert("送信に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信エラーが発生しました。");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "報告を送信する";
-            }
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const fileData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        // DataURL ("data:image/png;base64,XXXX") からtype部分とbase64部分を分離
+        const matches = fileData.match(/^data:(.+);base64,(.+)$/);
+        if (matches) {
+            imagePayload = {
+                type: matches[1],
+                base64: matches[2]
+            };
         }
+    }
+
+    try {
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "reportBug",
+                email: userEmail,
+                content: content,
+                userAgent: navigator.userAgent,
+                image: imagePayload  // ← GASが { type, base64 } を期待しているのでこの形で送る
+            })
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+            alert("不具合報告を管理者に送信しました（画像が添付されている場合はドライブへ保存されます）。ご協力ありがとうございました！");
+            toggleBugModal();
+        } else {
+            alert("送信に失敗しました: " + result.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信エラーが発生しました。");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "報告を送信する";
+    }
+}
     </script>
 </body>
 </html>
