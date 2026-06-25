@@ -4,33 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - ログインポータル</title>
-        <link rel="icon" href="log.png" type="image/png">
+    <link rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         .brand-bg { background-color: #130182; }
         .login-bg {
-            background: radial-gradient(circle at 20% 20%, rgba(19, 1, 130, 0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 80%, rgba(19, 1, 130, 0.04) 0%, transparent 50%),
+            background: radial-gradient(circle at 10% 10%, rgba(19, 1, 130, 0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(19, 1, 130, 0.04) 0%, transparent 50%),
                         #f8fafc;
         }
     </style>
 </head>
 <body class="login-bg font-sans min-h-screen flex flex-col justify-center items-center p-4">
 
-    <div class="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100 max-w-md w-full text-center">
+    <div class="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 max-w-md w-full text-center transition-all duration-300">
         
-        <div class="flex justify-center mb-6">
-            <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-30 h-30 object-contain">
+        <div class="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+            <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-24 h-24 object-contain">
         </div>
 
-        <h1 class="text-2xl font-bold text-gray-800 tracking-wide mb-2">デジタル目安箱</h1>
-        <p class="text-sm text-gray-500 mb-8">学校アカウント（Google）でログインしてください</p>
+        <h1 class="text-2xl font-black text-gray-800 tracking-wider mb-2">デジタル目安箱</h1>
+        <p class="text-sm text-gray-400 mb-8 font-medium">学校アカウント（Google）でログインしてください</p>
 
-        <div id="alert-box" class="hidden mb-6 p-3 rounded-lg text-sm font-medium text-left"></div>
-
-        <div class="flex justify-center w-full">
+        <div id="status-container" class="hidden mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center justify-center space-y-4 animate__animated animate__fadeIn">
+            
+            <div id="status-spinner" class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin"></div>
+            
+            <div id="status-success-icon" class="hidden w-14 h-14 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-green-200 animate__animated animate__bounceIn">✓</div>
+            
+            <div id="status-error-icon" class="hidden w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-red-200 animate__animated animate__shakeX">!</div>
+            
+            <p id="status-text" class="text-gray-600 font-bold tracking-wide animate-pulse text-sm"></p>
+        </div>
+        <div id="login-btn-wrapper" class="flex justify-center w-full transition-all duration-300">
             <div id="g_id_onload"
                  data-client_id="363133502855-gi2t4f4ek5o87vk6mam8srciorh14jg2.apps.googleusercontent.com"
                  data-context="signin"
@@ -40,8 +49,7 @@
             </div>
             <div class="g_id_signin"
                  data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
+                 data-shape="pill" data-theme="outline"
                  data-text="signin_with"
                  data-size="large"
                  data-logo_alignment="left">
@@ -49,30 +57,53 @@
         </div>
 
         <div class="mt-8 pt-6 border-t border-gray-100 flex items-start space-x-2 text-left">
-            <i class="fas fa-shield-alt text-gray-400 mt-1 shrink-0 text-xs"></i>
-            <p class="text-[11px] text-gray-400 leading-relaxed">
+            <i class="fas fa-shield-alt text-indigo-400 mt-1 shrink-0 text-xs"></i>
+            <p class="text-[11px] text-gray-400 leading-relaxed font-medium">
                 本システムは、生徒会が意見を適切に処理するためGoogleログインを必須としていますが、投書の公開やチャット対応は<strong>原則匿名</strong>で行われます。メールアドレスが生徒会に直接開示されることは運用規定第◯条◯項の場合を除き、ありません。
             </p>
         </div>
     </div>
 
-    <footer class="mt-8 text-xs text-gray-400">&copy; 2026 第一高校 生徒会</footer>
+    <footer class="mt-8 text-xs text-gray-400 font-medium">&copy; 2026 第一高校 生徒会</footer>
 
     <script>
-        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
-        const alertBox = document.getElementById("alert-box");
+        // 各種動的要素の取得
+        const statusContainer = document.getElementById("status-container");
+        const statusSpinner = document.getElementById("status-spinner");
+        const statusSuccessIcon = document.getElementById("status-success-icon");
+        const statusErrorIcon = document.getElementById("status-error-icon");
+        const statusText = document.getElementById("status-text");
+        const loginBtnWrapper = document.getElementById("login-btn-wrapper");
 
-        function showAlert(message, type) {
-            alertBox.innerText = message;
-            alertBox.className = `mb-6 p-3 rounded-lg text-sm font-medium ${
-                type === 'error' ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'
-            }`;
-            alertBox.classList.remove("hidden");
+        // ✨ 旧showAlertを大改造した、リッチなステータス切り替えシステム
+        function showStatus(message, type) {
+            statusText.innerText = message;
+            statusContainer.classList.remove("hidden");
+
+            // 全てのアニメーションアイコンを一旦非表示にリセット
+            statusSpinner.classList.add("hidden");
+            statusSuccessIcon.classList.add("hidden");
+            statusErrorIcon.classList.add("hidden");
+            statusText.classList.remove("animate-pulse", "text-green-600", "text-red-600", "text-gray-600");
+
+            if (type === 'info') {
+                // アカウント確認中のぐるぐるローディング
+                statusSpinner.classList.remove("hidden");
+                statusText.classList.add("animate-pulse", "text-gray-600");
+            } else if (type === 'success') {
+                // 認証成功！グリーンの跳ねるチェック
+                statusSuccessIcon.classList.remove("hidden");
+                statusText.classList.add("text-green-600");
+                loginBtnWrapper.classList.add("opacity-30", "pointer-events-none"); // ボタンを薄くして触れなくする
+            } else if (type === 'error') {
+                // エラー発生！レッドの警告マーク
+                statusErrorIcon.classList.remove("hidden");
+                statusText.classList.add("text-red-600");
+            }
         }
 
-        // JWT（Googleから返ってくる暗号トークン）をデコードしてメールアドレスを引っこ抜く関数
         function decodeJwt(token) {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -82,16 +113,14 @@
             return JSON.parse(jsonPayload);
         }
 
-        // Googleログインが成功した時に自動で呼ばれるコールバック関数
         async function handleCredentialResponse(response) {
-            showAlert("学校アカウントを確認中...", "info");
+            // 💡 1. ログインが始まったら、くるくるローディングを滑らかに起動！
+            showStatus("学校アカウントを確認しています...", "info");
             
             try {
-                // 1. Googleから届いたデータを解析してメールアドレスを取得
                 const responsePayload = decodeJwt(response.credential);
                 const email = responsePayload.email;
 
-                // 2. GASのAPIにメールアドレスを送信してロール（権限）を問い合わせる
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
                     body: JSON.stringify({ email: email })
@@ -101,26 +130,26 @@
                 console.log("GASから返ってきた役職:", result.role);
 
                 if (result.status === "success") {
-                    showAlert("認証成功！画面を切り替えます...", "info");
+                    // 💡 2. 成功したら、ローディングが「✓」にパッと切り替わって弾みます！
+                    showStatus("認証成功！マイページへ移動します...", "success");
                     
-                    // ブラウザのメモリに一時的にユーザー情報を保存
                     sessionStorage.setItem("user_email", result.email || email);
                     sessionStorage.setItem("user_role", result.role);
 
-                    // ✨ 3. 役割に応じてリダイレクト（管理者はadminへ、他は全員マイページへ！）
+                    // 💡 3. あえて1.2秒だけアニメーションを見せる「最高の余韻」を持たせて移動
                     setTimeout(() => {
                         if (result.role === "admin") {
                             window.location.href = "admin.html";
                         } else {
                             window.location.href = "mypage.html";
                         }
-                    }, 800);
+                    }, 1200);
                 } else {
-                    showAlert("認証に失敗しました。ユーザー情報が見つかりません。", "error");
+                    showStatus("ユーザー情報が見つかりません。登録を確認してください。", "error");
                 }
             } catch (error) {
                 console.error(error);
-                showAlert("エラーが発生しました。通信環境を確認してください。", "error");
+                showStatus("通信エラーが発生しました。電波の良い場所で試してください。", "error");
             }
         }
     </script>
