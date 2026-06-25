@@ -12,8 +12,8 @@
         /* 管理者専用の重厚感あるプレミアムカラー（深みのある赤紫） */
         .admin-bg { background-color: #4a042e; }
         .admin-text { color: #4a042e; }
-        
-        /* 💡 スムーズなフェードインアニメーションの初期定義 */
+
+        /* 💡 動的ロード時にパラパラと上からフェードインさせるための基本定義 */
         @keyframes fadeInCustom {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -21,9 +21,25 @@
         .fade-in-item {
             animation: fadeInCustom 0.4s ease forwards;
         }
+        
+        /* タブ切り替え用の活性・非活性スタイル */
+        .tab-active {
+            border-bottom-width: 2px;
+            --tw-border-opacity: 1;
+            border-color: rgb(147 51 234 / var(--tw-border-opacity));
+            --tw-text-opacity: 1;
+            color: rgb(147 51 234 / var(--tw-text-opacity));
+            font-weight: 700;
+        }
+        .tab-inactive {
+            border-bottom-width: 2px;
+            border-color: transparent;
+            --tw-text-opacity: 1;
+            color: rgb(156 163 175 / var(--tw-text-opacity));
+        }
     </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen flex flex-col antialiased">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
     <nav class="admin-bg text-white shadow-md animate__animated animate__fadeInDown animate__fast">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -31,98 +47,78 @@
                 <i class="fas fa-crown text-amber-400 text-xl animate-bounce"></i>
                 <span class="font-bold tracking-wider text-amber-200">システム管理者専用ポータル</span>
             </div>
-            <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 active:scale-95 px-3 py-1.5 rounded-lg transition font-bold duration-150">
+            <button onclick="logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition font-bold active:scale-95 duration-150">
                 ログアウト
             </button>
         </div>
     </nav>
 
-    <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6 overflow-hidden">
+    <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
         
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl shadow-sm border-l-4 border-amber-500 animate__animated animate__fadeInLeft animate__fast">
             <div>
-                <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    全校目安箱 統括コントロールパネル
-                </h1>
-                <p class="text-xs text-gray-500 mt-0.5">全ての生徒からの投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。</p>
+                <h1 class="text-xl font-bold text-gray-800">全校目安箱 統括コントロールパネル</h1>
+                <p class="text-xs text-gray-500 mt-0.5">すべての生徒からの投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。</p>
             </div>
-            <button onclick="loadAllAdminData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-600 px-3 py-2 rounded-lg transition duration-150 shadow-sm">
+            <button onclick="loadAllAdminData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition active:scale-95 duration-150 shadow-sm">
                 <i class="fas fa-sync-alt"></i>
                 <span>全データを同期更新</span>
             </button>
         </div>
-        
-        <div id="mention-panel" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm mb-6 animate__animated animate__headShake">
-            <h2 class="text-sm font-bold text-amber-800 mb-2 flex items-center gap-1.5">
-                <i class="fas fa-exclamation-circle text-amber-600 animate-pulse"></i> 
-                管理者へのヘルプ・メンション（@admin）が届いています！ (<span id="mention-count">0</span>件)
+
+        <div id="mention-panel" class="hidden bg-amber-50 border border-amber-300 p-4 rounded-xl shadow-sm animate__animated animate__headShake">
+            <h2 class="text-sm font-bold text-amber-800 mb-2 flex items-center gap-1">
+                <i class="fas fa-exclamation-circle text-amber-500 animate-pulse"></i> 管理者へのヘルプ・メンション（@admin）が届いています！ (<span id="mention-count">0</span>件)
             </h2>
-            <div id="mention-list" class="space-y-2 max-h-48 overflow-y-auto mt-3">
-            </div>
+            <div id="mention-list" class="space-y-2 max-h-48 overflow-y-auto mt-2"></div>
         </div>
 
-        <div id="bug-panel" class="hidden bg-red-50 border-2 border-red-400 p-5 rounded-xl shadow-sm mb-6 animate__animated animate__headShake">
-            <h2 class="text-sm font-bold text-red-800 mb-2 flex items-center gap-1.5">
-                <i class="fas fa-bug text-red-600 animate-bounce"></i> 
-                生徒からシステム不具合報告（バグ報告）が届いています！ (<span id="bug-count">0</span>件)
+        <div id="bug-panel" class="hidden bg-red-50 border border-red-300 p-4 rounded-xl shadow-sm animate__animated animate__headShake">
+            <h2 class="text-sm font-bold text-red-800 mb-2 flex items-center gap-1">
+                <i class="fas fa-bug text-red-500 animate-bounce"></i> 生徒からシステム不具合報告（バグ報告）が届いています！ (<span id="bug-count">0</span>件)
             </h2>
-            <div id="bug-list" class="space-y-2 max-h-48 overflow-y-auto mt-3">
-            </div>
+            <div id="bug-list" class="space-y-2 max-h-48 overflow-y-auto mt-2"></div>
         </div>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 animate__animated animate__fadeInUp animate__fast">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow duration-300">
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate__animated animate__fadeInUp animate__fast">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">総投書数</p>
-                    <h3 id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                    <h3 id="stat-total" class="text-xl font-bold text-gray-700 mt-0.5">-- 件</h3>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                    <i class="fas fa-inbox text-lg"></i>
-                </div>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500"><i class="fas fa-inbox"></i></div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow duration-300">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">未対応（受付）</p>
-                    <h3 id="stat-pending" class="text-2xl font-bold text-amber-600 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                    <h3 id="stat-pending" class="text-xl font-bold text-amber-600 mt-0.5">-- 件</h3>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-                    <i class="fas fa-envelope text-lg"></i>
-                </div>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-500"><i class="fas fa-envelope"></i></div>
             </div>
-
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow duration-300">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">現在検討中</p>
-                    <h3 id="stat-progress" class="text-2xl font-bold text-purple-600 mt-1">-- <span class="text-xs font-normal text-gray-400">件</span></h3>
+                    <h3 id="stat-progress" class="text-xl font-bold text-purple-600 mt-0.5">-- 件</h3>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
-                    <i class="fas fa-spinner text-lg"></i>
-                </div>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500"><i class="fas fa-spinner"></i></div>
             </div>
-
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow duration-300">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">回答完了率</p>
-                    <h3 id="stat-completion" class="text-2xl font-bold text-green-600 mt-1">-- <span class="text-xs font-normal text-gray-400">%</span></h3>
+                    <h3 id="stat-completion" class="text-xl font-bold text-green-600 mt-0.5">-- %</h3>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">
-                    <i class="fas fa-check-circle text-lg"></i>
-                </div>
+                <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-500"><i class="fas fa-check-circle"></i></div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.1s;">
-            
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-5">
-                <div class="space-y-3">
-                    <h2 class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                        <i class="fas fa-user-cog text-blue-600"></i> ユーザーアカウント権限設定
-                    </h2>
-                    <p class="text-xs text-gray-500">学内アカウントの権限ロール（一般生徒・生徒会・先生・管理者など）を画面上で変更・上書き登録します。</p>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="email" id="role-email-input" placeholder="student@school.ed.jp" class="flex-1 text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 transition duration-200">
-                        <select id="role-select" class="text-xs border border-gray-200 p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 font-bold cursor-pointer hover:border-gray-400 transition">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                <div class="space-y-2">
+                    <h2 class="text-sm font-bold text-gray-700 flex items-center gap-1"><i class="fas fa-user-cog text-blue-500"></i> ユーザーアカウント権限設定</h2>
+                    <p class="text-xs text-gray-400">学内アカウントの権限ロール（一般生徒・生徒会・先生・管理者など）を画面上で変更・上書き登録します。</p>
+                    <div class="flex gap-2">
+                        <input type="email" id="role-email-input" placeholder="student@school.ed.jp" class="flex-1 text-xs border p-2 rounded-lg focus:outline-none focus:border-blue-400">
+                        <select id="role-select" class="text-xs border p-2 rounded-lg bg-white font-bold cursor-pointer">
                             <option value="student">一般生徒 (student)</option>
                             <option value="council">生徒会役員 (council)</option>
                             <option value="chairperson">委員長 (chairperson)</option>
@@ -131,42 +127,32 @@
                             <option value="admin">最高管理者 (admin)</option>
                         </select>
                     </div>
-                    <button onclick="updateUserRole()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm hover:shadow-md duration-150">
-                        アカウントの権限を適用・変更する
-                    </button>
+                    <button onclick="updateUserRole()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition active:scale-[0.99] duration-150">アカウントの権限を適用・変更する</button>
                 </div>
-
                 <hr class="border-gray-100">
-
-                <div class="space-y-3">
-                    <h2 class="text-sm font-bold text-red-700 flex items-center gap-1.5">
-                        <i class="fas fa-ban"></i> 新規投稿ブロック登録
-                    </h2>
-                    <p class="text-xs text-gray-500">悪質な嫌がらせやスパムを行う生徒のアドレスを登録すると、該当アカウントからの新規の目安箱投稿を完全にブロックします。</p>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="flex-1 text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200 transition duration-200">
-                        <button onclick="addBlocklist()" class="bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm shrink-0 duration-150">
-                            ブロック登録
-                        </button>
+                <div class="space-y-2">
+                    <h2 class="text-sm font-bold text-red-700 flex items-center gap-1"><i class="fas fa-ban"></i> 新規投稿ブロック登録</h2>
+                    <p class="text-xs text-gray-400">悪質な嫌がらせやスパムを行う生徒のアドレスを登録すると、該当アカウントからの新規の目安箱投稿を完全にブロックします。</p>
+                    <div class="flex gap-2">
+                        <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="flex-1 text-xs border p-2 rounded-lg focus:outline-none focus:border-red-400">
+                        <button onclick="addBlocklist()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shrink-0 active:scale-95 duration-150">ブロック登録</button>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-red-50 flex flex-col">
-                <h2 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5">
-                    <i class="fas fa-list-ul"></i> 現在のブロックリスト一覧
-                </h2>
-                <div class="overflow-y-auto max-h-56 border border-gray-50 rounded-lg flex-1 bg-slate-50/50 shadow-inner">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                <h2 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1"><i class="fas fa-list-ul"></i> 現在のブロックリスト一覧</h2>
+                <div class="overflow-y-auto max-h-52 border border-gray-100 rounded-lg flex-1">
                     <table class="w-full text-left text-xs text-gray-600">
-                        <thead class="bg-slate-100 text-gray-500 sticky top-0 z-10 shadow-sm">
+                        <thead class="bg-gray-50 text-gray-500 sticky top-0">
                             <tr>
-                                <th class="p-2.5">ブロック対象メールアドレス</th>
-                                <th class="p-2.5 w-28">登録日時</th>
-                                <th class="p-2.5 w-14 text-center">解除</th>
+                                <th class="p-2">ブロック対象メールアドレス</th>
+                                <th class="p-2 w-28">登録日時</th>
+                                <th class="p-2 w-12 text-center">解除</th>
                             </tr>
                         </thead>
-                        <tbody id="blocklist-table-body" class="divide-y divide-gray-100 bg-white">
-                            <tr><td colspan="3" class="text-center py-6 text-gray-400"><i class="fas fa-spinner animate-spin mr-1.5"></i>読み込み中...</td></tr>
+                        <tbody id="blocklist-table-body" class="divide-y divide-gray-100">
+                            <tr><td colspan="3" class="text-center py-6 text-gray-400">読み込み中...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -174,120 +160,145 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.15s;">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between gap-4">
-                <div>
-                    <h2 class="text-sm font-bold text-gray-800 flex items-center gap-1.5">
-                        <i class="fas fa-archive text-amber-500"></i> 完了済みデータのアーカイブ整理
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-1.5 leading-relaxed">「回答完了」ステータスになっている古い投書データを、一覧画面から非表示（アーカイブ状態）にしてデータベースを軽量化します。</p>
-                </div>
-                <button onclick="archiveCompletedSuggestions()" class="w-full bg-amber-600 hover:bg-amber-700 active:scale-[0.99] text-white text-xs font-bold py-2.5 rounded-lg transition shadow-sm flex items-center justify-center gap-1.5 duration-150">
-                    <i class="fas fa-box-open"></i> 回答完了データをアーカイブする
-                </button>
-            </div>
-            
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
                 <div>
-                    <h2 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1.5">
-                        <i class="fas fa-toggle-on"></i> 全校目安箱 受付コントロール
-                    </h2>
-                    <p class="text-xs text-gray-500 mb-3">テスト期間や長期休暇、メンテナンス時など、全生徒からの新しい意見の投稿を一時的にロックできます。</p>
+                    <h2 class="text-sm font-bold text-gray-700 flex items-center gap-1"><i class="fas fa-archive text-amber-500"></i> 完了済みデータのアーカイブ整理</h2>
+                    <p class="text-xs text-gray-400 mt-1">「回答完了」ステータスになっている古い投書データを、一覧画面から非表示（アーカイブ状態）にしてデータベースを軽量化します。</p>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="toggleSystem('active')" id="sys-btn-active" class="flex-1 bg-green-600 hover:bg-green-700 active:scale-95 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm duration-150">
-                        通常稼働（受付中）
-                    </button>
-                    <button onclick="toggleSystem('maintenance')" id="sys-btn-main" class="flex-1 bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs font-bold py-2 rounded-lg transition shadow-sm duration-150">
-                        一時受付停止
-                    </button>
+                <button onclick="archiveCompletedSuggestions()" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded-lg mt-3 transition active:scale-[0.99] duration-150"><i class="fas fa-box-open mr-1"></i> 回答完了データをアーカイブする</button>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-bold text-gray-700 mb-1 flex items-center gap-1"><i class="fas fa-toggle-on"></i> 全校目安箱 受付コントロール</h2>
+                    <p class="text-xs text-gray-400 mb-2">テスト期間や長期休暇、メンテナンス時など、全生徒からの新しい意見の投稿を一時的にロックできます。</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="toggleSystem('active')" id="sys-btn-active" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-bold py-2 rounded-lg transition active:scale-95 duration-150">通常稼働（受付中）</button>
+                    <button onclick="toggleSystem('maintenance')" id="sys-btn-main" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-bold py-2 rounded-lg transition active:scale-95 duration-150">一時受付停止</button>
                 </div>
             </div>
         </div>
 
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.2s;">
-            <div class="md:w-1/3 space-y-3">
-                <h2 class="text-sm font-bold text-purple-700 flex items-center gap-1.5">
-                    <i class="fas fa-bullhorn animate-pulse"></i> 全校一斉アナウンス配信
-                </h2>
-                <p class="text-xs text-gray-500">生徒用トップページの上部にお知らせを掲載します。「メンテナンス予告」や「生徒会からの回答公開通知」などに利用できます。</p>
-                <div class="space-y-2">
-                    <input type="text" id="announcement-title" placeholder="タイトル（例：【重要】規則見直しについて）" class="w-full text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 transition">
-                    <textarea id="announcement-content" rows="3" placeholder="お知らせの本文を入力してください..." class="w-full text-xs border border-gray-200 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 resize-none"></textarea>
-                    <button onclick="postAnnouncement()" class="w-full bg-purple-700 hover:bg-purple-800 active:scale-[0.99] text-white text-xs font-bold py-2 rounded-lg transition shadow-sm duration-150">
-                        アナウンスを全体配信する
-                    </button>
-                </div>
+            <div class="md:w-1/3 space-y-2">
+                <h2 class="text-sm font-bold text-purple-700 flex items-center gap-1"><i class="fas fa-bullhorn text-purple-500"></i> 全校一斉アナウンス配信</h2>
+                <p class="text-xs text-gray-400">生徒用トップページの上部にお知らせを掲載します。「メンテナンス予告」や「生徒会からの回答公開通知」などに利用できます。</p>
+                <input type="text" id="announcement-title" placeholder="タイトル" class="w-full text-xs border p-2 rounded-lg focus:outline-none focus:border-purple-400">
+                <textarea id="announcement-content" rows="3" placeholder="本文を入力してください..." class="w-full text-xs border p-2 rounded-lg focus:outline-none focus:border-purple-400 resize-none"></textarea>
+                <button onclick="postAnnouncement()" class="w-full bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold py-2 rounded-lg transition active:scale-[0.99] duration-150">アナウンスを全体配信する</button>
             </div>
-            
             <div class="flex-1 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 flex flex-col">
-                <h2 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5">
-                    <i class="fas fa-history"></i> 配信中のアナウンス履歴 (最新3件)
-                </h2>
-                <div id="announcement-history-box" class="space-y-2 overflow-y-auto max-h-48 flex-1 text-xs text-gray-500 bg-slate-50 p-2.5 rounded-lg border border-gray-50">
-                    読み込み中...
-                </div>
+                <h2 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1"><i class="fas fa-history"></i> 配信中のアナウンス履歴 (最新3件)</h2>
+                <div id="announcement-history-box" class="space-y-2 overflow-y-auto max-h-48 flex-1 text-xs text-gray-400 bg-gray-50 p-2 rounded-lg">読み込み中...</div>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.25s;">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.25s;">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-gray-100 text-xs font-bold text-gray-500 tracking-wider sticky top-0 z-10 shadow-sm">
-                            <th class="p-4 w-24">投稿日</th>
-                            <th class="p-4 w-28">カテゴリ</th>
-                            <th class="p-4">タイトル / 内容の要約</th>
-                            <th class="p-4 w-32">対応ステータス</th>
-                            <th class="p-4 w-28 text-center">特権チャット</th>
+                        <tr class="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-500 tracking-wider">
+                            <th class="p-3 w-24">投稿日</th>
+                            <th class="p-3 w-24">カテゴリ</th>
+                            <th class="p-3">タイトル / 内容の要約</th>
+                            <th class="p-3 w-32">対応ステータス</th>
+                            <th class="p-3 w-24 text-center">特権チャット</th>
                         </tr>
                     </thead>
-                    <tbody id="suggestion-table-body" class="divide-y divide-gray-50 text-sm text-gray-700 bg-white">
-                        <tr id="table-loading">
-                            <td colspan="5" class="text-center py-12 text-gray-400">
-                                <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
-                                <span class="text-xs">スプレッドシートから全意見を取得中...</span>
-                            </td>
-                        </tr>
+                    <tbody id="suggestion-table-body" class="divide-y divide-gray-100 text-xs text-gray-700">
+                        <tr id="table-loading"><td colspan="5" class="text-center py-12 text-gray-400"><i class="fas fa-spinner animate-spin text-lg mb-1 block"></i>全意見を取得中...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
+    <div id="chat-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full h-[85vh] flex flex-col animate__animated animate__zoomIn animate__fast">
+            
+            <div class="p-4 border-b flex justify-between items-center bg-purple-900 text-white rounded-t-2xl">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                        <span class="bg-amber-400 text-purple-900 text-[10px] px-1.5 py-0.5 rounded-md font-bold shrink-0 shadow-sm"><i class="fas fa-shield-alt"></i> ADMIN特権介入</span>
+                        <h3 id="modal-title" class="font-bold text-sm truncate">投書案件チャット監視</h3>
+                    </div>
+                    <p id="modal-meta" class="text-[10px] text-purple-200 truncate mt-0.5">投稿者: --</p>
+                </div>
+                <button onclick="closeChatModal()" class="text-white/70 hover:text-white p-1 ml-2 transition active:scale-90 text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="flex border-b border-gray-100 bg-gray-50 text-xs">
+                <button id="tab-btn-chat" onclick="switchModalTab('chat')" class="flex-1 py-2.5 text-center transition font-bold border-b-2 tab-active">
+                    <i class="fas fa-comments mr-1"></i>対話スペース
+                </button>
+                <button id="tab-btn-detail" onclick="switchModalTab('detail')" class="flex-1 py-2.5 text-center transition font-medium border-b-2 tab-inactive">
+                    <i class="fas fa-file-alt mr-1"></i>意見原稿・全文詳細
+                </button>
+            </div>
+
+            <div id="tab-content-chat" class="flex-1 flex flex-col min-h-0">
+                <div id="chat-messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+                    <div class="text-center text-xs text-gray-400 py-8">メッセージを読み込み中...</div>
+                </div>
+                <div class="p-3 bg-white border-t flex gap-2 items-center">
+                    <input type="text" id="chat-reply-input" placeholder="管理者としてこのチャットに割り込み発言する..." class="flex-1 text-xs border p-2.5 rounded-xl focus:outline-none focus:border-purple-500">
+                    <button onclick="sendAdminChatMessage()" class="bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-md shrink-0 active:scale-95 duration-150">
+                        送信
+                    </button>
+                </div>
+            </div>
+
+            <div id="tab-content-detail" class="flex-1 overflow-y-auto p-5 space-y-4 hidden bg-white">
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">目安箱に投函されたタイトル</span>
+                    <h4 id="detail-full-title" class="text-sm font-bold text-gray-800 mt-0.5 bg-gray-50 p-2 rounded-lg border">--</h4>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">意見本文・具体的内容</span>
+                    <p id="detail-full-content" class="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap mt-1 bg-gray-50 p-3 rounded-xl border min-h-[120px]">--</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-[11px] bg-purple-50/50 border border-purple-100 p-3 rounded-xl">
+                    <div><span class="text-gray-400 block">システム管理ID:</span><span id="detail-id" class="font-mono text-gray-700 select-all font-bold">--</span></div>
+                    <div><span class="text-gray-400 block">元々の投稿日時:</span><span id="detail-date" class="text-gray-700 font-bold">--</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <script>
-        // ⚠️【要書き換え】デプロイしたGASのWebアプリURLを入力
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
-        // 厳重な権限チェック (admin のみアクセス可)
+        // セッション検証
         const userRole = sessionStorage.getItem("user_role");
         const userEmail = sessionStorage.getItem("user_email");
         
         if (!userEmail || userRole !== "admin") {
-            alert("このページは最高管理者(admin)専用です。アクセス権限がありません。");
+            alert("このページは最高管理者(admin)専用です。");
             window.location.href = "index.html";
         }
 
         const tableBody = document.getElementById("suggestion-table-body");
         const blocklistBody = document.getElementById("blocklist-table-body");
 
-        // 一括データロード
+        // チャットモーダル制御用の状態管理
+        let currentActiveSuggestionId = null;
+        let chatPollingIntervalId = null;
+        let currentTargetItemCache = null; // 詳細タブで使う用
+
+        // 初回ロードまとめ
         async function loadAllAdminData() {
             loadAdminData();
             loadBlocklistData();
-            loadBugReports();     // 💡【追加】不具合報告も同時に読み込むようにします！
+            loadAdminMentions();
+            loadBugReports();
         }
 
-        // ==========================================
-        // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
-        // ==========================================
+        // 1. 目安箱の全投書データロード & 描画
         async function loadAdminData() {
-            tableBody.innerHTML = `
-                <tr id="table-loading">
-                    <td colspan="5" class="text-center py-12 text-gray-400">
-                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
-                        <span class="text-xs">最高権限でデータを同期中...</span>
-                    </td>
-                </tr>`;
+            tableBody.innerHTML = `<tr id="table-loading"><td colspan="5" class="text-center py-12 text-gray-400"><i class="fas fa-spinner animate-spin text-lg mb-1 block"></i>最高権限でデータを同期中...</td></tr>`;
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
@@ -297,34 +308,23 @@
                     return;
                 }
 
-                tableBody.innerHTML = ""; // ローディング消去
+                tableBody.innerHTML = "";
+                let total = data.length, pending = 0, progress = 0, completed = 0;
 
-                // 📊 簡易ダッシュボード用の集計カウンター
-                let totalCount = data.length;
-                let pendingCount = 0;
-                let progressCount = 0;
-                let completedCount = 0;
-
-                if (totalCount === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">現在、目安箱に届いている意見はありません。</td></tr>`;
-                    updateDashboard(0, 0, 0, 0);
+                if (total === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400">現在、目安箱に届いている意見はありません。</td></tr>`;
+                    updateDashboard(0,0,0,0);
                     return;
                 }
 
                 data.forEach((item, index) => {
-                    // 各ステータスのカウント処理
-                    if (item.status === "受付") {
-                        pendingCount++;
-                    } else if (item.status === "生徒会検討中" || item.status === "先生方検討中" || item.status === "開示請求") {
-                        progressCount++;
-                    } else if (item.status === "回答完了") {
-                        completedCount++;
-                    }
+                    if (item.status === "受付") pending++;
+                    else if (item.status === "生徒会検討中" || item.status === "先生方検討中" || item.status === "開示請求") progress++;
+                    else if (item.status === "回答完了") completed++;
 
                     const tr = document.createElement("tr");
-                    // 💡 今風演出のキモ：ロード時に行データを1行ずつパラパラ上からフェードインさせる
-                    tr.className = "hover:bg-purple-50/30 transition-colors border-b border-gray-100 opacity-0 fade-in-item";
-                    tr.style.animationDelay = `${index * 0.02}s`; // 1行ごとに0.02秒ずつ遅延をずらす
+                    tr.className = "hover:bg-gray-50/50 transition-colors opacity-0 fade-in-item";
+                    tr.style.animationDelay = `${index * 0.02}s`;
 
                     let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
                     if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
@@ -332,69 +332,41 @@
                     if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
                     if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200";
 
-                    let approvalControlsHTML = "";
+                    // 三者承認パネルの構築
+                    let approvalHTML = "";
                     if (item.status === "開示請求") {
-                        approvalControlsHTML = `
-                            <div class="mt-2.5 p-3 bg-red-50/50 border border-red-200/60 rounded-xl text-xs space-y-2 max-w-xs shadow-sm">
-                                <div class="font-bold text-red-700 mb-1 flex items-center gap-1">
-                                    <i class="fas fa-shield-alt"></i> 🚨 アドレス開示請求・3者承認状況
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">副会長:</span>
-                                    <div>
-                                        ${item.approvals?.vice_president ?
-                                        '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ?
-                                        `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">管理者:</span>
-                                    <div>
-                                        ${item.approvals?.admin ?
-                                        '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ?
-                                        `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600 font-medium">担 当:</span>
-                                    <div>
-                                        ${item.approvals?.teacher ?
-                                        '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ?
-                                        `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] hover:bg-purple-700 font-bold shadow-sm transition">承認する</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                    </div>
-                                </div>
+                        approvalHTML = `
+                            <div class="mt-2 p-2 bg-red-50/60 border border-red-200 rounded-lg space-y-1 max-w-xs text-[11px]">
+                                <div class="font-bold text-red-700"><i class="fas fa-shield-alt"></i> アドレス開示請求・3者承認状況</div>
+                                <div class="flex justify-between"><span>副会長:</span><span>${item.approvals?.vice_president ? '✅ 承認済' : '<button onclick="approveRequest(\''+item.id+'\', \'vice_president\')" class="bg-blue-600 text-white px-1 rounded text-[9px]">承認</button>'}</span></div>
+                                <div class="flex justify-between"><span>管理者:</span><span>${item.approvals?.admin ? '✅ 承認済' : '<button onclick="approveRequest(\''+item.id+'\', \'admin\')" class="bg-red-600 text-white px-1 rounded text-[9px]">承認</button>'}</span></div>
+                                <div class="flex justify-between"><span>担 当:</span><span>${item.approvals?.teacher ? '✅ 承認済' : '<button onclick="approveRequest(\''+item.id+'\', \'teacher\')" class="bg-purple-600 text-white px-1 rounded text-[9px]">承認</button>'}</span></div>
                             </div>
                         `;
                     }
 
+                    // 完全開示時のメールアドレス表示
                     let disclosureHTML = "";
                     if (item.isFullyApproved === true) {
                         disclosureHTML = `
-                            <div class="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-lg animate__animated animate__pulse animate__infinite">
-                                <div class="text-[11px] font-bold text-red-700 flex items-center gap-1">
-                                    <i class="fas fa-exclamation-triangle"></i> 3者開示承認済・要対応
-                                </div>
-                                <div class="text-xs text-red-950 mt-1 bg-white p-2 rounded border border-red-100 font-mono font-bold flex items-center justify-between">
-                                    <span>投稿者アドレス:</span>
-                                    <span class="text-red-600 select-all">${item.studentEmail}</span>
-                                </div>
+                            <div class="mt-2 p-2 bg-red-100 border border-red-300 rounded-lg text-red-800 animate__animated animate__flash">
+                                <div class="font-bold text-[11px]"><i class="fas fa-exclamation-triangle"></i> 3者開示承認済・要対応</div>
+                                <div class="mt-0.5 font-mono select-all font-bold bg-white px-1.5 py-0.5 rounded border border-red-200">投稿者: ${item.studentEmail}</div>
                             </div>
                         `;
                     }
 
                     tr.innerHTML = `
-                        <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
-                        <td class="p-4 whitespace-nowrap">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600">${item.category}</span>
-                        </td>
-                        <td class="p-4 max-w-xs md:max-w-md">
+                        <td class="p-3 text-gray-400 whitespace-nowrap">${item.date}</td>
+                        <td class="p-3 whitespace-nowrap"><span class="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-medium">${item.category}</span></td>
+                        <td class="p-3 max-w-xs md:max-w-md">
                             <div class="font-bold text-gray-800 truncate">${item.title}</div>
-                            <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
-                            ${approvalControlsHTML}
+                            <div class="text-gray-400 truncate mt-0.5">${item.content}</div>
+                            ${approvalHTML}
                             ${disclosureHTML}
                         </td>
-                        <td class="p-4 whitespace-nowrap">
-                            <select id="status-${item.id}" onchange="updateStatus('${item.id}', this)" class="${selectBg} text-xs font-bold px-2 py-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all cursor-pointer">
+                        <td class="p-3 whitespace-nowrap">
+                            <select onchange="updateStatus('${item.id}', this)" class="${selectBg} text-xs font-bold px-1.5 py-1 rounded border focus:outline-none cursor-pointer">
                                 <option value="新規受付" ${item.status === '新規受付' || item.status === '受付' ? 'selected' : ''}>🔵 新規受付</option>
                                 <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
                                 <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
@@ -402,119 +374,96 @@
                                 <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 開示請求</option>
                             </select>
                         </td>
-                        <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="openChatModal('${item.id}')" class="relative p-2 text-gray-400 hover:text-purple-600 transition-colors duration-150 active:scale-90 inline-block">
-                                <i class="fas fa-comment-dots text-lg"></i>
-                                ${item.hasUnread ? '<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>' : ''}
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <button onclick="openChatModal('${item.id}', ${JSON.stringify(item).replace(/"/g, '&quot;')})" class="relative p-1 text-gray-400 hover:text-purple-600 active:scale-90 transition">
+                                <i class="fas fa-comment-dots text-base"></i>
+                                ${item.hasUnread ? '<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>' : ''}
                             </button>
                         </td>
                     `;
                     tableBody.appendChild(tr);
                 });
 
-                // ダッシュボードウィジェットへ数値を流し込み
-                const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-                updateDashboard(totalCount, pendingCount, progressCount, completionRate);
+                const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+                updateDashboard(total, pending, progress, rate);
             } catch (error) {
                 console.error(error);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの同期に失敗しました。再読み込みしてください。</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500">データの同期に失敗しました。</td></tr>`;
             }
         }
 
-        // ダッシュボード数値を画面表示に上書きする補助関数
         function updateDashboard(total, pending, progress, rate) {
-            document.getElementById("stat-total").innerHTML = `${total} <span class="text-xs font-normal text-gray-400">件</span>`;
-            document.getElementById("stat-pending").innerHTML = `${pending} <span class="text-xs font-normal text-gray-400">件</span>`;
-            document.getElementById("stat-progress").innerHTML = `${progress} <span class="text-xs font-normal text-gray-400">件</span>`;
-            document.getElementById("stat-completion").innerHTML = `${rate} <span class="text-xs font-normal text-gray-400">%</span>`;
+            document.getElementById("stat-total").innerText = total + " 件";
+            document.getElementById("stat-pending").innerText = pending + " 件";
+            document.getElementById("stat-progress").innerText = progress + " 件";
+            document.getElementById("stat-completion").innerText = rate + " %";
         }
 
-        // ==========================================
-        // 2. [新機能] ユーザーアカウントの権限変更変更をGASへリクエスト
-        // ==========================================
+        // 2. ユーザーロール変更リクエスト
         async function updateUserRole() {
             const emailInput = document.getElementById("role-email-input");
             const roleSelect = document.getElementById("role-select");
             const targetEmail = emailInput.value.trim();
             const selectedRole = roleSelect.value;
 
-            if (!targetEmail) return alert("変更対象のメールアドレスを入力してください。");
-            if (!confirm(`本当にアカウント [ ${targetEmail} ] の権限を「${selectedRole}」に変更しますか？`)) return;
+            if (!targetEmail) return alert("メールアドレスを入力してください。");
+            if (!confirm(`アカウント [ ${targetEmail} ] の権限を「${selectedRole}」に変更しますか？`)) return;
 
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
                     body: JSON.stringify({
                         action: "updateUserRole",
-                        email: userEmail, // 操作を行っている管理者自身のメール
-                        targetEmail: targetEmail, // 変更される側のメール
+                        email: userEmail,
+                        targetEmail: targetEmail,
                         newRole: selectedRole
                     })
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    alert(`アカウント権限を「${selectedRole}」に正常にアップデートしました。`);
+                    alert("アカウント権限を正常に変更しました。");
                     emailInput.value = "";
-                } else {
-                    alert("変更エラー: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。GAS側に「updateUserRole」のアクション処理が実装されているかご確認ください。");
-            }
+                } else { alert("変更エラー: " + result.message); }
+            } catch (e) { console.error(e); alert("通信に失敗しました。"); }
         }
 
-        // ==========================================
-        // 3. [新機能] 完了済みデータのアーカイブ処理
-        // ==========================================
+        // 3. 完了データのアーカイブ処理
         async function archiveCompletedSuggestions() {
-            if (!confirm("「回答完了」ステータスになっているすべての投稿データをアーカイブ（非表示化）しますか？\n※この操作は元に戻せません。")) return;
+            if (!confirm("「回答完了」のすべての投稿データを一覧からアーカイブ（非表示化）しますか？")) return;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "archiveCompleted",
-                        email: userEmail
-                    })
+                    body: JSON.stringify({ action: "archiveCompleted", email: userEmail })
                 });
                 const result = await res.json();
                 if (result.status === "success") {
                     alert(`正常に完了データをアーカイブしました！\n処理件数: ${result.archivedCount || 0} 件`);
-                    loadAdminData(); // リスト再読み込み
-                } else {
-                    alert("アーカイブエラー: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。GAS側に「archiveCompleted」のアクション処理が実装されているかご確認ください。");
-            }
+                    loadAdminData();
+                } else { alert("アーカイブエラー: " + result.message); }
+            } catch (e) { console.error(e); alert("通信に失敗しました。"); }
         }
 
-        // ==========================================
-        // ブロックリストの取得と描画
-        // ==========================================
+        // 4. ブロックリスト処理
         async function loadBlocklistData() {
-            blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">同期中...</td></tr>`;
+            blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400">同期中...</td></tr>`;
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBlocklist&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
-                
-                if(data.status === "success") {
+                if (data.status === "success") {
                     blocklistBody.innerHTML = "";
-                    if(data.list.length === 0) {
-                        blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-400">ブロック中のアドレスはありません。</td></tr>`;
+                    if (data.list.length === 0) {
+                        blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-400">ブロック中のアドレスはありません。</td></tr>`;
                         return;
                     }
                     data.list.forEach((item, index) => {
                         const tr = document.createElement("tr");
-                        tr.className = "hover:bg-slate-50 transition border-b border-gray-100 opacity-0 fade-in-item";
+                        tr.className = "hover:bg-gray-50 opacity-0 fade-in-item";
                         tr.style.animationDelay = `${index * 0.03}s`;
-
                         tr.innerHTML = `
-                            <td class="p-2 font-mono font-bold text-gray-700">${item.email}</td>
+                            <td class="p-2 font-mono text-gray-700">${item.email}</td>
                             <td class="p-2 text-gray-400">${item.date}</td>
                             <td class="p-2 text-center">
-                                <button onclick="removeBlocklist('${item.email}')" class="text-red-500 hover:text-red-700 active:scale-90 transition duration-150 inline-block p-1">
+                                <button onclick="removeBlocklist('${item.email}')" class="text-red-500 hover:text-red-700 active:scale-90 transition inline-block p-1">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -522,185 +471,93 @@
                         blocklistBody.appendChild(tr);
                     });
                 }
-            } catch (e) {
-                console.error(e);
-                blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-red-500">取得失敗</td></tr>`;
-            }
+            } catch (e) { blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-red-500">同期失敗</td></tr>`; }
         }
 
-        // ブロックリストの追加登録
         async function addBlocklist() {
             const input = document.getElementById("block-email-input");
             const targetEmail = input.value.trim();
-            if(!targetEmail) return alert("メールアドレスを入力してください。");
-            if(!confirm(`本当に ${targetEmail} からの新規投稿をブロックしますか？`)) return;
-
+            if(!targetEmail) return alert("アドレスを入力してください。");
+            if(!confirm(`${targetEmail} をブロックリストに登録しますか？`)) return;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "addBlocklist",
-                        email: userEmail,
-                        targetEmail: targetEmail
-                    })
+                    body: JSON.stringify({ action: "addBlocklist", email: userEmail, targetEmail: targetEmail })
                 });
                 const result = await res.json();
-                if(result.status === "success") {
-                    alert("ブロックリストに登録しました。");
-                    input.value = "";
-                    loadBlocklistData();
-                } else {
-                    alert("登録エラー: " + result.message);
-                }
-            } catch(e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
+                if (result.status === "success") { alert("ブロック登録しました。"); input.value = ""; loadBlocklistData(); }
+                else { alert("エラー: " + result.message); }
+            } catch (e) { alert("通信エラー"); }
         }
 
-        // ブロックリストの削除解除
         async function removeBlocklist(targetEmail) {
-            if(!confirm(`アドレス ${targetEmail} のブロックを解除しますか？`)) return;
+            if(!confirm(`${targetEmail} のブロックを解除しますか？`)) return;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "removeBlocklist",
-                        email: userEmail,
-                        targetEmail: targetEmail
-                    })
+                    body: JSON.stringify({ action: "removeBlocklist", email: userEmail, targetEmail: targetEmail })
                 });
                 const result = await res.json();
-                if(result.status === "success") {
-                    alert("ブロックを解除しました。");
-                    loadBlocklistData();
-                } else {
-                    alert("解除エラー: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
+                if (result.status === "success") { alert("ブロックを解除しました。"); loadBlocklistData(); }
+                else { alert("エラー: " + result.message); }
+            } catch (e) { alert("通信エラー"); }
         }
 
-        // ステータス変更をGASに反映
+        // 5. ステータス更新処理
         async function updateStatus(suggestionId, selectElement) {
             const newStatus = selectElement.value;
             selectElement.disabled = true;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "updateStatus",
-                        suggestionId: suggestionId,
-                        status: newStatus,
-                        email: userEmail
-                    })
+                    body: JSON.stringify({ action: "updateStatus", suggestionId: suggestionId, status: newStatus, email: userEmail })
                 });
                 const result = await res.json();
-                if (result.status === "success") {
-                    selectElement.classList.remove(
-                        "bg-blue-50", "text-blue-700", "border-blue-200",
-                        "bg-yellow-50", "text-yellow-700", "border-yellow-200",
-                        "bg-purple-50", "text-purple-700", "border-purple-200",
-                        "bg-green-50", "text-green-700", "border-green-200",
-                        "bg-red-50", "text-red-700", "border-red-200"
-                    );
-                    if (newStatus === "新規受付" || newStatus === "受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
-                    if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
-                    if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
-                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
-                    if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
-                    
-                    // ダッシュボード値や再計算のために全更新
-                    loadAdminData();
-                } else {
-                    alert("変更に失敗しました: " + result.message);
-                    loadAdminData();
-                }
-            } catch (error) {
-                console.error(error);
-                alert("通信エラーが発生しました。");
-                loadAdminData();
-            } finally {
-                selectElement.disabled = false;
-            }
+                if (result.status === "success") { loadAdminData(); } 
+                else { alert("変更失敗: " + result.message); loadAdminData(); }
+            } catch (error) { alert("通信エラー"); loadAdminData(); } finally { selectElement.disabled = false; }
         }
 
-        function openChatModal(id) {
-            window.location.href = `council_chat.html?id=${id}`;
-        }
+        function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
 
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
-
-        // 3者承認用関数
+        // 6. 3者開示承認処理
         async function approveRequest(suggestionId, roleToApprove) {
-            if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
-            const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
+            if (!confirm("本当にこの事案の身元開示を承認しますか？")) return;
             try {
-                const response = await fetch(GAS_API_URL, { // 💡 元コードの引数のミス(GAS->GAS_API_URL)を自然に修正
+                const response = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "approveDisclosure",
-                        email: senderEmail,
-                        suggestionId: suggestionId,
-                        role: roleToApprove
-                    })
+                    body: JSON.stringify({ action: "approveDisclosure", email: userEmail, suggestionId: suggestionId, role: roleToApprove })
                 });
                 const res = await response.json();
-                if (res.status === "success") {
-                    alert("承認を記録しました！");
-                    loadAdminData();
-                } else {
-                    alert("エラー: " + res.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
+                if (res.status === "success") { alert("承認を記録しました！"); loadAdminData(); }
+                else { alert("エラー: " + res.message); }
+            } catch (e) { alert("通信に失敗しました。"); }
         }
 
-        // ==========================================
-        // 新機能: 一斉アナウンスの投稿
-        // ==========================================
+        // 7. アナウンス全体配信
         async function postAnnouncement() {
             const titleInput = document.getElementById("announcement-title");
             const contentInput = document.getElementById("announcement-content");
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
 
-            if (!title || !content) return alert("タイトルと本文の両方を入力してください。");
-            if (!confirm(`全校生徒に向けて以下のアナウンスを配信しますか？\n\nタイトル: ${title}`)) return;
+            if (!title || !content) return alert("タイトルと本文を入力してください。");
+            if (!confirm("全校生徒に向けてアナウンスを配信しますか？")) return;
 
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "postAnnouncement",
-                        email: userEmail,
-                        title: title,
-                        content: content
-                    })
+                    body: JSON.stringify({ action: "postAnnouncement", email: userEmail, title: title, content: content })
                 });
                 const result = await res.json();
                 if (result.status === "success") {
                     alert("アナウンスを正常に配信しました！");
-                    titleInput.value = "";
-                    contentInput.value = "";
+                    titleInput.value = ""; contentInput.value = "";
                     loadAnnouncementHistory();
-                } else {
-                    alert("配信エラー: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
+                } else { alert("配信エラー: " + result.message); }
+            } catch (e) { alert("通信エラー"); }
         }
 
-        // アナウンス履歴をロードして表示する関数
         async function loadAnnouncementHistory() {
             const historyBox = document.getElementById("announcement-history-box");
             try {
@@ -709,153 +566,120 @@
                 if (data.status === "success") {
                     historyBox.innerHTML = "";
                     if (data.list.length === 0) {
-                        historyBox.innerHTML = `<div class="text-center py-6 text-gray-400">現在、配信中のアナウンスはありません。</div>`;
+                        historyBox.innerHTML = `<div class="text-center py-4 text-gray-400">配信中のアナウンスはありません。</div>`;
                         return;
                     }
                     data.list.forEach((item, index) => {
                         const div = document.createElement("div");
-                        div.className = "bg-white p-3 rounded-xl border border-gray-100 shadow-sm opacity-0 fade-in-item";
-                        div.style.animationDelay = `${index * 0.05}s`;
+                        div.className = "bg-white p-2.5 rounded-lg border border-gray-100 shadow-sm opacity-0 fade-in-item";
+                        div.style.animationDelay = `${index * 0.04}s`;
                         div.innerHTML = `
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="font-bold text-gray-800">${item.title}</span>
-                                <span class="text-[10px] text-gray-400 font-mono">${item.date || ""}</span>
-                            </div>
+                            <div class="flex justify-between items-center mb-0.5"><span class="font-bold text-gray-700">${item.title}</span><span class="text-[10px] text-gray-400 font-mono">${item.date || ""}</span></div>
                             <p class="text-gray-500 text-[11px] leading-relaxed whitespace-pre-wrap">${item.content}</p>
-                            <div class="text-[9px] text-right text-purple-400 font-bold mt-1">配信者: 管理者</div>
                         `;
                         historyBox.appendChild(div);
                     });
                 }
-            } catch (e) {
-                console.error(e);
-                historyBox.innerHTML = `<div class="text-center py-6 text-red-500">履歴の取得に失敗しました。</div>`;
-            }
+            } catch (e) { historyBox.innerHTML = `<div class="text-center py-4 text-red-500">履歴の取得失敗</div>`; }
         }
 
-        // 💡 メンション・不具合情報をロードする関数
+        // 8. 管理者へのヘルプ・メンション（@admin）読込
         async function loadAdminMentions() {
-            const listEl = document.getElementById("mention-list");
-            const panelEl = document.getElementById("mention-panel");
-            if (!listEl) return;
+            const list = document.getElementById("mention-list");
+            const panel = document.getElementById("mention-panel");
+            if (!list) return;
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getAdminMentions&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
                 if (data.status === "success" && data.list && data.list.length > 0) {
                     document.getElementById("mention-count").innerText = data.list.length;
-                    panelEl.classList.remove("hidden");
-                    listEl.innerHTML = "";
+                    panel.classList.remove("hidden");
+                    list.innerHTML = "";
                     data.list.forEach((item, index) => {
                         const div = document.createElement("div");
-                        div.className = "bg-white p-3 rounded-lg border border-amber-200 flex items-center justify-between text-xs opacity-0 fade-in-item shadow-sm";
+                        div.className = "bg-white p-2.5 rounded-lg border border-amber-200 flex items-center justify-between opacity-0 fade-in-item";
                         div.style.animationDelay = `${index * 0.03}s`;
                         div.innerHTML = `
-                            <div class="flex-1 min-w-0 pr-3">
+                            <div class="flex-1 min-w-0 pr-2">
                                 <div class="font-bold text-amber-900 truncate">💬 ${item.senderRoleName || '役員'}: 「${item.lastMessage}」</div>
-                                <div class="text-[10px] text-gray-400 mt-0.5 truncate">対象件名: ${item.suggestionTitle} (${item.date})</div>
+                                <div class="text-[10px] text-gray-400 truncate">件名: ${item.suggestionTitle} (${item.date})</div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
-                                <button onclick="openChatFromMention('${item.suggestionId}')" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] px-2 py-1 rounded font-bold transition">会話を見る</button>
-                                <button onclick="resolveAlert('mention', '${item.id}')" class="bg-gray-200 hover:bg-gray-300 text-gray-600 text-[10px] px-2 py-1 rounded font-bold transition">完了</button>
+                            <div class="flex gap-1 shrink-0">
+                                <button onclick="openChatFromMention('${item.suggestionId}')" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] px-2 py-0.5 rounded font-bold transition">見る</button>
+                                <button onclick="resolveAlert('mention', '${item.id}')" class="bg-gray-200 hover:bg-gray-300 text-gray-600 text-[10px] px-2 py-0.5 rounded font-bold transition">完了</button>
                             </div>
                         `;
-                        listEl.appendChild(div);
+                        list.appendChild(div);
                     });
-                } else {
-                    if (panelEl) panelEl.classList.add("hidden");
-                    listEl.innerHTML = "";
-                }
+                } else { if (panel) panel.classList.add("hidden"); list.innerHTML = ""; }
             } catch (e) { console.error(e); }
         }
 
+        // 9. 生徒からのシステム不具合報告（バグ報告）読込
         async function loadBugReports() {
-            const listEl = document.getElementById("bug-list");
-            const panelEl = document.getElementById("bug-panel");
-            if (!listEl) return;
+            const list = document.getElementById("bug-list");
+            const panel = document.getElementById("bug-panel");
+            if (!list) return;
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBugReports&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
                 if (data.status === "success" && data.list && data.list.length > 0) {
                     document.getElementById("bug-count").innerText = data.list.length;
-                    panelEl.classList.remove("hidden");
-                    listEl.innerHTML = "";
+                    if (panel) panel.classList.remove("hidden");
+                    list.innerHTML = "";
                     data.list.forEach((item, index) => {
                         const div = document.createElement("div");
-                        div.className = "bg-white p-3 rounded-lg border border-red-200 flex items-center justify-between text-xs opacity-0 fade-in-item shadow-sm";
+                        div.className = "bg-white p-2.5 rounded-lg border border-red-200 flex items-center justify-between opacity-0 fade-in-item";
                         div.style.animationDelay = `${index * 0.03}s`;
                         div.innerHTML = `
-                            <div class="flex-1 min-w-0 pr-3">
-                                <div class="font-bold text-red-900 leading-snug">🚨 [${item.os || 'OS不明'}/${item.browser || 'ブラウザ不明'}]</div>
-                                <p class="text-gray-600 mt-0.5 whitespace-pre-wrap text-[11px]">${item.description}</p>
-                                <div class="text-[9px] text-gray-400 mt-1 font-mono">${item.email} (${item.date})</div>
+                            <div class="flex-1 min-w-0 pr-2">
+                                <div class="font-bold text-red-900">[${item.os || 'OS不明'} / ${item.browser || 'ブラウザ不明'}]</div>
+                                <p class="text-gray-600 mt-0.5 text-[11px] whitespace-pre-wrap">${item.description}</p>
+                                <div class="text-[9px] text-gray-400 mt-0.5">${item.email} (${item.date})</div>
                             </div>
-                            <button onclick="resolveAlert('bug', '${item.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1.5 rounded font-bold transition shrink-0 duration-150">対応完了</button>
+                            <button onclick="resolveAlert('bug', '${item.id}')" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded font-bold transition shrink-0 active:scale-95 duration-150">対応完了</button>
                         `;
-                        listEl.appendChild(div);
+                        list.appendChild(div);
                     });
                 } else {
-                    if (panelEl) panelEl.classList.add("hidden");
-                    listEl.innerHTML = "";
+                    list.innerHTML = "";
+                    if (panel) panel.classList.add("hidden");
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("描画例外:", e); }
         }
 
+        // アラート完了処理
         async function resolveAlert(type, targetId) {
             if (!confirm("この報告を「対応完了」として一覧から非表示にしますか？")) return;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "resolveAdminAlert",
-                        email: userEmail,
-                        type: type,
-                        targetId: targetId
-                    })
+                    body: JSON.stringify({ action: "resolveAdminAlert", email: userEmail, type: type, targetId: targetId })
                 });
                 const result = await res.json();
                 if (result.status === "success") {
                     if (type === 'mention') loadAdminMentions();
                     if (type === 'bug') loadBugReports();
-                } else {
-                    alert("処理に失敗しました。");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信エラーが発生しました。");
-            }
+                } else { alert("処理に失敗しました。"); }
+            } catch (e) { console.error(e); alert("通信エラー"); }
         }
 
         function openChatFromMention(suggestionId) {
-            openChatModal(suggestionId);
+            openChatModal(suggestionId, { id: suggestionId, title: "メンションされた事案", studentEmail: "開示請求前または秘匿中" });
         }
 
-        // 受付状況のトグル機能
+        // 受付状況コントロール
         async function toggleSystem(statusType) {
-            const btnActive = document.getElementById("sys-btn-active");
-            const btnMain = document.getElementById("sys-btn-main");
-            
-            if(!confirm(`システム受付ステータスを 「${statusType === 'active' ? '通常稼働' : '一時受付停止'}」 に変更しますか？`)) return;
-            
+            if(!confirm(`システム受付ステータスを変更しますか？`)) return;
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "toggleSystemStatus",
-                        email: userEmail,
-                        status: statusType
-                    })
+                    body: JSON.stringify({ action: "toggleSystemStatus", email: userEmail, status: statusType })
                 });
                 const result = await res.json();
-                if (result.status === "success") {
-                    alert("システムの受付設定を正常に変更しました。");
-                    checkSystemStatus();
-                } else {
-                    alert("エラー: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信エラーが発生しました。");
-            }
+                if (result.status === "success") { alert("設定を変更しました。"); checkSystemStatus(); }
+                else { alert("エラー: " + result.message); }
+            } catch (e) { alert("通信エラー"); }
         }
 
         async function checkSystemStatus() {
@@ -866,21 +690,172 @@
                 const data = await res.json();
                 if(data.status === "success") {
                     if(data.systemStatus === "active") {
-                        btnActive.className = "flex-1 bg-green-600 text-white text-xs font-black py-2.5 rounded-lg border-2 border-green-700 shadow-md transform scale-[1.02] transition duration-200";
-                        btnMain.className = "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-400 text-xs font-bold py-2.5 rounded-lg border border-gray-200 transition duration-200";
+                        btnActive.className = "flex-1 bg-green-600 text-white text-xs font-bold py-2 rounded-lg border border-green-700 shadow-sm";
+                        btnMain.className = "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-400 text-xs font-bold py-2 rounded-lg border border-gray-200";
                     } else {
-                        btnActive.className = "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-400 text-xs font-bold py-2.5 rounded-lg border border-gray-200 transition duration-200";
-                        btnMain.className = "flex-1 bg-red-600 text-white text-xs font-black py-2.5 rounded-lg border-2 border-red-700 shadow-md transform scale-[1.02] transition duration-200";
+                        btnActive.className = "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-400 text-xs font-bold py-2 rounded-lg border border-gray-200";
+                        btnMain.className = "flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded-lg border border-red-700 shadow-sm";
                     }
                 }
             } catch(e) { console.error(e); }
         }
 
-        // 🗺️ 初期ロード
+        // ==========================================
+        // 💬 モーダルリアルタイムチャット特権制御ロジック群
+        // ==========================================
+        function openChatModal(suggestionId, itemData = null) {
+            currentActiveSuggestionId = suggestionId;
+            currentTargetItemCache = itemData;
+
+            // モーダル表示
+            const modal = document.getElementById("chat-modal");
+            modal.classList.remove("hidden");
+
+            // タイトルやメタ情報の仮書き込み
+            if(itemData) {
+                document.getElementById("modal-title").innerText = `案件: ${itemData.title || '無題'}`;
+                document.getElementById("modal-meta").innerText = `保護ID: ${itemData.id} | カテゴリ: ${itemData.category || '未分類'}`;
+            } else {
+                document.getElementById("modal-title").innerText = `案件ID: ${suggestionId}`;
+                document.getElementById("modal-meta").innerText = `読み込み中...`;
+            }
+
+            // タブを初期位置(チャット)に戻す
+            switchModalTab('chat');
+
+            // 1回目の即時チャットログ同期
+            fetchChatLogsForModal();
+
+            // 5秒に1回の自動更新ループを開始 (リアルタイム監視)
+            if(chatPollingIntervalId) clearInterval(chatPollingIntervalId);
+            chatPollingIntervalId = setInterval(fetchChatLogsForModal, 5000);
+        }
+
+        function closeChatModal() {
+            const modal = document.getElementById("chat-modal");
+            modal.classList.add("hidden");
+            currentActiveSuggestionId = null;
+            currentTargetItemCache = null;
+
+            // ループタイマーを完全に止めてブラウザの負荷を下げる
+            if(chatPollingIntervalId) {
+                clearInterval(chatPollingIntervalId);
+                chatPollingIntervalId = null;
+            }
+        }
+
+        // チャットログの非同期フェッチ
+        async function fetchChatLogsForModal() {
+            if(!currentActiveSuggestionId) return;
+            const container = document.getElementById("chat-messages-container");
+
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getChatMessages&suggestionId=${currentActiveSuggestionId}&email=${encodeURIComponent(userEmail)}`);
+                const result = await res.json();
+
+                if(result.status === "success") {
+                    container.innerHTML = "";
+                    const messages = result.messages || [];
+
+                    if(messages.length === 0) {
+                        container.innerHTML = `<div class="text-center text-xs text-gray-400 py-12">💬 この意見に関する対話履歴はまだありません。</div>`;
+                        return;
+                    }
+
+                    messages.forEach(msg => {
+                        const isMe = msg.email === userEmail; // 自分(最高管理者)が発言したか
+                        const msgWrapper = document.createElement("div");
+                        msgWrapper.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+
+                        // ロールに応じた名前と色
+                        let roleBadge = "生徒";
+                        let badgeClass = "bg-gray-200 text-gray-700";
+
+                        if(msg.role === 'council') { roleBadge = "生徒会役員"; badgeClass = "bg-amber-100 text-amber-800"; }
+                        else if(msg.role === 'teacher') { roleBadge = "担当教諭"; badgeClass = "bg-purple-100 text-purple-800"; }
+                        else if(msg.role === 'admin') { roleBadge = "最高管理者 👑"; badgeClass = "bg-red-600 text-white"; }
+
+                        msgWrapper.innerHTML = `
+                            <div class="flex items-center gap-1 text-[10px] text-gray-400 mb-0.5 ${isMe ? 'flex-row-reverse' : ''}">
+                                <span class="font-bold px-1 py-0.2 rounded text-[9px] ${badgeClass}">${roleBadge}</span>
+                                <span class="font-mono">${msg.date || ''}</span>
+                            </div>
+                            <div class="max-w-[85%] text-xs p-2.5 rounded-2xl shadow-sm leading-relaxed whitespace-pre-wrap ${
+                                isMe ? 'bg-purple-700 text-white rounded-tr-none' : 'bg-white text-gray-800 rounded-tl-none border border-gray-200'
+                            }">` + escapeHTML(msg.message) + `</div>
+                        `;
+                        container.appendChild(msgWrapper);
+                    });
+
+                    // 常に最新メッセージ(一番下)が見えるように自動追従スクロール
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch(e) { console.error("チャットログ同期に失敗:", e); }
+        }
+
+        // 管理者特権メッセージ送信
+        async function sendAdminChatMessage() {
+            const input = document.getElementById("chat-reply-input");
+            const text = input.value.trim();
+            if(!text || !currentActiveSuggestionId) return;
+
+            input.disabled = true;
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "sendChatMessage",
+                        email: userEmail,
+                        suggestionId: currentActiveSuggestionId,
+                        message: text
+                    })
+                });
+                const result = await res.json();
+                if(result.status === "success") {
+                    input.value = "";
+                    fetchChatLogsForModal(); // 画面をすぐ更新
+                } else { alert("送信に失敗しました: " + result.message); }
+            } catch(e) { alert("通信エラーが発生しました。"); } finally { input.disabled = false; input.focus(); }
+        }
+
+        // モーダル内のタブ制御
+        function switchModalTab(tabName) {
+            const btnChat = document.getElementById("tab-btn-chat");
+            const btnDetail = document.getElementById("tab-btn-detail");
+            const contentChat = document.getElementById("tab-content-chat");
+            const contentDetail = document.getElementById("tab-content-detail");
+
+            if(tabName === 'chat') {
+                btnChat.className = "flex-1 py-2.5 text-center transition font-bold border-b-2 tab-active";
+                btnDetail.className = "flex-1 py-2.5 text-center transition font-medium border-b-2 tab-inactive";
+                contentChat.classList.remove("hidden");
+                contentDetail.classList.add("hidden");
+            } else {
+                btnChat.className = "flex-1 py-2.5 text-center transition font-medium border-b-2 tab-inactive";
+                btnDetail.className = "flex-1 py-2.5 text-center transition font-bold border-b-2 tab-active";
+                contentChat.classList.add("hidden");
+                contentDetail.classList.remove("hidden");
+
+                // 詳細テキストのレンダリング
+                if(currentTargetItemCache) {
+                    document.getElementById("detail-full-title").innerText = currentTargetItemCache.title || "無題";
+                    document.getElementById("detail-full-content").innerText = currentTargetItemCache.content || "内容空欄";
+                    document.getElementById("detail-id").innerText = currentTargetItemCache.id || "--";
+                    document.getElementById("detail-date").innerText = currentTargetItemCache.date || "--";
+                }
+            }
+        }
+
+        // XSS防止用エスケープ関数
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        }
+
         window.onload = function() {
             loadAllAdminData();
             loadAnnouncementHistory();
-            loadAdminMentions();
             checkSystemStatus();
         };
     </script>
