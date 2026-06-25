@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - 生徒会管理ポータル</title>
-        <link rel="icon" href="log.png" type="image/png">
+    <link rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .brand-bg { background-color: #130182; }
         .brand-text { color: #130182; }
@@ -14,34 +15,33 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen flex flex-col">
 
-    <nav class="brand-bg text-white shadow-md">
+    <nav class="brand-bg text-white shadow-md animate__animated animate__fadeInDown animate__fast">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
                 <span class="font-bold tracking-wider">デジタル目安箱 生徒会専用管理ポータル</span>
             </div>
-           <div class="flex items-center space-x-2">
-    <button onclick="window.location.href='mypage.html'" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1">
-        <i class="fas fa-pen"></i> マイページへ
-    </button>
-    
-    <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
-        ログアウト
-    </button>
-</div>
+            <div class="flex items-center space-x-2">
+                <button onclick="window.location.href='mypage.html'" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1 hover:scale-105 active:scale-95 duration-150">
+                    <i class="fas fa-pen"></i> マイページへ
+                </button>
+                <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
+                    ログアウト
+                </button>
+            </div>
         </div>
     </nav>
 
     <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
         
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate__animated animate__fadeInUp animate__fast">
             <div class="flex-1">
                 <h1 class="text-xl font-bold text-gray-800 mb-3">届いた意見・要望の管理</h1>
                 
                 <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-wrap gap-4 items-center">
                     <div class="flex items-center gap-2">
                         <label for="filter-status" class="text-xs font-bold text-gray-600 whitespace-nowrap">🔄 対応ステータス:</label>
-                        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+                        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer transition shadow-sm hover:border-gray-400">
                             <option value="all">すべて表示（フィルターなし）</option>
                             <option value="受付">🔵 受付</option>
                             <option value="生徒会検討中">🟡 生徒会検討中</option>
@@ -53,7 +53,7 @@
 
                     <div class="flex items-center gap-2">
                         <label for="filter-committee" class="text-xs font-bold text-gray-600 whitespace-nowrap">💼 担当委員会:</label>
-                        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer">
+                        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer transition shadow-sm hover:border-gray-400">
                             <option value="all">すべて表示（フィルターなし）</option>
                             <option value="未割り当て">⏳ 未割り当て（担当なし）</option>
                             <option value="総務委員会">💼 総務担当</option>
@@ -67,13 +67,13 @@
                 </div>
                 <p class="text-xs text-gray-500 mt-2">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
             </div>
-            <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shrink-0 h-max">
+            <button onclick="loadCouncilData()" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition shrink-0 h-max shadow-sm active:scale-95">
                 <i class="fas fa-sync-alt"></i>
                 <span>一覧を更新</span>
             </button>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col animate__animated animate__fadeInUp animate__fast" style="animation-delay: 0.1s;">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -111,7 +111,6 @@
 
         console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
 
-        // 👑 🌟【修正】ログインチェックに新役職 chairperson を追加
         if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson" && userRole !== "admin") {
             alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
             window.location.href = "index.html";
@@ -134,7 +133,6 @@
             const userEmail = sessionStorage.getItem("user_email");
             const userRole = sessionStorage.getItem("user_role");
 
-            // 👑 🌟【修正】データ要求元の権限チェックにも chairperson と admin を追加
             if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson") {
                 console.error("権限がありません");
                 return;
@@ -149,7 +147,6 @@
                     return;
                 }
 
-                // 👑【最重要】取得データを外の変数にキープして、フィルター関数を呼び出す
                 allData = data; 
                 filterAndRenderData();
 
@@ -160,7 +157,7 @@
         }
 
         // ==========================================
-        // 🌟【新機能】データを絞り込んでテーブルを描画する関数
+        // 🌟 データを絞り込んでテーブルを描画する関数（アニメーション対応）
         // ==========================================
         function filterAndRenderData() {
             const statusFilter = document.getElementById("filter-status").value;
@@ -192,17 +189,19 @@
 
             // 2. 絞り込み結果が0件の場合
             if (filteredData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-gray-400 text-xs">該当する意見・要望はありません。</td></tr>`;
+                tableBody.innerHTML = `<tr class="animate__animated animate__fadeIn"><td colspan="5" class="text-center py-12 text-gray-400 text-xs">該当する意見・要望はありません。</td></tr>`;
                 return;
             }
 
-            // 🔄【ここを追加！】描画する前に配列を逆順にして、新しいものが下に並ぶようにする
+            // 配列を逆順にして新しいものが下に並ぶようにする
             filteredData.reverse();
 
             // 3. テーブルのHTML組み立て
-            filteredData.forEach(item => {
+            filteredData.forEach((item, index) => {
                 const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100";
+                // 💡 各行をフワッと左からスライドフェードインさせ、上から順にパラパラと表示させる遅延(delay)を設定
+                tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100 animate__animated animate__fadeInLeft animate__faster";
+                tr.style.animationDelay = `${index * 0.03}s`;
 
                 let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
                 if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
@@ -214,26 +213,26 @@
                 let approvalControlsHTML = "";
                 if (item.status === "開示請求") {
                     approvalControlsHTML = `
-                        <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs">
+                        <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs shadow-sm">
                             <div class="font-bold text-red-700 mb-1 flex items-center gap-1">
                                 <i class="fas fa-shield-alt"></i> アドレス開示請求・3者承認状況
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-600">副会長:</span>
                                 <div>
-                                    ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                    ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                 </div>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-600">管理者:</span>
                                 <div>
-                                    ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                    ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                 </div>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-600">教 師:</span>
                                 <div>
-                                    ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                    ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                 </div>
                             </div>
                         </div>
@@ -244,7 +243,7 @@
                 let committeeSelectHTML = `
                     <select id="commit-${item.id}" 
                             onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" 
-                            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm">
+                            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm cursor-pointer transition hover:border-gray-400">
                         <option value="未割り当て" ${(!item.committee || item.committee === '未割り当て') ? 'selected' : ''}>❓ 未割り当て</option>
                         <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
                         <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
@@ -262,20 +261,20 @@
                         <div class="flex gap-1.5">
                             <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo || ''}</textarea>
                             <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)" 
-                                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm">
+                                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm active:scale-95">
                                 保存
                             </button>
                         </div>
                     </div>
                 `;
 
-                // 👑 🌟【新機能】チャット権限の判定
+                // チャット権限の判定
                 const canChat = (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "admin");
                 
                 let chatButtonHTML = "";
                 if (canChat) {
                     chatButtonHTML = `
-                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm">
+                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95 duration-150">
                             <i class="fas fa-comments text-sm"></i>
                             ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
                         </button>
@@ -301,7 +300,7 @@
                         <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
                         
                         ${item.hasTeacherResponse ? `
-                            <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg">
+                            <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg shadow-sm">
                                 <div class="text-[11px] font-bold text-purple-700 flex items-center gap-1">
                                     <i class="fas fa-comment-medical"></i> 先生方からの共有回答あり
                                 </div>
@@ -315,7 +314,7 @@
                         ${memoHTML}
                     </td>
                     <td class="p-4 whitespace-nowrap">
-                        <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ${selectBg}">
+                        <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm transition-all hover:scale-102 ${selectBg}">
                             <option value="受付" ${item.status === '受付' || item.status === '新規受付' ? 'selected' : ''}>🔵 受付</option>
                             <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
                             <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
@@ -433,11 +432,6 @@
 
         function openCouncilChat(id) {
             window.location.href = `council_chat.html?id=${id}`;
-        }
-
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
         }
 
         window.onload = loadCouncilData;
