@@ -90,9 +90,8 @@
                 chevron.style.transform = "rotate(0deg)";
             }
         }
-
-        // ==========================================
-        // 1. チャット履歴＆元の意見を取得して描画（アニメーション適用）
+// ==========================================
+        // 1. チャット履歴＆元の意見を取得して描画（最新メッセージのみアニメーション）
         // ==========================================
         async function loadChatLog() {
             try {
@@ -120,7 +119,7 @@
 
                 document.getElementById("chat-loading").classList.add("hidden");
                 
-                // 現在表示されているメッセージ数を数えて、新規があるかチェック
+                // 💡 修正のキモ：現在画面に表示されているメッセージ数をキープ
                 const currentMsgCount = chatContainer.querySelectorAll('.msg-bubble').length;
                 
                 if (data.chats.length === 0) {
@@ -133,44 +132,52 @@
                         chatContainer.appendChild(infoMsg);
                     }
                 } else {
-                    // 案内文があれば消去
                     const existingInfo = chatContainer.querySelector('.info-msg');
                     if (existingInfo) existingInfo.remove();
 
-                    // 新しいデータがある場合のみ、メッセージを再構築
+                    // 新しいデータがある、または既読状態などの更新がある場合
                     if (currentMsgCount !== data.chats.length) {
-                        // 既存を一旦クリアしてすべて描画
+                        
+                        // 既存の要素を一旦クリア
                         const bubbles = chatContainer.querySelectorAll('.msg-bubble');
                         bubbles.forEach(el => el.remove());
 
                         data.chats.forEach((chat, index) => {
                             const isMe = (chat.sender === "student");
                             const wrapper = document.createElement("div");
-                            wrapper.className = `msg-bubble flex flex-col w-full max-w-[80%] ${isMe ? 'items-end ml-auto' : 'items-start'} animate__animated animate__backInUp animate__fast`;
                             
-                            // 💡 すでに過去の古い発言にはアニメーションの遅延をかけない（初回来入時のみパラパラ出す）
+                            // 💡 【ここを大改造！】
+                            // 1. 初回読み込み（currentMsgCount === 0）の時は、過去ログなので一瞬でフェードインさせる
+                            // 2. チャットを打って件数が増えた時（index >= currentMsgCount）の「新しい文字」だけを下からポンッと湧き上がらせる！
+                            let animationClass = "";
                             if (currentMsgCount === 0) {
-                                wrapper.style.animationDelay = `${index * 0.05}s`;
+                                animationClass = "animate__animated animate__fadeIn animate__fast"; // 初回は静かに
+                            } else if (index >= currentMsgCount) {
+                                animationClass = "animate__animated animate__backInUp animate__fast"; // 新着だけポンッ！
+                            }
+
+                            wrapper.className = `msg-bubble flex flex-col w-full max-w-[80%] ${isMe ? 'items-end ml-auto' : 'items-start'} ${animationClass}`;
+                            
+                            // 初回のみパラパラパラとテンポよく出すためのディレイ
+                            if (currentMsgCount === 0) {
+                                wrapper.style.animationDelay = `${index * 0.01}s`;
                             }
 
                             let nameText = "あなた（匿名生徒）";
-                            // 自分の吹き出し：濃いネイビー、右上が尖る
                             let bubbleClass = "brand-bg text-white rounded-2xl rounded-tr-none shadow-sm shadow-indigo-900/5"; 
 
                             if (!isMe) {
                                 if (chat.sender === "admin") {
                                     nameText = "先生（管理者） 👑";
-                                    // 管理者：プレミアム感のあるゴールド・ベージュ枠
                                     bubbleClass = "bg-amber-50 text-amber-950 rounded-2xl rounded-tl-none border border-amber-300 font-bold shadow-sm shadow-amber-500/5"; 
                                 } else {
                                     nameText = "生徒会役員";
-                                    // 生徒会：優しいライトグレー
                                     bubbleClass = "bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none border border-slate-200/40 shadow-sm";
                                 }
                             }
                             
                             const nameLabel = `<span class="text-[10px] font-black text-slate-400 mb-0.5 px-1 tracking-wider">${nameText}</span>`;
-                            const badgeRead = (isMe && chat.isRead) ? '<span class="text-indigo-600 font-black mr-1 animate__animated animate__fadeIn">既読</span>' : '';
+                            const badgeRead = (isMe && chat.isRead) ? '<span class="text-indigo-600 font-black mr-1">既読</span>' : '';
                             
                             const bubble = `
                                 <div class="p-3 px-4 rounded-2xl text-xs shadow-sm tracking-wide leading-relaxed ${bubbleClass}">
@@ -185,11 +192,11 @@
                             chatContainer.appendChild(wrapper);
                         });
 
-                        // 描画後、最下部まで滑らかにスクロール
+                        // 描画後、最下部までスクロール
                         setTimeout(() => {
                             chatContainer.scrollTo({
                                 top: chatContainer.scrollHeight,
-                                behavior: currentMsgCount === 0 ? 'auto' : 'smooth'
+                                behavior: currentMsgCount === 0 ? 'auto' : 'smooth' // 新しい文字の時はヌルッとスクロール
                             });
                         }, 50);
                     }
