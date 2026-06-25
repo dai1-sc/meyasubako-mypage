@@ -7,587 +7,690 @@
     <link rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #0a0a0f;
-            --bg-surface: #111118;
-            --bg-card: #16161f;
-            --bg-card-hover: #1c1c28;
-            --border: rgba(255,255,255,0.06);
-            --border-hover: rgba(255,255,255,0.12);
-            --accent: #8b3cf7;
-            --accent-glow: rgba(139,60,247,0.25);
-            --accent-2: #e11d7a;
-            --amber: #f59e0b;
-            --text-primary: #f0f0f5;
-            --text-secondary: #888899;
-            --text-muted: #444455;
+            --admin-primary: #3d0a28;
+            --admin-accent: #c4003a;
+            --admin-glow: rgba(196, 0, 58, 0.15);
         }
 
-        * { box-sizing: border-box; }
+        * { font-family: 'Noto Sans JP', 'Inter', sans-serif; }
 
         body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-primary);
+            background: #0f0f13;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(61, 10, 40, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(30, 10, 50, 0.3) 0%, transparent 50%);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Subtle noise texture overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.4;
-        }
-
-        /* Ambient gradient blobs */
-        .ambient-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.07;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .blob-1 {
-            width: 600px; height: 600px;
-            background: var(--accent);
-            top: -200px; left: -200px;
-            animation: blobDrift 20s ease-in-out infinite alternate;
-        }
-        .blob-2 {
-            width: 500px; height: 500px;
-            background: var(--accent-2);
-            bottom: -150px; right: -150px;
-            animation: blobDrift 25s ease-in-out infinite alternate-reverse;
-        }
-        @keyframes blobDrift {
-            0% { transform: translate(0,0) scale(1); }
-            100% { transform: translate(60px, 40px) scale(1.1); }
-        }
-
-        /* Nav */
-        .nav-glass {
-            background: rgba(10,10,15,0.85);
+        /* ナビゲーション */
+        .nav-bar {
+            background: rgba(15, 15, 19, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 50;
         }
 
-        /* Cards */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            border-color: var(--border-hover);
-        }
-
-        /* Stat cards */
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 20px;
+        .nav-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #c4003a, #6b0030);
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            transition: all 0.25s ease;
-            animation: fadeSlideUp 0.5s ease both;
-        }
-        .stat-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        .stat-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(196, 0, 58, 0.5);
         }
 
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #6d28d9);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 18px;
+        .logout-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            padding: 6px 14px;
+            border-radius: 8px;
             font-size: 12px;
-            font-weight: 700;
+            transition: all 0.2s ease;
             cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 0.02em;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* カード共通 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* ヘッダーカード */
+        .header-card {
+            background: linear-gradient(135deg, rgba(61, 10, 40, 0.6) 0%, rgba(25, 10, 45, 0.6) 100%);
+            border: 1px solid rgba(196, 0, 58, 0.3);
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
         }
-        .btn-primary::after {
+        .header-card::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-            opacity: 0;
-            transition: opacity 0.2s;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(196, 0, 58, 0.6), transparent);
         }
-        .btn-primary:hover::after { opacity: 1; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
-        .btn-primary:active { transform: translateY(0); }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #dc2626, #9f1239);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 18px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(220,38,38,0.3); }
-
-        .btn-amber {
-            background: linear-gradient(135deg, #d97706, #b45309);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 18px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-amber:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,158,11,0.25); }
-
-        .btn-green {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 18px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-green:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(22,163,74,0.25); }
-
-        .btn-ghost {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+        /* 同期ボタン */
+        .sync-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
             padding: 8px 16px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-ghost:hover {
-            background: rgba(255,255,255,0.08);
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-        }
-
-        /* Input fields */
-        .input-dark {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
             border-radius: 10px;
-            padding: 9px 12px;
             font-size: 12px;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.2s;
-            outline: none;
+            cursor: pointer;
+            white-space: nowrap;
         }
-        .input-dark::placeholder { color: var(--text-muted); }
-        .input-dark:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-            background: rgba(139,60,247,0.04);
+        .sync-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateY(-1px);
         }
+        .sync-btn:active .fa-sync-alt { animation: spin 0.5s linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        select.input-dark option {
-            background: #1c1c28;
-            color: var(--text-primary);
-        }
-
-        textarea.input-dark { resize: vertical; }
-
-        /* Section label */
-        .section-label {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        /* Alert panels */
+        /* アラートパネル */
         .alert-panel-mention {
-            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.04));
-            border: 1px solid rgba(245,158,11,0.25);
-            border-radius: 16px;
-            padding: 20px;
-            animation: slideDown 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.12) 0%, rgba(180, 83, 9, 0.08) 100%);
+            border: 1px solid rgba(217, 119, 6, 0.35);
+            border-radius: 14px;
+            animation: slideDown 0.3s ease;
         }
         .alert-panel-bug {
-            background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(220,38,38,0.04));
-            border: 1px solid rgba(220,38,38,0.25);
-            border-radius: 16px;
-            padding: 20px;
-            animation: slideDown 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.12) 0%, rgba(185, 28, 28, 0.08) 100%);
+            border: 1px solid rgba(220, 38, 38, 0.35);
+            border-radius: 14px;
+            animation: slideDown 0.3s ease;
         }
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-12px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Badges */
-        .badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 99px;
-            letter-spacing: 0.04em;
+        .alert-item-mention {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(217, 119, 6, 0.25);
+            border-radius: 10px;
         }
-        .badge-blue   { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
-        .badge-amber  { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
-        .badge-purple { background: rgba(139,60,247,0.15); color: #a78bfa; border: 1px solid rgba(139,60,247,0.2); }
-        .badge-green  { background: rgba(22,163,74,0.15);  color: #4ade80; border: 1px solid rgba(22,163,74,0.2); }
-        .badge-red    { background: rgba(220,38,38,0.15);  color: #f87171; border: 1px solid rgba(220,38,38,0.2); }
-        .badge-gray   { background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); }
+        .alert-item-bug {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(220, 38, 38, 0.25);
+            border-radius: 10px;
+        }
 
-        /* Table */
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+        /* 統計カード */
+        .stat-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 18px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .data-table thead th {
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: 0 0 14px 14px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-card.blue::after { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .stat-card.amber::after { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .stat-card.purple::after { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .stat-card.green::after { background: linear-gradient(90deg, #10b981, #34d399); }
+
+        .stat-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .stat-label {
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--text-muted);
-            padding: 12px 16px;
-            background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid var(--border);
+            color: rgba(255,255,255,0.35);
         }
-        .data-table tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.15s;
-        }
-        .data-table tbody tr:hover {
-            background: rgba(139,60,247,0.05);
-        }
-        .data-table tbody td {
-            padding: 14px 16px;
-            font-size: 13px;
-            vertical-align: middle;
-        }
-        .data-table tbody tr:last-child { border-bottom: none; }
-
-        /* Status select in table */
-        .status-select {
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 5px 8px;
-            font-size: 11px;
+        .stat-value {
+            font-size: 28px;
             font-weight: 700;
-            color: var(--text-primary);
-            cursor: pointer;
-            outline: none;
-            transition: all 0.15s;
+            letter-spacing: -0.02em;
+            margin-top: 4px;
         }
-        .status-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
-        .status-select option { background: #1c1c28; }
+        .stat-unit { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.3); margin-left: 2px; }
 
-        /* Divider */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 20px 0;
-        }
-
-        /* Section header */
-        .section-header {
-            font-size: 13px;
+        /* セクション見出し */
+        .section-title {
+            font-size: 12px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 12px;
         }
-        .section-header i { font-size: 14px; }
+        .section-title i { font-size: 11px; }
 
-        /* Animations */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-        .animate-fade-in { animation: fadeIn 0.4s ease; }
-
-        /* Crown pulse */
-        @keyframes crownPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 6px rgba(245,158,11,0.5)); }
-            50% { transform: scale(1.1) rotate(-5deg); filter: drop-shadow(0 0 12px rgba(245,158,11,0.8)); }
-        }
-        .crown-icon { animation: crownPulse 3s ease-in-out infinite; }
-
-        /* Loading spinner */
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spin { animation: spin 0.8s linear infinite; }
-
-        /* Scroll areas */
-        .scroll-area::-webkit-scrollbar { width: 4px; }
-        .scroll-area::-webkit-scrollbar-track { background: transparent; }
-        .scroll-area::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
-
-        /* Toggle system buttons */
-        .sys-btn-active-on  { background: linear-gradient(135deg, #16a34a, #15803d) !important; box-shadow: 0 0 20px rgba(22,163,74,0.3) !important; }
-        .sys-btn-main-on    { background: linear-gradient(135deg, #dc2626, #9f1239) !important; box-shadow: 0 0 20px rgba(220,38,38,0.3) !important; }
-
-        /* Control panel card with glow on hover */
-        .control-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.25s;
-        }
-        .control-card:hover { border-color: rgba(139,60,247,0.2); }
-
-        /* Announcement history item */
-        .announce-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
+        /* フォーム要素 */
+        .form-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
-            padding: 12px 14px;
+            padding: 9px 12px;
+            color: white;
+            font-size: 12px;
+            width: 100%;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-input::placeholder { color: rgba(255,255,255,0.25); }
+        .form-input:focus {
+            border-color: rgba(196, 0, 58, 0.5);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(196, 0, 58, 0.12);
+        }
+        .form-select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 9px 12px;
+            color: white;
+            font-size: 12px;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .form-select:focus {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+        .form-select option { background: #1a1a2e; color: white; }
+        textarea.form-input { resize: vertical; }
+
+        /* ボタン */
+        .btn-primary {
+            background: linear-gradient(135deg, #c4003a, #8b0028);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%;
+        }
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(196, 0, 58, 0.3); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-blue {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%;
+        }
+        .btn-blue:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3); }
+
+        .btn-red {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .btn-red:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3); }
+
+        .btn-amber {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+            white-space: nowrap;
+        }
+        .btn-amber:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3); }
+
+        .btn-green {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .btn-green:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .btn-danger:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3); }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%;
+        }
+        .btn-purple:hover { filter: brightness(1.12); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3); }
+
+        /* テーブル */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead tr {
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .data-table thead th {
+            padding: 14px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .data-table tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+        .data-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .data-table td { padding: 14px 16px; color: rgba(255,255,255,0.8); font-size: 13px; }
+
+        /* ブロックリストテーブル */
+        .block-table { width: 100%; border-collapse: collapse; }
+        .block-table thead tr {
+            background: rgba(255,255,255,0.04);
+            position: sticky; top: 0;
+        }
+        .block-table thead th {
+            padding: 10px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .block-table tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.15s;
+        }
+        .block-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+        .block-table td { padding: 10px 12px; font-size: 12px; color: rgba(255,255,255,0.7); }
+
+        /* ステータスセレクト（動的生成） */
+        select.status-select {
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border: 1px solid;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* アニメーション */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.4s ease both; }
+        .fade-in-1 { animation-delay: 0.05s; }
+        .fade-in-2 { animation-delay: 0.1s; }
+        .fade-in-3 { animation-delay: 0.15s; }
+        .fade-in-4 { animation-delay: 0.2s; }
+        .fade-in-5 { animation-delay: 0.25s; }
+        .fade-in-6 { animation-delay: 0.3s; }
+        .fade-in-7 { animation-delay: 0.35s; }
+        .fade-in-8 { animation-delay: 0.4s; }
+
+        /* divider */
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 16px 0;
+        }
+
+        /* アナウンス履歴アイテム */
+        .announce-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 12px;
-            transition: background 0.15s;
-            animation: fadeSlideUp 0.3s ease both;
         }
-        .announce-item:hover { background: rgba(255,255,255,0.05); }
+        .announce-item:hover { border-color: rgba(255,255,255,0.13); }
+        .announce-delete-btn {
+            color: rgba(255,255,255,0.25);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+        .announce-delete-btn:hover { color: #ef4444; }
 
-        /* Blocklist table rows */
-        #blocklist-table-body tr td { color: var(--text-secondary); font-size: 12px; }
-        #blocklist-table-body tr td:first-child { color: var(--text-primary); font-weight: 600; font-family: monospace; font-size: 11px; }
-
-        /* Chat button */
+        /* チャットボタン */
         .chat-btn {
-            width: 36px; height: 36px;
-            background: rgba(139,60,247,0.1);
-            border: 1px solid rgba(139,60,247,0.2);
+            position: relative;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 10px;
-            display: inline-flex; align-items: center; justify-content: center;
-            color: #a78bfa;
+            padding: 8px 12px;
+            color: rgba(255,255,255,0.45);
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
         }
         .chat-btn:hover {
-            background: rgba(139,60,247,0.2);
-            border-color: rgba(139,60,247,0.4);
-            transform: scale(1.08);
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #a78bfa;
         }
 
-        /* Unread dot */
-        .unread-dot {
-            position: absolute;
-            top: 6px; right: 6px;
-            width: 8px; height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-            border: 1.5px solid var(--bg-card);
-            animation: ping 1.5s ease-in-out infinite;
-        }
-        @keyframes ping {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+        /* カテゴリバッジ */
+        .category-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Stagger animations for cards */
-        .stat-card:nth-child(1) { animation-delay: 0.05s; }
-        .stat-card:nth-child(2) { animation-delay: 0.10s; }
-        .stat-card:nth-child(3) { animation-delay: 0.15s; }
-        .stat-card:nth-child(4) { animation-delay: 0.20s; }
+        /* ローディング */
+        .loading-spinner { color: rgba(255,255,255,0.3); }
 
-        main > * {
-            animation: fadeSlideUp 0.5s ease both;
-            animation-delay: 0.1s;
-        }
-        main > *:nth-child(2) { animation-delay: 0.15s; }
-        main > *:nth-child(3) { animation-delay: 0.2s; }
-        main > *:nth-child(4) { animation-delay: 0.25s; }
-        main > *:nth-child(5) { animation-delay: 0.3s; }
-
-        /* Heading eyebrow */
-        .eyebrow {
-            font-size: 10px;
+        /* メンション・バグアラートボタン */
+        .btn-alert-chat {
+            background: rgba(217, 119, 6, 0.2);
+            border: 1px solid rgba(217, 119, 6, 0.4);
+            color: #fbbf24;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 4px;
+            padding: 5px 10px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-alert-chat:hover { background: rgba(217, 119, 6, 0.3); }
+        .btn-alert-resolve {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-alert-resolve:hover { background: rgba(16, 185, 129, 0.3); }
+        .btn-bug-resolve {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-bug-resolve:hover { background: rgba(239, 68, 68, 0.3); }
+
+        /* 開示請求 */
+        .disclosure-box {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 10px;
         }
 
-        .hidden { display: none !important; }
+        /* 添付画像ボタン */
+        .image-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 6px;
+        }
+        .image-link:hover { background: rgba(59, 130, 246, 0.2); }
+
+        /* ステータスセレクト色 */
+        select.s-blue   { background: rgba(59,130,246,0.15); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+        select.s-yellow { background: rgba(234,179,8,0.15);  color: #fde047; border-color: rgba(234,179,8,0.3); }
+        select.s-purple { background: rgba(139,92,246,0.15); color: #c4b5fd; border-color: rgba(139,92,246,0.3); }
+        select.s-green  { background: rgba(16,185,129,0.15); color: #6ee7b7; border-color: rgba(16,185,129,0.3); }
+        select.s-red    { background: rgba(239,68,68,0.15);  color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+        select.s-blue option, select.s-yellow option, select.s-purple option,
+        select.s-green option, select.s-red option { background: #1a1a2e; color: white; }
+
+        /* Pulse */
+        .pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .pulse-dot.red { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.8); animation: pulseAnim 1.5s infinite; }
+        @keyframes pulseAnim {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
     </style>
 </head>
+
 <body>
-
-    <!-- Ambient light blobs -->
-    <div class="ambient-blob blob-1"></div>
-    <div class="ambient-blob blob-2"></div>
-
-    <!-- ========== NAV ========== -->
-    <nav class="nav-glass">
-        <div class="max-w-6xl mx-auto px-5 py-3.5 flex justify-between items-center">
+    <!-- ナビゲーション -->
+    <nav class="nav-bar">
+        <div class="max-w-6xl mx-auto px-5 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-crown text-white text-sm crown-icon"></i>
+                <div class="nav-logo-icon">
+                    <i class="fas fa-crown text-white text-sm"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-sm text-white tracking-wide">システム管理者専用ポータル</span>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
-                        <span class="text-[10px] text-green-400 font-medium">ADMIN ACCESS</span>
-                    </div>
+                    <span class="font-bold text-white text-sm tracking-wide">システム管理者ポータル</span>
+                    <span class="ml-2 text-[10px] bg-red-900/50 text-red-300 border border-red-700/40 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">ADMIN</span>
                 </div>
             </div>
-            <button onclick="logout()" class="btn-ghost flex items-center gap-2">
-                <i class="fas fa-sign-out-alt text-xs"></i>
-                <span>ログアウト</span>
+            <button onclick="logout()" class="logout-btn">
+                <i class="fas fa-sign-out-alt mr-1.5 text-xs opacity-70"></i>ログアウト
             </button>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-6 relative z-10">
+    <main class="max-w-6xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col gap-5">
 
-        <!-- ========== HEADER PANEL ========== -->
-        <div class="card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
-             style="background: linear-gradient(135deg, rgba(139,60,247,0.1), rgba(225,29,122,0.05)); border-color: rgba(139,60,247,0.2);">
+        <!-- ヘッダー -->
+        <div class="header-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 fade-in">
             <div>
-                <div class="eyebrow">Control Center</div>
+                <p class="text-[10px] font-bold tracking-widest uppercase text-red-400/80 mb-1">Control Panel</p>
                 <h1 class="text-lg font-bold text-white">全校目安箱 統括コントロールパネル</h1>
-                <p class="text-xs mt-1" style="color: var(--text-secondary);">
-                    全生徒の投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。
-                </p>
+                <p class="text-xs text-white/40 mt-1 leading-relaxed">全ての生徒からの投稿状況の閲覧、ステータス制御、および「システム管理者 👑」としての特権チャット介入が可能です。</p>
             </div>
-            <button onclick="loadAllAdminData()" class="btn-ghost flex items-center gap-2 shrink-0 self-start md:self-auto">
+            <button onclick="loadAllAdminData()" class="sync-btn fade-in fade-in-1">
                 <i class="fas fa-sync-alt text-xs"></i>
                 <span>全データを同期更新</span>
             </button>
         </div>
 
-        <!-- ========== MENTION ALERT ========== -->
-        <div id="mention-panel" class="hidden alert-panel-mention">
-            <h2 class="text-sm font-bold flex items-center gap-2 mb-3" style="color: #fbbf24;">
-                <i class="fas fa-at" style="animation: pulse 1.5s ease-in-out infinite;"></i>
-                管理者へのヘルプ・メンション（@admin）が届いています！
-                <span class="badge badge-amber" id="mention-count">0</span>件
+        <!-- メンションパネル -->
+        <div id="mention-panel" class="hidden alert-panel-mention p-4">
+            <h2 class="text-xs font-bold text-amber-300 mb-3 flex items-center gap-2">
+                <span class="pulse-dot red"></span>
+                管理者へのヘルプ・メンション（@admin）が届いています
+                <span class="bg-amber-500/25 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30">
+                    <span id="mention-count">0</span>件
+                </span>
             </h2>
-            <div id="mention-list" class="space-y-2 max-h-52 overflow-y-auto scroll-area"></div>
+            <div id="mention-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <!-- ========== BUG ALERT ========== -->
-        <div id="bug-panel" class="hidden alert-panel-bug">
-            <h2 class="text-sm font-bold flex items-center gap-2 mb-3" style="color: #f87171;">
-                <i class="fas fa-bug"></i>
-                生徒からシステム不具合報告（バグ報告）が届いています！
-                <span class="badge badge-red" id="bug-count">0</span>件
+        <!-- バグパネル -->
+        <div id="bug-panel" class="hidden alert-panel-bug p-4">
+            <h2 class="text-xs font-bold text-red-300 mb-3 flex items-center gap-2">
+                <i class="fas fa-bug text-red-400 animate-bounce"></i>
+                生徒からシステム不具合報告（バグ報告）が届いています
+                <span class="bg-red-500/25 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-500/30">
+                    <span id="bug-count">0</span>件
+                </span>
             </h2>
-            <div id="bug-list" class="space-y-2 max-h-52 overflow-y-auto scroll-area"></div>
+            <div id="bug-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
-        <!-- ========== STATS ========== -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="stat-card">
-                <div>
-                    <p class="section-label mb-1">総投書数</p>
-                    <h3 id="stat-total" class="text-2xl font-bold text-white">
-                        -- <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>
-                    </h3>
-                </div>
-                <div class="stat-icon" style="background:rgba(59,130,246,0.12); color:#60a5fa;">
-                    <i class="fas fa-inbox"></i>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <p class="section-label mb-1">未対応（受付）</p>
-                    <h3 id="stat-pending" class="text-2xl font-bold" style="color:#fbbf24;">
-                        -- <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>
-                    </h3>
-                </div>
-                <div class="stat-icon" style="background:rgba(245,158,11,0.12); color:#fbbf24;">
-                    <i class="fas fa-envelope"></i>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <p class="section-label mb-1">現在検討中</p>
-                    <h3 id="stat-progress" class="text-2xl font-bold" style="color:#a78bfa;">
-                        -- <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>
-                    </h3>
-                </div>
-                <div class="stat-icon" style="background:rgba(139,60,247,0.12); color:#a78bfa;">
-                    <i class="fas fa-spinner"></i>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <p class="section-label mb-1">回答完了率</p>
-                    <h3 id="stat-completion" class="text-2xl font-bold" style="color:#4ade80;">
-                        -- <span class="text-xs font-normal" style="color:var(--text-muted)">%</span>
-                    </h3>
-                </div>
-                <div class="stat-icon" style="background:rgba(22,163,74,0.12); color:#4ade80;">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== ACCOUNT CONTROLS ========== -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Role + Block -->
-            <div class="control-card space-y-5">
-                <!-- Role management -->
-                <div class="space-y-3">
-                    <div class="section-header">
-                        <i class="fas fa-user-cog" style="color:#60a5fa;"></i>
-                        ユーザーアカウント権限設定
+        <!-- 統計カード -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 fade-in fade-in-2">
+            <div class="stat-card blue">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="stat-label">総投書数</p>
+                        <h3 id="stat-total" class="stat-value text-white">--<span class="stat-unit">件</span></h3>
                     </div>
-                    <p class="text-xs" style="color:var(--text-secondary);">
-                        学内アカウントの権限ロール（一般生徒・生徒会・先生・管理者など）を変更・上書き登録します。
-                    </p>
+                    <div class="stat-icon bg-blue-500/15">
+                        <i class="fas fa-inbox text-blue-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card amber">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="stat-label">未対応</p>
+                        <h3 id="stat-pending" class="stat-value text-amber-400">--<span class="stat-unit">件</span></h3>
+                    </div>
+                    <div class="stat-icon bg-amber-500/15">
+                        <i class="fas fa-envelope text-amber-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card purple">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="stat-label">検討中</p>
+                        <h3 id="stat-progress" class="stat-value text-purple-400">--<span class="stat-unit">件</span></h3>
+                    </div>
+                    <div class="stat-icon bg-purple-500/15">
+                        <i class="fas fa-spinner text-purple-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="stat-label">完了率</p>
+                        <h3 id="stat-completion" class="stat-value text-emerald-400">--<span class="stat-unit">%</span></h3>
+                    </div>
+                    <div class="stat-icon bg-emerald-500/15">
+                        <i class="fas fa-check-circle text-emerald-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 権限設定 & ブロックリスト -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in fade-in-3">
+
+            <!-- 権限設定 + ブロック登録 -->
+            <div class="glass-card p-5 space-y-5">
+                <!-- 権限設定 -->
+                <div class="space-y-3">
+                    <p class="section-title"><i class="fas fa-user-cog text-blue-400"></i> ユーザーアカウント権限設定</p>
+                    <p class="text-xs text-white/35 leading-relaxed">学内アカウントの権限ロール（一般生徒・生徒会・先生・管理者など）を変更・上書き登録します。</p>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="email" id="role-email-input" placeholder="student@school.ed.jp" class="input-dark flex-1">
-                        <select id="role-select" class="input-dark sm:w-auto" style="min-width:140px;">
+                        <input type="email" id="role-email-input" placeholder="student@school.ed.jp" class="form-input flex-1">
+                        <select id="role-select" class="form-select">
                             <option value="student">一般生徒 (student)</option>
                             <option value="council">生徒会役員 (council)</option>
                             <option value="chairperson">委員長 (chairperson)</option>
@@ -596,153 +699,115 @@
                             <option value="admin">最高管理者 (admin)</option>
                         </select>
                     </div>
-                    <button onclick="updateUserRole()" class="btn-primary w-full">
-                        <i class="fas fa-check mr-1.5"></i>アカウントの権限を適用・変更する
+                    <button onclick="updateUserRole()" class="btn-blue">
+                        <i class="fas fa-key text-xs"></i> アカウントの権限を適用・変更する
                     </button>
                 </div>
 
                 <div class="divider"></div>
 
-                <!-- Block -->
+                <!-- ブロック登録 -->
                 <div class="space-y-3">
-                    <div class="section-header">
-                        <i class="fas fa-ban" style="color:#f87171;"></i>
-                        新規投稿ブロック登録
-                    </div>
-                    <p class="text-xs" style="color:var(--text-secondary);">
-                        悪質な嫌がらせやスパムを行う生徒のアドレスを登録すると、新規の目安箱投稿を完全にブロックします。
-                    </p>
+                    <p class="section-title"><i class="fas fa-ban text-red-400"></i> 新規投稿ブロック登録</p>
+                    <p class="text-xs text-white/35 leading-relaxed">悪質な嫌がらせやスパムを行う生徒のアドレスを登録し、新規の投稿を完全にブロックします。</p>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="input-dark flex-1">
-                        <button onclick="addBlocklist()" class="btn-danger shrink-0" style="border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
-                            <i class="fas fa-ban text-xs"></i> ブロック登録
-                        </button>
+                        <input type="email" id="block-email-input" placeholder="example@school.ed.jp" class="form-input flex-1">
+                        <button onclick="addBlocklist()" class="btn-red">ブロック登録</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Blocklist -->
-            <div class="control-card flex flex-col">
-                <div class="section-header">
-                    <i class="fas fa-list-ul" style="color:var(--text-secondary);"></i>
-                    現在のブロックリスト一覧
-                </div>
-                <div class="overflow-y-auto scroll-area flex-1 rounded-lg" style="max-height:220px; background:rgba(0,0,0,0.2); border:1px solid var(--border);">
-                    <table class="w-full text-left text-xs">
-                        <thead style="background:rgba(255,255,255,0.03); position:sticky; top:0;">
+            <!-- ブロックリスト一覧 -->
+            <div class="glass-card p-5 flex flex-col">
+                <p class="section-title mb-3"><i class="fas fa-list-ul text-white/40"></i> 現在のブロックリスト一覧</p>
+                <div class="overflow-y-auto max-h-56 rounded-lg border border-white/5 flex-1">
+                    <table class="block-table">
+                        <thead>
                             <tr>
-                                <th class="px-3 py-2.5" style="color:var(--text-muted); font-size:10px; letter-spacing:0.06em; font-weight:700; text-transform:uppercase;">ブロック対象メールアドレス</th>
-                                <th class="px-3 py-2.5 w-28" style="color:var(--text-muted); font-size:10px; letter-spacing:0.06em; font-weight:700; text-transform:uppercase;">登録日時</th>
-                                <th class="px-3 py-2.5 w-12 text-center" style="color:var(--text-muted); font-size:10px; letter-spacing:0.06em; font-weight:700; text-transform:uppercase;">解除</th>
+                                <th class="text-left p-2.5">ブロック対象メールアドレス</th>
+                                <th class="text-left p-2.5 w-28">登録日時</th>
+                                <th class="text-center p-2.5 w-14">解除</th>
                             </tr>
                         </thead>
-                        <tbody id="blocklist-table-body" style="divide-y:1px solid var(--border);">
-                            <tr>
-                                <td colspan="3" class="text-center py-8" style="color:var(--text-muted); font-size:12px;">読み込み中...</td>
-                            </tr>
+                        <tbody id="blocklist-table-body">
+                            <tr><td colspan="3" class="text-center py-6 text-white/25">読み込み中...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ========== ARCHIVE + SYSTEM TOGGLE + ANNOUNCEMENT ========== -->
-        <!-- Archive -->
-        <div class="control-card flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="section-header">
-                    <i class="fas fa-archive" style="color:#fbbf24;"></i>
-                    完了済みデータのアーカイブ整理
+        <!-- アーカイブ + 受付コントロール -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in fade-in-4">
+            <!-- アーカイブ -->
+            <div class="glass-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <p class="section-title"><i class="fas fa-archive text-amber-400"></i> 完了済みデータのアーカイブ整理</p>
+                    <p class="text-xs text-white/35 leading-relaxed">「回答完了」ステータスの古い投書データを非表示（アーカイブ状態）にしてDBを軽量化します。</p>
                 </div>
-                <p class="text-xs" style="color:var(--text-secondary);">
-                    「回答完了」ステータスになっている古い投書データを一覧画面から非表示にしてデータベースを軽量化します。
-                </p>
-            </div>
-            <button onclick="archiveCompletedSuggestions()" class="btn-amber flex items-center gap-2 shrink-0 self-start md:self-auto">
-                <i class="fas fa-box-open text-xs"></i>
-                回答完了データをアーカイブする
-            </button>
-        </div>
-
-        <!-- System Toggle -->
-        <div class="control-card">
-            <div class="section-header">
-                <i class="fas fa-toggle-on" style="color:#4ade80;"></i>
-                全校目安箱 受付コントロール
-            </div>
-            <p class="text-xs mb-4" style="color:var(--text-secondary);">
-                テスト期間や長期休暇、メンテナンス時など、全生徒からの新しい意見の投稿を一時的にロックできます。
-            </p>
-            <div class="flex gap-3">
-                <button onclick="toggleSystem('active')" id="sys-btn-active"
-                    class="flex-1 btn-green flex items-center justify-center gap-2">
-                    <i class="fas fa-circle-check text-xs"></i>
-                    通常稼働（受付中）にする
-                </button>
-                <button onclick="toggleSystem('maintenance')" id="sys-btn-main"
-                    class="flex-1 btn-danger flex items-center justify-center gap-2">
-                    <i class="fas fa-pause-circle text-xs"></i>
-                    一時受付停止にする
+                <button onclick="archiveCompletedSuggestions()" class="btn-amber shrink-0 self-start sm:self-auto">
+                    <i class="fas fa-box-open"></i> アーカイブする
                 </button>
             </div>
-        </div>
 
-        <!-- Announcement -->
-        <div class="control-card">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-                <!-- Post -->
-                <div class="md:col-span-2 space-y-3">
-                    <div class="section-header">
-                        <i class="fas fa-bullhorn" style="color:#a78bfa; animation: pulse 2s ease-in-out infinite;"></i>
-                        全校一斉アナウンス配信
-                    </div>
-                    <p class="text-xs" style="color:var(--text-secondary);">
-                        生徒用トップページの上部にお知らせを掲載します。メンテナンス予告や回答公開通知などに使用できます。
-                    </p>
-                    <input type="text" id="announcement-title"
-                        placeholder="タイトル（例：【重要】規則見直しについて）"
-                        class="input-dark">
-                    <textarea id="announcement-content" rows="3"
-                        placeholder="お知らせの本文を入力してください..."
-                        class="input-dark"></textarea>
-                    <button onclick="postAnnouncement()" class="btn-primary w-full" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
-                        <i class="fas fa-paper-plane mr-1.5"></i>アナウンスを全体配信する
+            <!-- 受付コントロール -->
+            <div class="glass-card p-5 space-y-3">
+                <p class="section-title"><i class="fas fa-toggle-on text-white/40"></i> 全校目安箱 受付コントロール</p>
+                <p class="text-xs text-white/35">テスト期間・メンテナンス時など、全生徒からの新しい投稿を一時的にロックできます。</p>
+                <div class="flex gap-2">
+                    <button onclick="toggleSystem('active')" id="sys-btn-active" class="btn-green">
+                        <i class="fas fa-check-circle mr-1"></i> 通常稼働（受付中）
+                    </button>
+                    <button onclick="toggleSystem('maintenance')" id="sys-btn-main" class="btn-danger">
+                        <i class="fas fa-lock mr-1"></i> 受付停止
                     </button>
                 </div>
+            </div>
+        </div>
 
-                <!-- History -->
-                <div class="md:col-span-3 flex flex-col" style="border-left:1px solid var(--border); padding-left:24px;">
-                    <div class="section-header">
-                        <i class="fas fa-history" style="color:var(--text-secondary);"></i>
-                        配信中のアナウンス履歴 (最新3件)
-                    </div>
-                    <div id="announcement-history-box"
-                        class="space-y-2 overflow-y-auto scroll-area flex-1 text-xs"
-                        style="color:var(--text-secondary); max-height:200px;">
-                        読み込み中...
-                    </div>
+        <!-- アナウンス配信 -->
+        <div class="glass-card p-5 flex flex-col md:flex-row gap-6 fade-in fade-in-5">
+            <div class="md:w-2/5 space-y-3">
+                <p class="section-title"><i class="fas fa-bullhorn text-purple-400 animate-pulse"></i> 全校一斉アナウンス配信</p>
+                <p class="text-xs text-white/35 leading-relaxed">生徒用トップページにお知らせを掲載します。メンテナンス予告や回答公開通知などに利用できます。</p>
+                <div class="space-y-2">
+                    <input type="text" id="announcement-title" placeholder="タイトル（例：【重要】規則見直しについて）" class="form-input">
+                    <textarea id="announcement-content" rows="3" placeholder="お知らせの本文を入力してください..." class="form-input"></textarea>
+                    <button onclick="postAnnouncement()" class="btn-purple">
+                        <i class="fas fa-paper-plane text-xs"></i> アナウンスを全体配信する
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 border-t md:border-t-0 md:border-l border-white/06 pt-4 md:pt-0 md:pl-6 flex flex-col">
+                <p class="section-title mb-3"><i class="fas fa-history text-white/40"></i> 配信中のアナウンス履歴 (最新3件)</p>
+                <div id="announcement-history-box" class="space-y-2 overflow-y-auto max-h-48 flex-1 text-xs text-white/40">
+                    読み込み中...
                 </div>
             </div>
         </div>
 
-        <!-- ========== DATA TABLE ========== -->
-        <div class="card overflow-hidden">
+        <!-- 意見一覧テーブル -->
+        <div class="glass-card overflow-hidden fade-in fade-in-6">
+            <div class="px-5 py-4 border-b border-white/07">
+                <p class="section-title mb-0"><i class="fas fa-table text-white/40"></i> 全投稿一覧</p>
+            </div>
             <div class="overflow-x-auto">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="w-24">投稿日</th>
-                            <th class="w-28">カテゴリ</th>
-                            <th>タイトル / 内容の要約</th>
-                            <th class="w-32">対応ステータス</th>
-                            <th class="w-24 text-center">特権チャット</th>
+                            <th class="text-left w-24">投稿日</th>
+                            <th class="text-left w-28">カテゴリ</th>
+                            <th class="text-left">タイトル / 内容の要約</th>
+                            <th class="text-left w-36">対応ステータス</th>
+                            <th class="text-center w-24">特権チャット</th>
                         </tr>
                     </thead>
                     <tbody id="suggestion-table-body">
                         <tr id="table-loading">
-                            <td colspan="5" class="text-center py-16" style="color:var(--text-muted);">
-                                <i class="fas fa-spinner spin text-2xl mb-3 block" style="color:var(--accent);"></i>
-                                <span class="text-xs">スプレッドシートから全意見を取得中...</span>
+                            <td colspan="5" class="text-center py-14">
+                                <i class="fas fa-spinner animate-spin text-xl text-white/20 mb-2 block"></i>
+                                <span class="text-xs text-white/25">スプレッドシートから全意見を取得中...</span>
                             </td>
                         </tr>
                     </tbody>
@@ -772,18 +837,21 @@
         async function loadAllAdminData() {
             loadAdminData();
             loadBlocklistData();
-            loadBugReports();
+            loadBugReports();     // 💡【追加】不具合報告も同時に読み込むようにします！
         }
 
+        // ==========================================
+        // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
+        // ==========================================
         // ==========================================
         // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
         // ==========================================
         async function loadAdminData() {
             tableBody.innerHTML = `
                 <tr id="table-loading">
-                    <td colspan="5" class="text-center py-16" style="color:var(--text-muted);">
-                        <i class="fas fa-spinner spin text-2xl mb-3 block" style="color:var(--accent);"></i>
-                        <span class="text-xs">最高権限でデータを同期中...</span>
+                    <td colspan="5" class="text-center py-14">
+                        <i class="fas fa-spinner animate-spin text-xl text-white/20 mb-2 block"></i>
+                        <span class="text-xs text-white/25">最高権限でデータを同期中...</span>
                     </td>
                 </tr>`;
 
@@ -796,20 +864,22 @@
                     return;
                 }
 
-                tableBody.innerHTML = "";
+                tableBody.innerHTML = ""; // ローディング消去
 
+                // 📊 簡易ダッシュボード用の集計カウンター
                 let totalCount = data.length;
                 let pendingCount = 0;
                 let progressCount = 0;
                 let completedCount = 0;
 
                 if (totalCount === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-16 text-xs" style="color:var(--text-muted);">現在、目安箱に届いている意見はありません。</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-14 text-white/25 text-xs">現在、目安箱に届いている意見はありません。</td></tr>`;
                     updateDashboard(0, 0, 0, 0);
                     return;
                 }
 
                 data.forEach(item => {
+                    // 各ステータスのカウント処理
                     if (item.status === "受付") {
                         pendingCount++;
                     } else if (item.status === "生徒会検討中" || item.status === "先生方検討中" || item.status === "開示請求") {
@@ -820,42 +890,35 @@
 
                     const tr = document.createElement("tr");
 
-                    let statusClass = "badge-blue";
-                    if (item.status === "生徒会検討中") statusClass = "badge-amber";
-                    if (item.status === "先生方検討中") statusClass = "badge-purple";
-                    if (item.status === "回答完了") statusClass = "badge-green";
-                    if (item.status === "開示請求") statusClass = "badge-red";
-
-                    let selectBg = "rgba(59,130,246,0.15)";
-                    let selectColor = "#60a5fa";
-                    if (item.status === "生徒会検討中") { selectBg = "rgba(245,158,11,0.15)"; selectColor = "#fbbf24"; }
-                    if (item.status === "先生方検討中") { selectBg = "rgba(139,60,247,0.15)"; selectColor = "#a78bfa"; }
-                    if (item.status === "回答完了") { selectBg = "rgba(22,163,74,0.15)"; selectColor = "#4ade80"; }
-                    if (item.status === "開示請求") { selectBg = "rgba(220,38,38,0.15)"; selectColor = "#f87171"; }
+                    let selectClass = "s-blue";
+                    if (item.status === "生徒会検討中") selectClass = "s-yellow";
+                    if (item.status === "先生方検討中") selectClass = "s-purple";
+                    if (item.status === "回答完了") selectClass = "s-green";
+                    if (item.status === "開示請求") selectClass = "s-red";
 
                     let approvalControlsHTML = "";
                     if (item.status === "開示請求") {
                         approvalControlsHTML = `
-                            <div class="mt-2.5 p-3 rounded-xl text-xs space-y-2 max-w-xs" style="background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2);">
-                                <div class="font-bold mb-1 flex items-center gap-1" style="color:#f87171;">
+                            <div class="mt-2.5 p-3 bg-red-50/50 border border-red-200/60 rounded-xl text-xs space-y-2 max-w-xs shadow-sm">
+                                <div class="font-bold text-red-700 mb-1 flex items-center gap-1">
                                     <i class="fas fa-shield-alt"></i> 🚨 アドレス開示請求・3者承認状況
                                 </div>
-                                <div class="flex items-center justify-between" style="color:var(--text-secondary);">
-                                    <span>副会長:</span>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">副会長:</span>
                                     <div>
-                                        ${item.approvals?.vice_president ? '<span style="color:#4ade80; font-weight:700;">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;border:none;cursor:pointer;">承認</button>` : '<span style="color:var(--text-muted);">⏳ 未承認</span>'}
+                                        ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                     </div>
                                 </div>
-                                <div class="flex items-center justify-between" style="color:var(--text-secondary);">
-                                    <span>管理者:</span>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">管理者:</span>
                                     <div>
-                                        ${item.approvals?.admin ? '<span style="color:#f87171; font-weight:700;">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;border:none;cursor:pointer;">承認</button>` : '<span style="color:var(--text-muted);">⏳ 未承認</span>'}
+                                        ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                     </div>
                                 </div>
-                                <div class="flex items-center justify-between" style="color:var(--text-secondary);">
-                                    <span style="font-weight:600;">担 当:</span>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600 font-medium">担 当:</span>
                                     <div>
-                                        ${item.approvals?.teacher ? '<span style="color:#a78bfa; font-weight:700;">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;border:none;cursor:pointer;">承認する</button>` : '<span style="color:var(--text-muted);">⏳ 未承認</span>'}
+                                        ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] hover:bg-purple-700 font-bold shadow-sm transition">承認する</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                     </div>
                                 </div>
                             </div>
@@ -865,33 +928,31 @@
                     let disclosureHTML = "";
                     if (item.isFullyApproved === true) {
                         disclosureHTML = `
-                            <div class="mt-2 p-2.5 rounded-lg" style="background:rgba(220,38,38,0.1); border:1px solid rgba(220,38,38,0.25);">
-                                <div class="text-xs font-bold flex items-center gap-1 mb-1" style="color:#f87171; animation:pulse 1.5s ease-in-out infinite;">
+                            <div class="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-lg">
+                                <div class="text-[11px] font-bold text-red-700 flex items-center gap-1 animate-pulse">
                                     <i class="fas fa-exclamation-triangle"></i> 3者開示承認済・要対応
                                 </div>
-                                <div class="text-xs mt-1 p-2 rounded flex items-center justify-between font-mono" style="background:rgba(0,0,0,0.3); border:1px solid rgba(220,38,38,0.15);">
-                                    <span style="color:var(--text-secondary);">投稿者アドレス:</span>
-                                    <span style="color:#f87171; font-weight:700;" class="select-all">${item.studentEmail}</span>
+                                <div class="text-xs text-red-950 mt-1 bg-white p-2 rounded border border-red-100 font-mono font-bold flex items-center justify-between">
+                                    <span>投稿者アドレス:</span>
+                                    <span class="text-red-600 select-all">${item.studentEmail}</span>
                                 </div>
                             </div>
                         `;
                     }
 
                     tr.innerHTML = `
-                        <td class="whitespace-nowrap" style="color:var(--text-muted); font-size:11px;">${item.date}</td>
+                        <td class="text-xs text-white/30 whitespace-nowrap font-mono">${item.date}</td>
                         <td class="whitespace-nowrap">
-                            <span class="badge badge-gray">${item.category}</span>
+                            <span class="category-badge">${item.category}</span>
                         </td>
-                        <td style="max-width:300px;">
-                            <div class="font-semibold text-white truncate" style="font-size:13px;">${item.title}</div>
-                            <div class="truncate mt-0.5" style="font-size:11px; color:var(--text-muted);">${item.content}</div>
+                        <td class="max-w-xs md:max-w-sm">
+                            <div class="font-semibold text-white/85 truncate text-sm">${item.title}</div>
+                            <div class="text-xs text-white/30 truncate mt-0.5">${item.content}</div>
                             ${approvalControlsHTML}
                             ${disclosureHTML}
                         </td>
                         <td class="whitespace-nowrap">
-                            <select id="status-${item.id}" onchange="updateStatus('${item.id}', this)"
-                                class="status-select"
-                                style="background:${selectBg}; color:${selectColor};">
+                            <select id="status-${item.id}" onchange="updateStatus('${item.id}', this)" class="status-select ${selectClass}">
                                 <option value="新規受付" ${item.status === '新規受付' ? 'selected' : ''}>🔵 新規受付</option>
                                 <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
                                 <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
@@ -901,32 +962,34 @@
                         </td>
                         <td class="text-center whitespace-nowrap">
                             <button onclick="openChatModal('${item.id}')" class="chat-btn">
-                                <i class="fas fa-comment-dots text-sm"></i>
-                                ${item.hasUnread ? '<span class="unread-dot"></span>' : ''}
+                                <i class="fas fa-comment-dots text-base"></i>
+                                ${item.hasUnread ? '<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>' : ''}
                             </button>
                         </td>
                     `;
                     tableBody.appendChild(tr);
                 });
 
+                // ダッシュボードウィジェットへ数値を流し込み
                 const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
                 updateDashboard(totalCount, pendingCount, progressCount, completionRate);
 
             } catch (error) {
                 console.error(error);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-xs" style="color:#f87171;">データの同期に失敗しました。再読み込みしてください。</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-14 text-red-400 text-xs">データの同期に失敗しました。再読み込みしてください。</td></tr>`;
             }
         }
 
+        // ダッシュボード数値を画面表示に上書きする補助関数
         function updateDashboard(total, pending, progress, rate) {
-            document.getElementById("stat-total").innerHTML = `${total} <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>`;
-            document.getElementById("stat-pending").innerHTML = `${pending} <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>`;
-            document.getElementById("stat-progress").innerHTML = `${progress} <span class="text-xs font-normal" style="color:var(--text-muted)">件</span>`;
-            document.getElementById("stat-completion").innerHTML = `${rate} <span class="text-xs font-normal" style="color:var(--text-muted)">%</span>`;
+            document.getElementById("stat-total").innerHTML = `${total}<span class="stat-unit">件</span>`;
+            document.getElementById("stat-pending").innerHTML = `${pending}<span class="stat-unit">件</span>`;
+            document.getElementById("stat-progress").innerHTML = `${progress}<span class="stat-unit">件</span>`;
+            document.getElementById("stat-completion").innerHTML = `${rate}<span class="stat-unit">%</span>`;
         }
 
         // ==========================================
-        // 2. ユーザーアカウントの権限変更
+        // 2. [新機能] ユーザーアカウントの権限変更変更をGASへリクエスト
         // ==========================================
         async function updateUserRole() {
             const emailInput = document.getElementById("role-email-input");
@@ -942,8 +1005,8 @@
                     method: "POST",
                     body: JSON.stringify({
                         action: "updateUserRole",
-                        email: userEmail,
-                        targetEmail: targetEmail,
+                        email: userEmail, // 操作を行っている管理者自身のメール
+                        targetEmail: targetEmail, // 変更される側のメール
                         newRole: selectedRole
                     })
                 });
@@ -961,7 +1024,7 @@
         }
 
         // ==========================================
-        // 3. 完了済みデータのアーカイブ処理
+        // 3. [新機能] 完了済みデータのアーカイブ処理
         // ==========================================
         async function archiveCompletedSuggestions() {
             if (!confirm("「回答完了」ステータスになっているすべての投稿データをアーカイブ（非表示化）しますか？\n※この操作は元に戻せません。")) return;
@@ -977,7 +1040,7 @@
                 const result = await res.json();
                 if (result.status === "success") {
                     alert(`正常に完了データをアーカイブしました！\n処理件数: ${result.archivedCount || 0} 件`);
-                    loadAdminData();
+                    loadAdminData(); // リスト再読み込み
                 } else {
                     alert("アーカイブエラー: " + result.message);
                 }
@@ -991,7 +1054,7 @@
         // ブロックリストの取得と描画
         // ==========================================
         async function loadBlocklistData() {
-            blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6" style="color:var(--text-muted); font-size:12px;">同期中...</td></tr>`;
+            blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-white/25">同期中...</td></tr>`;
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getBlocklist&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
@@ -999,21 +1062,17 @@
                 if(data.status === "success") {
                     blocklistBody.innerHTML = "";
                     if(data.list.length === 0) {
-                        blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-8" style="color:var(--text-muted); font-size:12px;">ブロック中のアドレスはありません。</td></tr>`;
+                        blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-white/25">ブロック中のアドレスはありません。</td></tr>`;
                         return;
                     }
                     data.list.forEach(item => {
                         const tr = document.createElement("tr");
-                        tr.style.borderBottom = "1px solid var(--border)";
                         tr.innerHTML = `
-                            <td class="px-3 py-2.5 font-mono font-bold" style="color:var(--text-primary); font-size:11px;">${item.email}</td>
-                            <td class="px-3 py-2.5" style="color:var(--text-muted); font-size:11px;">${item.date}</td>
-                            <td class="px-3 py-2.5 text-center">
-                                <button onclick="removeBlocklist('${item.email}')"
-                                    style="color:var(--text-muted); background:none; border:none; cursor:pointer; transition:color 0.15s; font-size:13px;"
-                                    onmouseover="this.style.color='#f87171'"
-                                    onmouseout="this.style.color='var(--text-muted)'">
-                                    <i class="fas fa-trash-alt"></i>
+                            <td class="font-mono font-bold text-white/70">${item.email}</td>
+                            <td class="text-white/35">${item.date}</td>
+                            <td class="text-center">
+                                <button onclick="removeBlocklist('${item.email}')" class="text-white/25 hover:text-red-400 transition-colors">
+                                    <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </td>
                         `;
@@ -1022,7 +1081,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6" style="color:#f87171; font-size:12px;">取得失敗</td></tr>`;
+                blocklistBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-red-400">取得失敗</td></tr>`;
             }
         }
 
@@ -1099,13 +1158,14 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    let bg = "rgba(59,130,246,0.15)"; let col = "#60a5fa";
-                    if (newStatus === "生徒会検討中") { bg = "rgba(245,158,11,0.15)"; col = "#fbbf24"; }
-                    if (newStatus === "先生方検討中") { bg = "rgba(139,60,247,0.15)"; col = "#a78bfa"; }
-                    if (newStatus === "回答完了") { bg = "rgba(22,163,74,0.15)"; col = "#4ade80"; }
-                    if (newStatus === "開示請求") { bg = "rgba(220,38,38,0.15)"; col = "#f87171"; }
-                    selectElement.style.background = bg;
-                    selectElement.style.color = col;
+                    selectElement.classList.remove("s-blue","s-yellow","s-purple","s-green","s-red");
+                    if (newStatus === "新規受付") selectElement.classList.add("s-blue");
+                    if (newStatus === "生徒会検討中") selectElement.classList.add("s-yellow");
+                    if (newStatus === "先生方検討中") selectElement.classList.add("s-purple");
+                    if (newStatus === "回答完了") selectElement.classList.add("s-green");
+                    if (newStatus === "開示請求") selectElement.classList.add("s-red");
+                    
+                    // ダッシュボード値や再計算のために全更新
                     loadAdminData();
                 } else {
                     alert("変更に失敗しました: " + result.message);
@@ -1129,12 +1189,13 @@
             window.location.href = "index.html";
         }
 
+
         // 3者承認用関数
         async function approveRequest(suggestionId, roleToApprove) {
             if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
             const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
             try {
-                const response = await fetch(GAS_API_URL, {
+                const response = await fetch(GAS, {
                     method: "POST",
                     body: JSON.stringify({
                         action: "approveDisclosure",
@@ -1155,7 +1216,6 @@
                 alert("通信に失敗しました。");
             }
         }
-
         // ==========================================
         // 新機能: 一斉アナウンスの投稿
         // ==========================================
@@ -1183,7 +1243,7 @@
                     alert("アナウンスを正常に配信しました！");
                     titleInput.value = "";
                     contentInput.value = "";
-                    loadAnnouncementHistory();
+                    loadAnnouncementHistory(); // 履歴を更新
                 } else {
                     alert("配信エラー: " + result.message);
                 }
@@ -1203,42 +1263,59 @@
                 if (data.status === "success") {
                     historyBox.innerHTML = "";
                     if (data.list.length === 0) {
-                        historyBox.innerHTML = `<div class="text-center py-8" style="color:var(--text-muted); font-size:12px;">現在、配信中のアナウンスはありません。</div>`;
+                        historyBox.innerHTML = `<div class="text-center py-6 text-white/25">現在、配信中のアナウンスはありません。</div>`;
                         return;
                     }
-                    data.list.forEach(item => {
-                        const displaySender = "管理者";
-                        const div = document.createElement("div");
-                        div.className = "announce-item";
-                        div.innerHTML = `
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div>
-                                        <span class="font-bold" style="color:var(--text-primary); font-size:12px;">${item.title}</span>
-                                        <span class="badge badge-gray ml-2" style="font-size:9px;">${displaySender}</span>
-                                    </div>
-                                    <span style="color:var(--text-muted); font-family:monospace; font-size:10px;">${item.date}</span>
-                                </div>
-                                <p style="color:var(--text-secondary); white-space:pre-wrap; font-size:11px;">${item.content}</p>
-                            </div>
-                            <button onclick="deleteAnnouncement('${item.id}')"
-                                style="color:var(--text-muted); background:none; border:none; cursor:pointer; transition:color 0.15s; font-size:13px; padding:4px; flex-shrink:0;"
-                                onmouseover="this.style.color='#f87171'"
-                                onmouseout="this.style.color='var(--text-muted)'"
-                                title="このアナウンスを削除">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        `;
-                        historyBox.appendChild(div);
-                    });
+                    // アナウンス履歴を読み込む関数の中のループ部分
+data.list.forEach(item => {
+    // 💡 配信者の表示を「管理者」に固定する（または item.email を使わず直接「管理者」と書く）
+    const displaySender = "管理者"; 
+
+    const div = document.createElement("div");
+    div.className = "announce-item";
+    div.innerHTML = `
+        <div class="flex-1">
+            <div class="flex justify-between items-start mb-1">
+                <div>
+                    <span class="font-bold text-white/85 text-xs">${item.title}</span>
+                    <span class="text-[10px] bg-white/08 text-white/40 px-1.5 py-0.5 rounded ml-2">${displaySender}</span>
+                </div>
+                <span class="text-[10px] text-white/25 font-mono ml-2 shrink-0">${item.date}</span>
+            </div>
+            <p class="text-white/45 whitespace-pre-wrap text-xs leading-relaxed">${item.content}</p>
+        </div>
+        <button onclick="deleteAnnouncement('${item.id}')" class="announce-delete-btn" title="このアナウンスを削除">
+            <i class="fas fa-trash-alt text-xs"></i>
+        </button>
+    `;
+    historyBox.appendChild(div);
+});
                 }
             } catch (e) {
                 console.error(e);
-                historyBox.innerHTML = `<div style="color:#f87171; font-size:12px; padding:8px 0;">履歴の取得に失敗しました。</div>`;
+                historyBox.innerHTML = `<div class="text-red-400 py-2 text-xs">履歴の取得に失敗しました。</div>`;
             }
         }
 
-        // アナウンスの削除
+        // 既存の一括ロード関数にお知らせ読み込みを組み込む
+// 既存の window.onload はすべて削除し、これ1つに統一します
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. 基本データのロード
+    if (typeof loadAllAdminData === "function") {
+        try { loadAllAdminData(); } catch(e) { console.error("基本データ読込エラー:", e); }
+    }
+
+    // 2. ブロックリスト・アナウンス履歴
+    try { if (typeof loadBlocklist === "function") loadBlocklist(); } catch(e) { console.error(e); }
+    try { if (typeof loadAnnouncementHistory === "function") loadAnnouncementHistory(); } catch(e) { console.error(e); }
+    
+    // 3. 🚨 メンションSOSと不具合報告の即時チェック
+    try { loadAdminMentions(); } catch(e) { console.error("メンション取得エラー:", e); }
+    try { loadBugReports(); } catch(e) { console.error("不具合報告取得エラー:", e); }
+});
+        // ==========================================
+        // 新機能: アナウンスの削除
+        // ==========================================
         async function deleteAnnouncement(id) {
             if (!confirm("このアナウンスを削除しますか？\n（生徒側の画面からもすぐに消えます）")) return;
 
@@ -1254,7 +1331,7 @@
                 const result = await res.json();
                 if (result.status === "success") {
                     alert("アナウンスを削除しました。");
-                    loadAnnouncementHistory();
+                    loadAnnouncementHistory(); // 履歴を再読み込み
                 } else {
                     alert("削除エラー: " + result.message);
                 }
@@ -1263,7 +1340,6 @@
                 alert("通信に失敗しました。");
             }
         }
-
         async function toggleSystem(status) {
             const statusText = status === 'active' ? '【通常稼働（受付中）】' : '【一時受付停止（メンテナンス）】';
             if (!confirm(`システムを ${statusText} に切り替えますか？`)) return;
@@ -1288,21 +1364,22 @@
                 alert("通信に失敗しました。");
             }
         }
-
         // ==========================================
-        // 🚨 管理者メンションSOSをロードする
+        // 🚨【対応完了ボタン付き】自分（@admin）宛てのメンションSOSをロードする
         // ==========================================
         async function loadAdminMentions() {
             const panel = document.getElementById("mention-panel");
             const countEl = document.getElementById("mention-count");
             const listEl = document.getElementById("mention-list");
 
+            // 👇 【追加】HTMLの枠がちゃんと見つかっているか確認
             console.log("HTMLの枠チェック:", { panel, countEl, listEl });
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getAdminMentions&email=${encodeURIComponent(userEmail)}`);
                 const data = await res.json();
 
+                // 👇 【追加】GASからどんなデータが届いたか確認
                 console.log("GASからのデータチェック:", data);
 
                 if (data.status === "success" && data.list.length > 0) {
@@ -1312,29 +1389,23 @@
 
                     data.list.forEach(item => {
                         const div = document.createElement("div");
-                        div.style.cssText = "padding:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(245,158,11,0.2); border-radius:12px; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; animation: fadeSlideUp 0.3s ease both;";
+                        div.className = "alert-item-mention p-3 text-xs flex justify-between items-start gap-4";
                         let senderBadge = item.senderRole === 'student' ? '👤 生徒' : '🎗️ 生徒会役員';
                         
                         div.innerHTML = `
-                            <div style="flex:1;">
-                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                                    <span style="font-weight:700; color:#fbbf24; font-size:12px;">${senderBadge}</span>
-                                    <span style="font-size:10px; color:var(--text-muted); font-family:monospace;">${item.date}</span>
-                                    <span class="badge badge-gray" style="font-size:9px;">対象：${item.suggestionTitle}</span>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="font-bold text-amber-300">${senderBadge}</span>
+                                    <span class="text-[10px] text-white/30 font-mono">${item.date}</span>
+                                    <span class="text-[10px] bg-white/07 text-white/45 px-1.5 py-0.5 rounded font-bold">対象：${item.suggestionTitle}</span>
                                 </div>
-                                <p style="font-size:12px; color:var(--text-secondary); white-space:pre-wrap; padding:8px 12px; border-radius:8px; border:1px solid rgba(245,158,11,0.1); background:rgba(245,158,11,0.04);">${item.message}</p>
+                                <p class="text-white/70 font-medium whitespace-pre-wrap bg-white/04 p-2 rounded mt-1 border border-amber-500/15">${item.message}</p>
                             </div>
-                            <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
-                                <button onclick="openChatFromMention('${item.suggestionId}')"
-                                    style="background:linear-gradient(135deg,#d97706,#b45309);color:white;font-weight:700;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-size:11px;white-space:nowrap;transition:all 0.2s;"
-                                    onmouseover="this.style.transform='translateY(-1px)'"
-                                    onmouseout="this.style.transform='translateY(0)'">
-                                    会話を見る <i class="fas fa-chevron-right" style="font-size:9px;"></i>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <button onclick="openChatFromMention('${item.suggestionId}')" class="btn-alert-chat">
+                                    会話を見る <i class="fas fa-chevron-right text-[9px]"></i>
                                 </button>
-                                <button onclick="resolveAlert('mention', '${item.messageId}')"
-                                    style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;font-weight:700;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-size:11px;white-space:nowrap;transition:all 0.2s;"
-                                    onmouseover="this.style.transform='translateY(-1px)'"
-                                    onmouseout="this.style.transform='translateY(0)'">
+                                <button onclick="resolveAlert('mention', '${item.messageId}')" class="btn-alert-resolve">
                                     <i class="fas fa-check"></i> 対応完了
                                 </button>
                             </div>
@@ -1350,7 +1421,10 @@
         }
 
         // ==========================================
-        // 🪲 未対応の不具合報告をロードする
+        // 🪲 未対応の不具合報告をロードする（重複排除＆画像全対応版）
+        // ==========================================
+        // ==========================================
+        // 🪲 未対応の不具合報告をロードする（2回呼び出し完全防御＆画像超自動検知版）
         // ==========================================
         async function loadBugReports() {
             const panel = document.getElementById("bug-panel");
@@ -1368,6 +1442,9 @@
                 console.log("【最新版デバッグ】GASから取得したデータ:", data);
 
                 const reportList = data.bugs || data.list || [];
+
+                // 💡 【超強力重複ガード】データを追加する直前でリストを一回完全に空っぽにします！
+                // これにより、たとえこの関数が同時に何回実行されても、最後に終わった1回分だけが画面に残ります。
                 listEl.innerHTML = "";
 
                 if (reportList && reportList.length > 0) {
@@ -1386,17 +1463,24 @@
                         const content = item.content || "内容なし";
                         const env = item.userAgent || "環境不明";
                         
+                        // 🔍 【全自動画像検知システム】
+                        // GASがどんなキー名で画像URLを送ってきていても、オブジェクトの中から
+                        // httpから始まる文字列、または「DriveApp/エラー/拒否」という文字を全自動で探し出します。
                         let url = "";
+                        
+                        // まずよくあるキー名を確認
                         let possibleUrl = item.image || item.attachmentUrl || item.url || item.fileUrl || item.file || "";
                         
                         if (typeof possibleUrl === "string" && possibleUrl.length > 0) {
                             url = possibleUrl;
                         } else {
+                            // もし見つからなければ、itemの中身を全探索する
                             for (let key in item) {
                                 if (typeof item[key] === "string" && (item[key].startsWith("http") || item[key].includes("drive.google.com") || item[key].includes("エラー") || item[key].includes("拒否") || item[key].includes("DriveApp"))) {
                                     url = item[key];
                                     break;
                                 } else if (typeof item[key] === "object" && item[key] !== null) {
+                                    // もし画像データがさらにオブジェクトの階層（{url: "..."}など）に入っていた場合の救済
                                     if (item[key].url && typeof item[key].url === "string") {
                                         url = item[key].url;
                                         break;
@@ -1408,41 +1492,35 @@
                         let imageButton = "";
                         if (url && (url.startsWith("http") || url.includes("drive.google.com"))) {
                             imageButton = `
-                                <a href="${url}" target="_blank"
-                                    style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#60a5fa;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);padding:4px 10px;border-radius:8px;margin-top:8px;text-decoration:none;transition:all 0.2s;"
-                                    onmouseover="this.style.background='rgba(59,130,246,0.18)'"
-                                    onmouseout="this.style.background='rgba(59,130,246,0.1)'">
+                                <a href="${url}" target="_blank" class="image-link">
                                     <i class="fas fa-image"></i> 📷 添付画像を確認
                                 </a>
                             `;
                         } else if (url && (url.includes("エラー") || url.includes("拒否") || url.includes("DriveApp"))) {
                             imageButton = `
-                                <span style="display:inline-block;font-size:10px;color:#f87171;background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.2);padding:3px 8px;border-radius:6px;margin-top:8px;">
+                                <span class="inline-block text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded mt-2">
                                     ⚠️ ドライブ保存エラー（権限設定前に送信されたデータです）
                                 </span>
                             `;
                         }
 
                         const div = document.createElement("div");
-                        div.style.cssText = "padding:12px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(220,38,38,0.15); border-radius:12px; margin-bottom:8px; animation: fadeSlideUp 0.3s ease both;";
+                        div.className = "alert-item-bug p-3 rounded-xl mb-2";
                         
                         div.innerHTML = `
                             <div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                    <div style="display:flex;align-items:center;gap:8px;">
-                                        <span style="font-size:10px;font-family:monospace;color:var(--text-muted);background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:5px;">${date}</span>
-                                        <span style="font-size:10px;color:var(--text-secondary);font-weight:600;"><i class="fas fa-user-circle" style="margin-right:3px;"></i>${email}</span>
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-[10px] font-mono text-white/30 bg-white/05 px-1.5 py-0.5 rounded">${date}</span>
+                                        <span class="text-[10px] text-white/50 font-bold"><i class="fas fa-user-circle mr-0.5"></i>${email}</span>
                                     </div>
                                 </div>
-                                <p style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${content}</p>
-                                <div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-family:monospace;">環境: ${env}</div>
+                                <p class="text-xs text-white/70 whitespace-pre-wrap leading-relaxed">${content}</p>
+                                <div class="text-[9px] text-white/25 mt-1 font-mono">環境: ${env}</div>
                                 ${imageButton}
                             </div>
-                            <div style="margin-top:10px;text-align:right;">
-                                <button onclick="resolveAlert('bug', '${id}')"
-                                    style="font-size:11px;background:linear-gradient(135deg,#dc2626,#9f1239);color:white;font-weight:700;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;"
-                                    onmouseover="this.style.transform='translateY(-1px)'"
-                                    onmouseout="this.style.transform='translateY(0)'">
+                            <div class="mt-3 text-right">
+                                <button onclick="resolveAlert('bug', '${id}')" class="btn-bug-resolve">
                                     <i class="fas fa-check"></i> 完了
                                 </button>
                             </div>
@@ -1466,7 +1544,6 @@
                 console.error("【重大なエラー】描画処理で例外が発生しました:", e);
             }
         }
-
         // ==========================================
         // ✔️ メンション・不具合を「対応完了」にする共通処理
         // ==========================================
@@ -1485,6 +1562,7 @@
                 });
                 const result = await res.json();
                 if (result.status === "success") {
+                    // 再ロードして画面を更新
                     if (type === 'mention') loadAdminMentions();
                     if (type === 'bug') loadBugReports();
                 } else {
@@ -1495,26 +1573,10 @@
                 alert("通信エラーが発生しました。");
             }
         }
-
         // 💡 メンションアラートの「会話を見る」ボタンをチャット画面へ繋ぐ
-        function openChatFromMention(suggestionId) {
-            openChatModal(suggestionId);
-        }
-
-        // ==========================================
-        // DOMContentLoaded
-        // ==========================================
-        document.addEventListener("DOMContentLoaded", () => {
-            if (typeof loadAllAdminData === "function") {
-                try { loadAllAdminData(); } catch(e) { console.error("基本データ読込エラー:", e); }
-            }
-
-            try { if (typeof loadBlocklist === "function") loadBlocklist(); } catch(e) { console.error(e); }
-            try { if (typeof loadAnnouncementHistory === "function") loadAnnouncementHistory(); } catch(e) { console.error(e); }
-            
-            try { loadAdminMentions(); } catch(e) { console.error("メンション取得エラー:", e); }
-            try { loadBugReports(); } catch(e) { console.error("不具合報告取得エラー:", e); }
-        });
+function openChatFromMention(suggestionId) {
+    openChatModal(suggestionId);
+}
     </script>
 </body>
 </html>
