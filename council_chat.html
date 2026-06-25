@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - 生徒会対話ルーム</title>
-        <link rel="icon" href="log.png" type="image/png">
+    <link rel="icon" href="log.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         .brand-bg { background-color: #130182; }
         .brand-text { color: #130182; }
+        /* スクロールバーを滑らかにする設定 */
+        #chat-container {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen flex flex-col">
@@ -63,9 +68,9 @@
         const userRole = sessionStorage.getItem("user_role");
 
         if (!userEmail || !suggestionId || 
-    (userRole !== "chairperson" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "admin" && userRole !== "council")) {
-    window.location.href = "index.html";
-}
+            (userRole !== "chairperson" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "admin" && userRole !== "council")) {
+            window.location.href = "index.html";
+        }
 
         const chatContainer = document.getElementById("chat-container");
         const chatForm = document.getElementById("chat-form");
@@ -82,7 +87,7 @@
         }
 
         // ==========================================
-        // 1. チャット履歴＆意見を取得して描画
+        // 1. チャット履歴＆意見を取得して描画（✨アニメーション対応）
         // ==========================================
         async function loadCouncilChatLog() {
             try {
@@ -95,6 +100,7 @@
                     return;
                 }
 
+                // 上部要約の更新
                 document.getElementById("sum-category").innerText = data.suggestion.category;
                 document.getElementById("sum-date").innerText = data.suggestion.date;
                 document.getElementById("sum-title").innerText = data.suggestion.title;
@@ -109,13 +115,17 @@
                 
                 document.getElementById("chat-loading").classList.add("hidden");
                 
-                const existingMsgs = chatContainer.querySelectorAll('.msg-bubble');
-                existingMsgs.forEach(el => el.remove());
+                // 💡 現在画面に描画されている既存メッセージの件数を取得
+                const currentMsgCount = chatContainer.querySelectorAll('.msg-bubble').length;
 
                 if (data.chats.length === 0) {
                     if(!chatContainer.querySelector('.no-msg-info')) {
+                        // メッセージがない場合の初期化
+                        const bubbles = chatContainer.querySelectorAll('.msg-bubble');
+                        bubbles.forEach(el => el.remove());
+                        
                         const infoMsg = document.createElement("div");
-                        infoMsg.className = "no-msg-info text-center text-[11px] text-gray-400 my-auto bg-slate-50 p-4 rounded-xl border border-dashed border-gray-200";
+                        infoMsg.className = "no-msg-info text-center text-[11px] text-gray-400 my-auto bg-slate-50 p-4 rounded-xl border border-dashed border-gray-200 animate__animated animate__fadeIn";
                         infoMsg.innerHTML = `<i class="fas fa-reply text-lg mb-1 block"></i>生徒へメッセージを直接送ることができます。`;
                         chatContainer.appendChild(infoMsg);
                     }
@@ -123,88 +133,116 @@
                     const noInfo = chatContainer.querySelector('.no-msg-info');
                     if(noInfo) noInfo.remove();
 
-                    data.chats.forEach(chat => {
-                        // ✨【修正】自分（閲覧中の役員）が送った発言かどうかを厳密に判定
-                        // chat.sender が "student" 以外（＝役員・先生・管理者）であり、かつ自分のロールまたは一般役員ロールと一致するかどうか
-                        const isMe = (chat.sender === "admin" && userRole === "admin") || 
-                                     (chat.sender === "teacher" && userRole === "teacher") ||
-                                     (chat.sender === "chairperson" && userRole === "chairperson") ||
-                                     (chat.sender === "vice_president" && userRole === "vice_president") ||
-                                     (chat.sender === "council" && userRole === "council");
+                    // 💡 新着メッセージがある、または初回読み込み時のみ追加描画する（チラつき防止）
+                    if (currentMsgCount !== data.chats.length) {
                         
-                        const wrapper = document.createElement("div");
-                        // LINE風の左右配置：自分が送ったら ml-auto(右寄せ) と items-end、相手なら items-start(左寄せ)
-                        wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'}`;
+                        // 一旦古い要素をクリア
+                        const existingMsgs = chatContainer.querySelectorAll('.msg-bubble');
+                        existingMsgs.forEach(el => el.remove());
 
-                        // ✨【修正】発言者の役職（role/sender）に応じて名前のテキストを分岐
-                        let nameText = "生徒（匿名）";
-                        let bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none"; 
+                        data.chats.forEach((chat, index) => {
+                            const isMe = (chat.sender === "admin" && userRole === "admin") || 
+                                         (chat.sender === "teacher" && userRole === "teacher") ||
+                                         (chat.sender === "chairperson" && userRole === "chairperson") ||
+                                         (chat.sender === "vice_president" && userRole === "vice_president") ||
+                                         (chat.sender === "council" && userRole === "council");
+                            
+                            const wrapper = document.createElement("div");
+                            
+                            // 💡 アニメーションのクラス判定ロジック
+                            let animationClass = "";
+                            if (currentMsgCount === 0) {
+                                // 初回読み込み時は静かにフェードイン
+                                animationClass = "animate__animated animate__fadeIn animate__fast";
+                            } else if (index >= currentMsgCount) {
+                                // 15秒更新や自分が打って件数が増えた新着メッセージだけポンッと下から飛び出す！
+                                animationClass = "animate__animated animate__backInUp animate__fast";
+                            }
 
-                        if (isMe) {
-                            // 自分が送信したメッセージの表示（右側）
-                            if (chat.sender === "admin") {
-                                nameText = "あなた（システム管理者 👑）";
-                                bubbleClass = "bg-red-900 text-white rounded-tr-none shadow-md font-medium border border-red-700";
-                            } else if (chat.sender === "teacher") {
-                                nameText = "あなた（先生）";
-                                bubbleClass = "bg-purple-900 text-white rounded-tr-none";
-                            } else {
-                                nameText = "あなた（生徒会役員）";
-                                bubbleClass = "bg-indigo-900 text-white rounded-tr-none";
+                            // クラスを結合
+                            wrapper.className = `msg-bubble flex flex-col w-full max-w-[75%] ${isMe ? 'items-end ml-auto' : 'items-start'} ${animationClass}`;
+
+                            // 初回のみパラパラと表示させる遅延設定
+                            if (currentMsgCount === 0) {
+                                wrapper.style.animationDelay = `${index * 0.01}s`;
                             }
-                        } else {
-                            // 相手（生徒、あるいは他の役職者）が送信したメッセージの表示（左側）
-                            if (chat.sender === "admin") {
-                                nameText = "システム管理者 👑";
-                                bubbleClass = "bg-red-50 text-red-950 rounded-tl-none border border-red-200 font-medium";
-                            } else if (chat.sender === "teacher") {
-                                nameText = "先生";
-                                bubbleClass = "bg-purple-50 text-purple-950 rounded-tl-none border border-purple-200";
-                            } else if (chat.sender === "council" || chat.sender === "chairperson" || chat.sender === "vice_president") {
-                                nameText = "生徒会役員";
-                                bubbleClass = "bg-indigo-50 text-indigo-950 rounded-tl-none border border-indigo-200";
+
+                            let nameText = "生徒（匿名）";
+                            let bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none"; 
+
+                            if (isMe) {
+                                if (chat.sender === "admin") {
+                                    nameText = "あなた（システム管理者 👑）";
+                                    bubbleClass = "bg-red-900 text-white rounded-tr-none shadow-md font-medium border border-red-700";
+                                } else if (chat.sender === "teacher") {
+                                    nameText = "あなた（先生）";
+                                    bubbleClass = "bg-purple-900 text-white rounded-tr-none";
+                                } else {
+                                    nameText = "あなた（生徒会役員）";
+                                    bubbleClass = "bg-indigo-900 text-white rounded-tr-none";
+                                }
                             } else {
-                                nameText = "生徒（匿名）";
-                                bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
+                                if (chat.sender === "admin") {
+                                    nameText = "システム管理者 👑";
+                                    bubbleClass = "bg-red-50 text-red-950 rounded-tl-none border border-red-200 font-medium";
+                                } else if (chat.sender === "teacher") {
+                                    nameText = "先生";
+                                    bubbleClass = "bg-purple-50 text-purple-950 rounded-tl-none border border-purple-200";
+                                } else if (chat.sender === "council" || chat.sender === "chairperson" || chat.sender === "vice_president") {
+                                    nameText = "生徒会役員";
+                                    bubbleClass = "bg-indigo-50 text-indigo-950 rounded-tl-none border border-indigo-200";
+                                } else {
+                                    nameText = "生徒（匿名）";
+                                    bubbleClass = "bg-gray-100 text-gray-800 rounded-tl-none";
+                                }
                             }
-                        }
-                        
-                        // 👑 admin専用：削除・編集ボタンのHTML
-                        let adminButtonsHTML = "";
-                        if (userRole === "admin" && chat.id) {
-                            adminButtonsHTML = `
-                                <div class="flex space-x-2 text-[10px] text-gray-400 mt-1 px-1">
-                                    <button onclick="editMessage('${chat.id}', '${encodeURIComponent(chat.message)}')" class="hover:text-blue-600 transition flex items-center space-x-0.5">
-                                        <i class="fas fa-edit"></i> <span>編集</span>
-                                    </button>
-                                    <button onclick="deleteMessage('${chat.id}')" class="hover:text-red-500 transition flex items-center space-x-0.5">
-                                        <i class="fas fa-trash-alt"></i> <span>削除</span>
-                                    </button>
+                            
+                            let adminButtonsHTML = "";
+                            if (userRole === "admin" && chat.id) {
+                                adminButtonsHTML = `
+                                    <div class="flex space-x-2 text-[10px] text-gray-400 mt-1 px-1">
+                                        <button onclick="editMessage('${chat.id}', '${encodeURIComponent(chat.message)}')" class="hover:text-blue-600 transition flex items-center space-x-0.5">
+                                            <i class="fas fa-edit"></i> <span>編集</span>
+                                        </button>
+                                        <button onclick="deleteMessage('${chat.id}')" class="hover:text-red-500 transition flex items-center space-x-0.5">
+                                            <i class="fas fa-trash-alt"></i> <span>削除</span>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+
+                            const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
+                            const bubble = `
+                                <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
+                                    <p class="whitespace-pre-wrap">${chat.message}</p>
+                                </div>
+                                <div class="flex items-center space-x-1 justify-between w-full ${isMe ? 'justify-end' : ''}">
+                                    <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
                                 </div>
                             `;
-                        }
+                            
+                            wrapper.innerHTML = nameLabel + bubble;
+                            if(adminButtonsHTML) {
+                                const btnContainer = document.createElement("div");
+                                btnContainer.innerHTML = adminButtonsHTML;
+                                wrapper.appendChild(btnContainer);
+                            }
+                            chatContainer.appendChild(wrapper);
+                        });
 
-                        const nameLabel = `<span class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${nameText}</span>`;
-                        const bubble = `
-                            <div class="p-3 rounded-2xl text-sm shadow-sm tracking-wide ${bubbleClass}">
-                                <p class="whitespace-pre-wrap">${chat.message}</p>
-                            </div>
-                            <div class="flex items-center space-x-1 justify-between w-full ${isMe ? 'justify-end' : ''}">
-                                <span class="text-[9px] text-gray-400 mt-0.5 px-1">${chat.timestamp} ${isMe && chat.isRead ? '（既読）' : ''}</span>
-                            </div>
-                        `;
-                        
-                        wrapper.innerHTML = nameLabel + bubble;
-                        if(adminButtonsHTML) {
-                            const btnContainer = document.createElement("div");
-                            btnContainer.innerHTML = adminButtonsHTML;
-                            wrapper.appendChild(btnContainer);
+                        // 🏄‍♂️ 最下部へ自動スクロール（初回は瞬時に、新着は滑らかにスクロール）
+                        if (currentMsgCount === 0) {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        } else {
+                            setTimeout(() => {
+                                chatContainer.scrollTo({
+                                    top: chatContainer.scrollHeight,
+                                    behavior: 'smooth'
+                                });
+                            }, 60);
                         }
-                        chatContainer.appendChild(wrapper);
-                    });
+                    }
                 }
-
-                chatContainer.scrollTop = chatContainer.scrollHeight;
 
             } catch (error) {
                 console.error(error);
@@ -230,7 +268,7 @@
                         action: "sendChatMessage",
                         suggestionId: suggestionId,
                         email: userEmail,
-                        sender: userRole, // ✨ 現在ログインしている正しい役職（chairperson や vice_president 等）を送信
+                        sender: userRole, 
                         message: messageText
                     })
                 });
@@ -238,7 +276,8 @@
 
                 if (result.status === "success") {
                     chatInput.value = "";
-                    loadCouncilChatLog();
+                    // 💡 送信成功直後にリロードを呼び出し、新着メッセージとしてポップアップさせる
+                    await loadCouncilChatLog();
                 } else {
                     alert("送信失敗: " + result.message);
                 }
@@ -286,6 +325,8 @@
                 });
                 const result = await res.json();
                 if (result.status === "success") {
+                    // 編集・削除時は全件の整合性を保つため一旦全クリアして再描画
+                    chatContainer.querySelectorAll('.msg-bubble').forEach(el => el.remove());
                     loadCouncilChatLog();
                 } else {
                     alert("編集に失敗しました: " + result.message);
@@ -312,6 +353,8 @@
                 });
                 const result = await res.json();
                 if (result.status === "success") {
+                    // 編集・削除時は全件の整合性を保つため一旦全クリアして再描画
+                    chatContainer.querySelectorAll('.msg-bubble').forEach(el => el.remove());
                     loadCouncilChatLog();
                 } else {
                     alert("削除に失敗しました: " + result.message);
