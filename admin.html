@@ -645,11 +645,17 @@
                     </div>
                     <!-- 停止ボタン -->
                     <div class="toggle-option inactive-option" onclick="toggleSystem('maintenance')" id="sys-btn-main">
-                        <div class="toggle-icon">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="toggle-label text-gray-500">一時受付停止<br><span class="text-xs font-normal">（メンテナンス）</span></div>
-                    </div>
+    <span class="toggle-badge badge-now hidden" id="maintenance-badge">現在の状態</span>
+
+    <div class="toggle-icon">
+        <i class="fas fa-lock"></i>
+    </div>
+
+    <div class="toggle-label text-gray-500">
+        一時受付停止<br>
+        <span class="text-xs font-normal">（メンテナンス）</span>
+    </div>
+</div>
                 </div>
             </div>
         </div>
@@ -1260,16 +1266,49 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (result.status === "success") {
     alert(`システムを正常に ${statusText} へ切り替えました。`);
 
-    // 表示を最新の状態に更新
-    loadSystemStatus();
+    // 画面表示を最新状態に更新
+    await loadSystemStatus();
+
 } else {
-                    alert("設定変更エラー: " + result.message);
-                }
+    alert("設定変更エラー: " + result.message);
+}
             } catch (e) {
                 console.error(e);
                 alert("通信に失敗しました。");
             }
         }
+        async function loadSystemStatus() {
+    try {
+        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
+        const result = await res.json();
+
+        if (result.status !== "success") return;
+
+        const activeBtn = document.getElementById("sys-btn-active");
+        const mainBtn = document.getElementById("sys-btn-main");
+        const activeBadge = document.getElementById("active-badge");
+const maintenanceBadge = document.getElementById("maintenance-badge");
+
+        // 一旦リセット
+        activeBtn.classList.remove("active-option", "inactive-option");
+        mainBtn.classList.remove("active-option", "inactive-option", "maintenance-option");
+
+        if (result.systemStatus === "active") {
+            activeBtn.classList.add("active-option");
+            mainBtn.classList.add("inactive-option");
+            activeBadge.classList.remove("hidden");
+maintenanceBadge.classList.add("hidden");
+        } else {
+            activeBtn.classList.add("inactive-option");
+            mainBtn.classList.add("maintenance-option");
+            activeBadge.classList.add("hidden");
+maintenanceBadge.classList.remove("hidden");
+        }
+
+    } catch (e) {
+        console.error(e);
+    }
+}
         // ==========================================
         // 🚨【対応完了ボタン付き】自分（@admin）宛てのメンションSOSをロードする
         // ==========================================
