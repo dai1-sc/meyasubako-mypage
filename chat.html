@@ -77,6 +77,22 @@
         const chatContainer = document.getElementById("chat-container");
         const chatForm = document.getElementById("chat-form");
         const chatInput = document.getElementById("chat-input");
+        // システムが受付停止中ならマイページへ戻す
+async function checkSystemStatus() {
+    try {
+        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
+        const result = await res.json();
+
+        if (result.status === "success" && result.systemStatus === "maintenance") {
+            window.location.replace("mypage.html");
+            return false;
+        }
+        return true;
+    } catch (e) {
+        console.error(e);
+        return true;
+    }
+}
 
         // 💡 元の意見カードを開閉する関数
         function toggleSummaryDetails() {
@@ -257,10 +273,20 @@
             }
         });
 
-        window.onload = loadChatLog;
+       window.onload = async () => {
+    const ok = await checkSystemStatus();
+    if (!ok) return;
+
+    loadChatLog();
+};
         
-        // 10秒ごとに新着メッセージがないか自動パトロール（リアルタイム化）
-        setInterval(loadChatLog, 10000);
+        // 5秒ごとに新着メッセージがないか自動パトロール（リアルタイム化）
+        setInterval(async () => {
+    const ok = await checkSystemStatus();
+    if (!ok) return;
+
+    loadChatLog();
+}, 5000);
     </script>
 </body>
 </html>
