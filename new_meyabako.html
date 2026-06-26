@@ -11,14 +11,14 @@
             /* 指定のメインカラー（深いネイビー） */
             --primary-color: #130182;
             
-            /* 深海の背景色：指定色からさらに深く暗い青へのグラデーション */
-            --bg-deep-sea: linear-gradient(180deg, #0a0145 0%, #05002a 50%, #010015 100%);
+            /* 深海の背景ベースグラデーション */
+            --bg-deep-sea: linear-gradient(180deg, #102a75 0%, #061148 40%, #020521 100%);
             
             /* アクセントには静かな光をイメージしたプラチナゴールド系 */
             --accent-color: #d1c1a1; 
             
-            /* カードの背景：深海に浮かぶ潜水艦や探査機をイメージした、少し青みと透過を入れた白 */
-            --card-bg: rgba(245, 248, 255, 0.96); 
+            /* カードの背景：少し透過を強めて背景の光が綺麗に透けるように調整 */
+            --card-bg: rgba(245, 248, 255, 0.92); 
             
             --text-color: #1a1a2e;
             --text-muted: #505070;
@@ -26,27 +26,8 @@
 
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            
-            /* --- 🌊 深海の背景実装 --- */
             background: var(--bg-deep-sea);
             position: relative;
-            
-            /* 光と気泡のエフェクトを擬似要素で追加 */
-            &::before {
-                content: '';
-                position: fixed;
-                top: 0; left: 0; width: 100%; height: 100%;
-                background-image: 
-                    /* 差し込む光の筋 */
-                    radial-gradient(circle at 50% -20%, rgba(100, 149, 237, 0.15) 0%, rgba(10, 1, 69, 0) 60%),
-                    /* 浮遊する気泡 */
-                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 2px, transparent 2px),
-                    radial-gradient(circle at 40% 85%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-                background-size: cover, 50px 50px, 60px 60px, 80px 80px;
-                z-index: -1;
-            }
-
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -55,6 +36,55 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* --- 🌊 劇的に強化した「差し込む光」のエフェクト --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                /* 1. 水面の最も明るい中央の輝き */
+                radial-gradient(circle at 50% -10%, rgba(135, 206, 250, 0.6) 0%, rgba(16, 42, 117, 0) 45%),
+                
+                /* 2. 左から右斜め下に走るシャープな光の筋 */
+                repeating-linear-gradient(115deg, 
+                    rgba(255, 255, 255, 0) 0%, 
+                    rgba(255, 255, 255, 0) 4%, 
+                    rgba(143, 188, 253, 0.08) 7%, 
+                    rgba(255, 255, 255, 0) 10%, 
+                    rgba(255, 255, 255, 0) 14%
+                ),
+                
+                /* 3. 右から左斜め下に交差する柔らかな光の筋 */
+                repeating-linear-gradient(65deg, 
+                    rgba(255, 255, 255, 0) 0%, 
+                    rgba(255, 255, 255, 0) 8%, 
+                    rgba(179, 212, 255, 0.06) 12%, 
+                    rgba(255, 255, 255, 0) 16%, 
+                    rgba(255, 255, 255, 0) 22%
+                ),
+                
+                /* 4. 水深による減衰（下に行くほど光を遮る黒のグラデーション） */
+                linear-gradient(to bottom, rgba(0,0,0,0) 20%, rgba(2, 5, 33, 0.7) 80%);
+                
+            background-size: cover;
+            filter: blur(2px); /* 光の筋を少しだけ自然に馴染ませる */
+            z-index: -2;
+        }
+
+        /* 水中のわずかな気泡エフェクト（別レイヤーで分離） */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 2px, transparent 2px),
+                radial-gradient(circle at 40% 85%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px, 60px 60px, 80px 80px;
+            z-index: -1;
         }
 
         .container {
@@ -63,34 +93,29 @@
             margin: 0 auto;
             padding: 40px 20px;
             box-sizing: border-box;
-            z-index: 1; /* 背景エフェクトより上にする */
+            z-index: 1;
         }
 
-        /* 告知カード全体のデザイン（角丸を少し落とし、洗練された影に） */
+        /* 告知カード（背景がシースルーになって光が後ろを通ります） */
         .announcement-card {
             background: var(--card-bg);
             border-radius: 12px;
-            /* 深海に浮かぶ潜水艦のような、重厚で静かな影 */
-            box-shadow: 0 25px 50px rgba(0, 0, 10, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 10, 0.4);
             padding: 45px 50px;
             text-align: center;
             overflow: hidden;
             position: relative;
-            backdrop-filter: blur(5px); /* 背景をわずかにぼかす */
+            backdrop-filter: blur(8px); /* 磨りガラス効果を少し強めて美しく */
+            -webkit-backdrop-filter: blur(8px);
         }
 
-        /* 上部のアクセントラインを指定色に */
         .announcement-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
+            top: 0; left: 0; width: 100%; height: 5px;
             background: var(--primary-color);
         }
 
-        /* バッジを落ち着いた雰囲気に変更 */
         .badge {
             background: var(--primary-color);
             color: white;
@@ -148,7 +173,6 @@
             margin: 8px 0;
         }
 
-        /* 特徴ブロックのレイアウトと落ち着いたトーン化 */
         .features {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -171,7 +195,6 @@
             border-color: #d1d9e6;
         }
 
-        /* アイコンの色を指定色に変更 */
         .feature-icon {
             font-size: 1.9rem;
             color: var(--primary-color); 
@@ -193,7 +216,6 @@
             line-height: 1.6;
         }
 
-        /* スケジュール部分を上品な薄青グレー×アクセント（ゴールド）に */
         .schedule {
             background: #eef2f9;
             border-left: 4px solid var(--accent-color);
@@ -225,7 +247,6 @@
             margin-top: 15px;
         }
 
-        /* ボタンのデザインを指定色ベースのシックなものに */
         .btn-back {
             display: inline-block;
             padding: 13px 38px;
@@ -241,12 +262,12 @@
         }
 
         .btn-back:hover {
-            background-color: #0b0052; /* より深いネイビーへ */
+            background-color: #0b0052;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(19, 1, 130, 0.4);
         }
 
-        /* --- ✨ アニメーションの設定 --- */
+        /* --- アニメーション --- */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -258,13 +279,11 @@
             }
         }
 
-        /* 各要素に初期非表示とアニメーションを設定（時間差で動かします） */
         .badge, h1, .logo-container, .lead, .feature-item, .schedule, .footer-actions {
-            animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; /* 少しゆっくり、滑らかに */
+            animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
             opacity: 0; 
         }
 
-        /* 時間差（ディレイ）の調整：水中でゆっくり浮かび上がるように */
         .badge { animation-delay: 0.15s; }
         h1 { animation-delay: 0.3s; }
         .logo-container { animation-delay: 0.45s; }
@@ -277,28 +296,12 @@
         .schedule { animation-delay: 1.2s; }
         .footer-actions { animation-delay: 1.35s; }
 
-        /* レスポンシブ対応 */
         @media (max-width: 768px) {
-            .announcement-card {
-                padding: 35px 25px;
-            }
-            .features {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            .schedule {
-                flex-direction: column;
-                gap: 5px;
-                text-align: center;
-                padding: 15px;
-            }
-            body {
-                display: block;
-            }
-            .container {
-                margin: 0 auto;
-                padding: 30px 15px;
-            }
+            .announcement-card { padding: 35px 25px; }
+            .features { grid-template-columns: 1fr; gap: 15px; }
+            .schedule { flex-direction: column; gap: 5px; text-align: center; padding: 15px; }
+            body { display: block; }
+            .container { margin: 0 auto; padding: 30px 15px; }
             h1 { font-size: 1.4rem; }
             h1 span { font-size: 1.6rem; }
         }
