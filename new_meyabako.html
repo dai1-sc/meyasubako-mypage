@@ -10,20 +10,42 @@
         :root {
             /* 指定のメインカラー（深いネイビー） */
             --primary-color: #130182;
-            /* アクセントには落ち着いたブラウングレーやゴールド系を微調整 */
-            --accent-color: #bfa15f; 
-            --bg-overlay: rgba(30, 30, 35, 0.75); /* 写真の上に重ねるダークな薄幕 */
-            --card-bg: rgba(255, 255, 255, 0.95); /* 高級感のある少し透過した白 */
-            --text-color: #2c2c35;
-            --text-muted: #555560;
+            
+            /* 深海の背景色：指定色からさらに深く暗い青へのグラデーション */
+            --bg-deep-sea: linear-gradient(180deg, #0a0145 0%, #05002a 50%, #010015 100%);
+            
+            /* アクセントには静かな光をイメージしたプラチナゴールド系 */
+            --accent-color: #d1c1a1; 
+            
+            /* カードの背景：深海に浮かぶ人工物をイメージし、少し青みと透過を入れた白 */
+            --card-bg: rgba(245, 248, 255, 0.96); 
+            
+            --text-color: #1a1a2e;
+            --text-muted: #505070;
         }
 
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            /* 画像のような落ち着いたワークスペースの背景写真を設定 */
-            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                        url('https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
-            background-size: cover;
+            
+            /* --- 🌊 深海の背景実装 --- */
+            background: var(--bg-deep-sea);
+            position: relative;
+            /* かすかな光と気泡のエフェクトを擬似要素で追加 */
+            &::before {
+                content: '';
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background-image: 
+                    /* 差し込む光の筋 */
+                    radial-gradient(circle at 50% -20%, rgba(100, 149, 237, 0.15) 0%, rgba(10, 1, 69, 0) 60%),
+                    /* 浮遊する気泡 */
+                    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 2px, transparent 2px),
+                    radial-gradient(circle at 40% 85%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                background-size: cover, 50px 50px, 60px 60px, 80px 80px;
+                z-index: -1;
+            }
+
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -40,18 +62,20 @@
             margin: 0 auto;
             padding: 40px 20px;
             box-sizing: border-box;
+            z-index: 1; /* 背景エフェクトより上にする */
         }
 
-        /* 告知カード全体のデザイン変更（角丸を少し落とし、洗練された影に） */
+        /* 告知カード全体のデザイン（角丸を少し落とし、洗練された影に） */
         .announcement-card {
             background: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            /* 深海に浮かぶ潜水艦のような、重厚で静かな影 */
+            box-shadow: 0 25px 50px rgba(0, 0, 10, 0.5);
             padding: 45px 50px;
             text-align: center;
             overflow: hidden;
             position: relative;
-            backdrop-filter: blur(8px); /* 背景の微細なぼかし効果 */
+            backdrop-filter: blur(5px); /* 背景をわずかにぼかす */
         }
 
         /* 上部のアクセントラインを指定色に */
@@ -69,13 +93,14 @@
         .badge {
             background: var(--primary-color);
             color: white;
-            padding: 6px 18px;
+            padding: 7px 20px;
             border-radius: 4px;
             font-size: 0.85rem;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             display: inline-block;
             margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(19, 1, 130, 0.2);
         }
 
         h1 {
@@ -97,10 +122,11 @@
         .logo-container {
             margin: 25px auto;
             max-width: 400px;
-            background: #f8f9fa;
+            background: #ffffff;
             border-radius: 6px;
-            padding: 10px;
-            border: 1px solid #eaeaea;
+            padding: 12px;
+            border: 1px solid #e0e6ed;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
         }
 
         .logo-container img {
@@ -132,22 +158,24 @@
 
         .feature-item {
             background: #ffffff;
-            border: 1px solid #e8e8ed;
+            border: 1px solid #e6ebf2;
             padding: 25px 20px;
             border-radius: 8px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .feature-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(19, 1, 130, 0.06);
+            border-color: #d1d9e6;
         }
 
         /* アイコンの色を指定色に変更 */
         .feature-icon {
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             color: var(--primary-color); 
             margin-bottom: 12px;
+            filter: drop-shadow(0 2px 4px rgba(19, 1, 130, 0.1));
         }
 
         .feature-item h3 {
@@ -164,11 +192,11 @@
             line-height: 1.6;
         }
 
-        /* スケジュール部分を上品なグレー×ゴールド（アクセント）に */
+        /* スケジュール部分を上品な薄青グレー×アクセント（ゴールド）に */
         .schedule {
-            background: #f4f4f7;
+            background: #eef2f9;
             border-left: 4px solid var(--accent-color);
-            padding: 18px 20px;
+            padding: 20px;
             border-radius: 4px;
             margin-bottom: 35px;
             display: flex;
@@ -182,6 +210,7 @@
             margin: 0;
             color: var(--primary-color);
             letter-spacing: 0.5px;
+            font-weight: 700;
         }
 
         .date {
@@ -198,28 +227,29 @@
         /* ボタンのデザインを指定色ベースのシックなものに */
         .btn-back {
             display: inline-block;
-            padding: 12px 35px;
+            padding: 13px 38px;
             background-color: var(--primary-color);
             color: white;
             text-decoration: none;
             border-radius: 4px;
             font-weight: 600;
             font-size: 0.95rem;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(19, 1, 130, 0.3);
         }
 
         .btn-back:hover {
             background-color: #0b0052; /* より深いネイビーへ */
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(19, 1, 130, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(19, 1, 130, 0.4);
         }
 
-        /* --- 🌟 アニメーション（一工夫）の実装 --- */
+        /* --- アニメーションの設定 --- */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(25px);
             }
             to {
                 opacity: 1;
@@ -229,28 +259,27 @@
 
         /* 各要素に初期非表示とアニメーションを設定（時間差で動かします） */
         .badge, h1, .logo-container, .lead, .feature-item, .schedule, .footer-actions {
-            animation: fadeInUp 0.8s ease forwards;
-            opacity: 0; /* アニメーション開始前は非表示 */
+            animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; /* 少しゆっくり、滑らかに */
+            opacity: 0; 
         }
 
         /* 時間差（ディレイ）の調整 */
-        .badge { animation-delay: 0.1s; }
-        h1 { animation-delay: 0.2s; }
-        .logo-container { animation-delay: 0.3s; }
-        .lead { animation-delay: 0.4s; }
+        .badge { animation-delay: 0.15s; }
+        h1 { animation-delay: 0.3s; }
+        .logo-container { animation-delay: 0.45s; }
+        .lead { animation-delay: 0.6s; }
         
-        /* 特徴ブロックは左から順にぽん、ぽん、ぽんと表示 */
-        .features .feature-item:nth-child(1) { animation-delay: 0.5s; }
-        .features .feature-item:nth-child(2) { animation-delay: 0.6s; }
-        .features .feature-item:nth-child(3) { animation-delay: 0.7s; }
+        .features .feature-item:nth-child(1) { animation-delay: 0.75s; }
+        .features .feature-item:nth-child(2) { animation-delay: 0.9s; }
+        .features .feature-item:nth-child(3) { animation-delay: 1.05s; }
         
-        .schedule { animation-delay: 0.8s; }
-        .footer-actions { animation-delay: 0.9s; }
+        .schedule { animation-delay: 1.2s; }
+        .footer-actions { animation-delay: 1.35s; }
 
         /* レスポンシブ対応 */
         @media (max-width: 768px) {
             .announcement-card {
-                padding: 30px 20px;
+                padding: 35px 25px;
             }
             .features {
                 grid-template-columns: 1fr;
@@ -260,12 +289,14 @@
                 flex-direction: column;
                 gap: 5px;
                 text-align: center;
+                padding: 15px;
             }
             body {
                 display: block;
             }
             .container {
                 margin: 0 auto;
+                padding: 30px 15px;
             }
             h1 { font-size: 1.4rem; }
             h1 span { font-size: 1.6rem; }
