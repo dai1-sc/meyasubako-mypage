@@ -13,10 +13,85 @@
         .brand-text { color: #130182; }
         .brand-border { border-color: #130182; }
         
-        /* カスタムスクロールバーでスマホアプリ感をさらにUP */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+
+        /* カウントダウンウィジェット */
+        .countdown-widget {
+            background: linear-gradient(135deg, #130182 0%, #3b1fc1 100%);
+            border-radius: 20px;
+            padding: 16px 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(19,1,130,0.25);
+            flex-shrink: 0;
+        }
+        .countdown-widget::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+        }
+        .countdown-widget::after {
+            content: '';
+            position: absolute;
+            bottom: -20px; left: -20px;
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .countdown-days {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            font-variant-numeric: tabular-nums;
+        }
+        .countdown-days-unit {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0.75;
+            margin-left: 2px;
+        }
+        .countdown-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .countdown-event {
+            font-size: 13px;
+            font-weight: 800;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .countdown-date-sub {
+            font-size: 10px;
+            opacity: 0.55;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        @keyframes countPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .countdown-dot {
+            width: 6px; height: 6px;
+            background: #a5f3fc;
+            border-radius: 50%;
+            display: inline-block;
+            animation: countPulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
@@ -41,15 +116,30 @@
 
     <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
         
+        <!-- ヘッダーカード（カウントダウン追加） -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <div>
+            <div class="flex-1">
                 <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
                     こんにちは！<span class="animate-bounce">👋</span>
                 </h1>
                 <p class="text-xs text-slate-400 mt-1 font-medium">ここでは、あなたの意見の進捗確認や、生徒会との個別の相談・対話ができます。</p>
+                <div class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 self-start mt-3 inline-flex items-center shadow-inner">
+                    <i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
+                </div>
             </div>
-            <div class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 self-start md:self-auto flex items-center shadow-inner">
-                <i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
+
+            <!-- カウントダウンウィジェット -->
+            <div class="countdown-widget">
+                <p class="countdown-label">Next Event</p>
+                <div class="flex items-baseline gap-1 relative z-10">
+                    <span class="countdown-days" id="countdown-days">--</span>
+                    <span class="countdown-days-unit">日</span>
+                </div>
+                <div class="countdown-event relative z-10">
+                    <span class="countdown-dot"></span>
+                    <span>オープンスクール</span>
+                </div>
+                <p class="countdown-date-sub relative z-10">7月30日（水）まで</p>
             </div>
         </div>
 
@@ -199,6 +289,31 @@
             });
         }
 
+        // ==========================================
+        // カウントダウン（オープンスクール：7月30日）
+        // ==========================================
+        function updateCountdown() {
+            const el = document.getElementById("countdown-days");
+            if (!el) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const target = new Date(today.getFullYear(), 6, 30); // 7月30日（月は0始まりなので6）
+            // もし今年の7/30をすでに過ぎていたら翌年を対象にする
+            if (target < today) target.setFullYear(target.getFullYear() + 1);
+
+            const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
+
+            if (diff === 0) {
+                el.textContent = "0";
+                el.closest(".countdown-widget").querySelector(".countdown-label").textContent = "🎉 Today!";
+            } else {
+                el.textContent = diff;
+            }
+        }
+        updateCountdown();
+
         async function loadLatestAnnouncement() {
             const banner = document.getElementById("announcement-banner");
             const titleEl = document.getElementById("student-announcement-title");
@@ -275,7 +390,6 @@
                         : "border-slate-100 hover:border-slate-200";
 
                     const card = document.createElement("div");
-                    // 💡 リストが上から順番にフワフワッと軽快に現れるディレイ演出を追加
                     card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
@@ -383,13 +497,11 @@
             const card = document.getElementById("bug-modal-card");
             
             if (modal.classList.contains("hidden")) {
-                // 開くとき
                 document.getElementById("bug-content").value = "";
                 document.getElementById("bug-file").value = "";
                 modal.classList.remove("hidden");
                 card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomIn animate__fast";
             } else {
-                // 閉じるとき（消えるアニメーションをあててから隠す）
                 card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomOut animate__fast";
                 setTimeout(() => {
                     modal.classList.add("hidden");
