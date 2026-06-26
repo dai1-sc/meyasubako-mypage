@@ -295,9 +295,10 @@
                             <div class="text-[10px] font-bold text-gray-400">担当：${committeeSelectHTML}</div>
                         </div>
                     </td>
-                    <td class="p-4 max-w-xs md:max-w-md">
-                        <div class="font-bold text-gray-800 truncate">${item.title}</div>
-                        <div class="text-xs text-gray-400 truncate mt-0.5">${item.content}</div>
+<td class="p-4 min-w-[280px] md:max-w-md break-words">
+    <div class="font-bold text-gray-800">${item.title}</div>
+    <div class="text-xs text-gray-400 mt-1 whitespace-pre-wrap">${item.content}</div>
+    ...
                         
                         ${item.hasTeacherResponse ? `
                             <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg shadow-sm">
