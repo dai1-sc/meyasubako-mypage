@@ -738,9 +738,7 @@
         // ==========================================
         // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
         // ==========================================
-        // ==========================================
-        // 1. 管理者として全データをGASから取得して描画 ＆ ダッシュボード集計
-        // ==========================================
+
         async function loadAdminData() {
             tableBody.innerHTML = `
                 <tr id="table-loading">
@@ -1260,8 +1258,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    alert(`システムを正常に ${statusText} へ切り替えました。`);
-                } else {
+    alert(`システムを正常に ${statusText} へ切り替えました。`);
+
+    // 表示を最新の状態に更新
+    loadSystemStatus();
+} else {
                     alert("設定変更エラー: " + result.message);
                 }
             } catch (e) {
@@ -1328,9 +1329,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==========================================
         // 🪲 未対応の不具合報告をロードする（重複排除＆画像全対応版）
         // ==========================================
-        // ==========================================
-        // 🪲 未対応の不具合報告をロードする（2回呼び出し完全防御＆画像超自動検知版）
-        // ==========================================
+
         async function loadBugReports() {
             const panel = document.getElementById("bug-panel");
             const listEl = document.getElementById("bug-list");
