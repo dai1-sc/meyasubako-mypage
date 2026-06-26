@@ -30,7 +30,6 @@
             justify-content: center;
         }
 
-        /* 画面に収まるよう横幅を1100pxに拡張し、マージンを調整 */
         .container {
             width: 100%;
             max-width: 1100px;
@@ -39,7 +38,6 @@
             box-sizing: border-box;
         }
 
-        /* 告知カードの上下パディングを少しスマートに */
         .announcement-card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -94,11 +92,10 @@
             margin-top: 5px;
         }
 
-        /* ロゴ部分の隙間を最適化 */
         .logo-container {
             margin: 15px auto;
-            max-width: 160px;
-            padding: 10px;
+            max-width: 380px;
+            padding: 15px 25px;
             background: #f1f3f9;
             border-radius: 12px;
         }
@@ -110,18 +107,18 @@
         }
 
         .lead {
-            font-size: 1.05rem;
-            color: var(--text-muted);
+            font-size: 1.1rem;
+            color: var(--text-color);
             max-width: 750px;
             margin: 0 auto 25px auto;
             text-align: center;
+            font-weight: 500;
         }
 
         .lead p {
-            margin: 5px 0;
+            margin: 4px 0;
         }
 
-        /* 特徴セクション（横に広々と並ぶように調整） */
         .features {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -142,7 +139,6 @@
             transform: translateY(-5px);
         }
 
-        /* アイコンの色を画像に合わせた綺麗なブルー系に固定 */
         .feature-icon {
             font-size: 2rem;
             color: #3b82f6; 
@@ -163,7 +159,6 @@
             line-height: 1.5;
         }
 
-        /* スケジュールと戻るボタンを横並びっぽくスッキリさせて高さを圧縮 */
         .schedule {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 15px;
@@ -207,7 +202,6 @@
             background-color: var(--secondary-color);
         }
 
-        /* タブレット・スマホ用のレスポンシブ対応 */
         @media (max-width: 768px) {
             .features {
                 grid-template-columns: 1fr;
@@ -240,23 +234,23 @@
             </div>
 
             <div class="lead">
-                <p>いつもデジタル目安箱をご利用いただきありがとうございます。生徒会では、皆さんからいただいた意見をよりスピーディーに、より透明性を持って学校運営に反映させるため、システムの全面リニューアルを決定いたしました！</p>
-                <p>現在の機能はそのままに、さらに使いやすく、みんなが参加したくなるような新機能を多数搭載予定です。どうぞご期待ください！</p>
+                <p>生徒の皆さんの声をより早く学校運営に届けるため、目安箱の全面リニューアルが決定！</p>
+                <p>現在の使いやすさはそのままに、さらにみんなが参加したくなる新機能を多数搭載して生まれ変わります。</p>
             </div>
 
             <div class="features">
                 <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-heart"></i></div>
+                    <div class="feature-icon"><i class="fa-solid fa-spinner"></i></div>
                     <h3>進捗状況確認機能</h3>
                     <p>生徒会が今どこまで対応をしているのか、一目で確認。</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-chart-bar"></i></div>
+                    <div class="feature-icon"><i class="fa-solid fa-comment-dots"></i></div>
                     <h3>新・チャット機能</h3>
                     <p>意見の詳細やその他やり取りを匿名で生徒会と行うことができます。</p>
                 </div>
                 <div class="feature-item">
-                    <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+                    <div class="feature-icon"><i class="fa-solid fa-lightbulb"></i></div>
                     <h3>そのほかにも</h3>
                     <p>様々な新機能を追加し、より使いやすいデジタル目安箱へ。</p>
                 </div>
