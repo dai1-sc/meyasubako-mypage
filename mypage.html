@@ -96,7 +96,7 @@
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
 
-    <nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95">
+    <nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
         <div class="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2.5 transform hover:scale-105 transition duration-300 cursor-pointer">
                 <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain drop-shadow">
@@ -116,7 +116,7 @@
 
     <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
 
-        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
             <div class="flex-1">
                 <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
                     こんにちは！<span class="animate-bounce">👋</span>
@@ -138,8 +138,8 @@
                     <span>学校説明会</span>
                 </div>
                 <div class="text-xs text-white/90 relative z-10 flex items-center gap-1 mb-2">
-        <i class="fas fa-map-marker-alt text-red-400 text-[10px]"></i>
-        <span>熊本城ホール/第一高校</span> 
+                    <i class="fas fa-map-marker-alt text-red-400 text-[10px]"></i>
+                    <span>熊本城ホール / 第一高校</span> 
                 </div>
                 <p class="countdown-date-sub relative z-10">7月30日（木）まで</p>
             </div>
@@ -160,7 +160,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            <div class="md:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24">
+            <div class="md:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24 animate__animated animate__fadeInDown animate__delay-1s">
                 <h2 class="text-base font-black text-slate-800 mb-5 flex items-center tracking-wide">
                     <i class="fas fa-pen-fancy brand-text mr-2 text-indigo-600"></i>意見を届ける
                 </h2>
@@ -198,36 +198,37 @@
                 </form>
             </div>
 
-            <div class="md:col-span-2 space-y-4">
+            <div class="md:col-span-2 space-y-4 animate__animated animate__fadeInDown animate__delay-1s">
     
-    <h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
-        <i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
-        あなたの投書と進捗
-        <span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
-    </h2>
+                <h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
+                    <i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
+                    あなたの投書と進捗
+                    <span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
+                </h2>
 
-    <div id="list-loading" class="space-y-4 py-2">
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
-            <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-            <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
-            <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
-            <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-        </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
-            <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-            <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
-            <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-        </div>
-    </div>
+                <div id="list-loading" class="space-y-4 py-2">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
+                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+                        <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
+                        <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
+                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
+                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+                        <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
+                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+                    </div>
+                </div>
 
-    <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
-        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-            <i class="fas fa-folder-open"></i>
-        </div>
-        <p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
-    </div>
+                <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
+                    <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
+                </div>
 
-    <div id="suggestion-list" class="space-y-4"></div>
+                <div id="suggestion-list" class="space-y-4"></div>
+            </div>
         </div>
 
         <button onclick="toggleBugModal()" class="fixed bottom-6 right-6 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-black px-4 py-3 rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 flex items-center gap-1.5 z-40 border border-slate-700 hover:-translate-y-1">
@@ -340,9 +341,6 @@
             }
         }
 
-        // ==========================================
-        // 1. 過去の投稿データを取得して描画（重複バグ修正済み）
-        // ==========================================
         async function loadSuggestions() {
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
@@ -395,7 +393,6 @@
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
-                    // 重複部分を削除し、タイトルとコンテンツが1組だけ表示されるよう修正
                     card.innerHTML = `
                         ${unreadBadge}
                         <div class="flex items-center space-x-2 text-[11px] font-black text-slate-400 mb-2.5">
