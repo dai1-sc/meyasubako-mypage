@@ -17,7 +17,7 @@
             /* アクセントには静かな光をイメージしたプラチナゴールド系 */
             --accent-color: #d1c1a1; 
             
-            /* カードの背景：深海に浮かぶ人工物をイメージし、少し青みと透過を入れた白 */
+            /* カードの背景：深海に浮かぶ潜水艦や探査機をイメージした、少し青みと透過を入れた白 */
             --card-bg: rgba(245, 248, 255, 0.96); 
             
             --text-color: #1a1a2e;
@@ -30,7 +30,8 @@
             /* --- 🌊 深海の背景実装 --- */
             background: var(--bg-deep-sea);
             position: relative;
-            /* かすかな光と気泡のエフェクトを擬似要素で追加 */
+            
+            /* 光と気泡のエフェクトを擬似要素で追加 */
             &::before {
                 content: '';
                 position: fixed;
@@ -245,7 +246,7 @@
             box-shadow: 0 6px 20px rgba(19, 1, 130, 0.4);
         }
 
-        /* --- アニメーションの設定 --- */
+        /* --- ✨ アニメーションの設定 --- */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -263,7 +264,7 @@
             opacity: 0; 
         }
 
-        /* 時間差（ディレイ）の調整 */
+        /* 時間差（ディレイ）の調整：水中でゆっくり浮かび上がるように */
         .badge { animation-delay: 0.15s; }
         h1 { animation-delay: 0.3s; }
         .logo-container { animation-delay: 0.45s; }
