@@ -659,9 +659,16 @@
             <div class="md:w-2/5 space-y-3">
                 <p class="sec-title"><i class="fas fa-bullhorn text-purple-500 animate-pulse"></i> 全校一斉アナウンス配信</p>
                 <p class="text-xs text-gray-500 leading-relaxed">生徒用トップページにお知らせを掲載します。メンテナンス予告や回答公開通知などに利用できます。</p>
+                
                 <div class="space-y-2">
                     <input type="text" id="announcement-title" placeholder="タイトル（例：【重要】規則見直しについて）" class="form-input">
                     <textarea id="announcement-content" rows="3" placeholder="お知らせの本文を入力してください..." class="form-input"></textarea>
+                    <label class="flex items-center gap-2 mt-2">
+    <input type="checkbox" id="announcement-important">
+    <span class="text-xs font-bold text-red-600">
+        重要なお知らせとして配信（赤背景で表示）
+    </span>
+</label>
                     <button onclick="postAnnouncement()" class="btn-purple">
                         <i class="fas fa-paper-plane text-xs"></i> アナウンスを全体配信する
                     </button>
@@ -1120,17 +1127,19 @@
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
                     body: JSON.stringify({
-                        action: "postAnnouncement",
-                        email: userEmail,
-                        title: title,
-                        content: content
-                    })
+    action: "postAnnouncement",
+    email: userEmail,
+    title: title,
+    content: content,
+    important: document.getElementById("announcement-important").checked
+})
                 });
                 const result = await res.json();
                 if (result.status === "success") {
                     alert("アナウンスを正常に配信しました！");
                     titleInput.value = "";
                     contentInput.value = "";
+                    document.getElementById("announcement-important").checked = false;
                     loadAnnouncementHistory(); // 履歴を更新
                 } else {
                     alert("配信エラー: " + result.message);
@@ -1165,9 +1174,17 @@ data.list.forEach(item => {
         <div class="flex-1">
             <div class="flex justify-between items-start mb-1">
                 <div>
-                    <span class="font-bold text-gray-800 text-xs">${item.title}</span>
-                    <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded ml-2">${displaySender}</span>
-                </div>
+    <span class="font-bold text-gray-800 text-xs">${item.title}</span>
+
+    ${item.important ? `
+    <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded ml-2 font-bold">
+        重要
+    </span>` : ""}
+
+    <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded ml-2">
+        ${displaySender}
+    </span>
+</div>
                 <span class="text-[10px] text-gray-400 font-mono ml-2 shrink-0">${item.date}</span>
             </div>
             <p class="text-gray-500 whitespace-pre-wrap text-xs leading-relaxed">${item.content}</p>
