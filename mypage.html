@@ -194,36 +194,35 @@
             </div>
 
             <div class="md:col-span-2 space-y-4">
+    
     <h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
         <i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
         あなたの投書と進捗
         <span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
     </h2>
-</div>
 
-                <div id="list-loading" class="space-y-4 py-2">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
-                        <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-                    </div>
-                </div>
+    <div id="list-loading" class="space-y-4 py-2">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
+            <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+            <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
+            <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
+            <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
+            <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+            <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
+            <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+        </div>
+    </div>
 
-                <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
-                    <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-                    <p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
-                </div>
+    <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
+        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
+    </div>
 
-                <div id="suggestion-list" class="space-y-4"></div>
-            </div>
+    <div id="suggestion-list" class="space-y-4"></div>
         </div>
 
         <button onclick="toggleBugModal()" class="fixed bottom-6 right-6 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-black px-4 py-3 rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 flex items-center gap-1.5 z-40 border border-slate-700 hover:-translate-y-1">
