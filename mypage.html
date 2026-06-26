@@ -116,7 +116,6 @@
 
     <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
 
-        <!-- ヘッダーカード（カウントダウン追加） -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
             <div class="flex-1">
                 <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
@@ -128,7 +127,6 @@
                 </div>
             </div>
 
-            <!-- カウントダウンウィジェット -->
             <div class="countdown-widget">
                 <p class="countdown-label">Next Event</p>
                 <div class="flex items-baseline gap-1 relative z-10">
@@ -289,9 +287,6 @@
             });
         }
 
-        // ==========================================
-        // カウントダウン（オープンスクール：7月30日）
-        // ==========================================
         function updateCountdown() {
             const el = document.getElementById("countdown-days");
             if (!el) return;
@@ -299,8 +294,7 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const target = new Date(today.getFullYear(), 6, 30); // 7月30日（月は0始まりなので6）
-            // もし今年の7/30をすでに過ぎていたら翌年を対象にする
+            const target = new Date(today.getFullYear(), 6, 30); 
             if (target < today) target.setFullYear(target.getFullYear() + 1);
 
             const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
@@ -340,7 +334,7 @@
         }
 
         // ==========================================
-        // 1. 過去の投稿データを取得して描画（アニメーションクラス付与）
+        // 1. 過去の投稿データを取得して描画（重複バグ修正済み）
         // ==========================================
         async function loadSuggestions() {
             try {
@@ -394,14 +388,13 @@
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
+                    // 重複部分を削除し、タイトルとコンテンツが1組だけ表示されるよう修正
                     card.innerHTML = `
                         ${unreadBadge}
                         <div class="flex items-center space-x-2 text-[11px] font-black text-slate-400 mb-2.5">
                             <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
                             <span class="font-mono">${item.date}</span>
                         </div>
-                        <h3 class="text-base font-black text-slate-800 mb-2">${item.title}</h3>
-                        <p class="text-xs text-slate-500 line-clamp-2 mb-5 font-medium leading-relaxed">${item.content}</p>
                         <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
                         <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
                         
@@ -425,9 +418,6 @@
             }
         }
 
-        // ==========================================
-        // 2. 新規意見を送信する処理
-        // ==========================================
         document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById("btn-submit");
@@ -493,7 +483,6 @@
             }
         }
 
-        // 🪲 不具合報告モーダルの滑らかな開閉処理
         function toggleBugModal() {
             const modal = document.getElementById("bug-modal");
             const card = document.getElementById("bug-modal-card");
