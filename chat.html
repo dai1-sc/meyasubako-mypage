@@ -107,14 +107,14 @@ console.log(result);
                     </p>
 
                     <p class="text-xs text-slate-400 mt-6">
-                        3秒後にマイページへ戻ります...
+                        5秒後にマイページへ戻ります...
                     </p>
                 </div>
             `;
 
             setTimeout(() => {
                 window.location.replace("mypage.html");
-            }, 3000);
+            }, 5000);
 
             return false;
         }
@@ -306,13 +306,8 @@ console.log(result);
             }
         });
 
-       window.onload = async () => {
-    alert("check開始");
-
+      window.onload = async () => {
     const ok = await checkSystemStatus();
-
-    alert("check完了");
-
     if (!ok) return;
 
     loadChatLog();
@@ -324,7 +319,7 @@ console.log(result);
     if (!ok) return;
 
     loadChatLog();
-}, 10000);
+}, 5000);
     </script>
 </body>
 </html>
