@@ -79,10 +79,12 @@
         const chatInput = document.getElementById("chat-input");
         // システムが受付停止中ならマイページへ戻す
 async function checkSystemStatus() {
+    console.log("checkSystemStatus 実行");
     try {
         const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
         const result = await res.json();
-
+        
+console.log(result);
         if (result.status === "success" && result.systemStatus === "maintenance") {
 
             // 入力欄を非表示
@@ -305,7 +307,12 @@ async function checkSystemStatus() {
         });
 
        window.onload = async () => {
+    alert("check開始");
+
     const ok = await checkSystemStatus();
+
+    alert("check完了");
+
     if (!ok) return;
 
     loadChatLog();
