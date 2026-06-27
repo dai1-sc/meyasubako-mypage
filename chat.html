@@ -16,7 +16,16 @@
         #chat-container::-webkit-scrollbar { width: 4px; }
         #chat-container::-webkit-scrollbar-track { background: transparent; }
         #chat-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        body {
+    transition: opacity .6s ease, transform .6s ease;
+}
+
+body.page-leave {
+    opacity: 0;
+    transform: scale(0.98);
+}
     </style>
+    
 </head>
 <body class="bg-slate-100 font-sans h-screen flex flex-col text-slate-800 antialiased overflow-hidden">
 
@@ -107,14 +116,31 @@ console.log(result);
                     </p>
 
                     <p class="text-xs text-slate-400 mt-6">
-                        5秒後にマイページへ戻ります...
-                    </p>
+    <span id="countdown">5</span>秒後にマイページへ戻ります...
+</p>
                 </div>
             `;
 
-            setTimeout(() => {
-                window.location.replace("mypage.html");
-            }, 5000);
+            let sec = 5;
+
+const countdown = document.getElementById("countdown");
+
+const timer = setInterval(() => {
+    sec--;
+    countdown.textContent = sec;
+
+    if (sec <= 0) {
+        clearInterval(timer);
+
+        // フェードアウト開始
+        document.body.classList.add("page-leave");
+
+        // アニメーション終了後に遷移
+        setTimeout(() => {
+            window.location.replace("mypage.html");
+        }, 600);
+    }
+}, 1000);
 
             return false;
         }
