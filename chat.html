@@ -101,29 +101,30 @@ console.log(result);
 
             // 停止画面を表示
             chatContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full text-center animate__animated animate__fadeIn">
-                    <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
-                        <i class="fas fa-lock text-3xl text-red-500"></i>
-                    </div>
+<div class="flex flex-col items-center justify-center h-full text-center animate__animated animate__fadeIn">
+    <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
+        <i class="fas fa-lock text-3xl text-red-500"></i>
+    </div>
 
-                    <h2 class="text-lg font-black text-red-600 mb-2">
-                        一時受付停止中
-                    </h2>
+    <h2 class="text-lg font-black text-red-600 mb-2">
+        一時受付停止中
+    </h2>
 
-                    <p class="text-sm text-slate-500 leading-relaxed max-w-xs">
-                        現在は一時受付停止中のため、<br>
-                        チャットを送信できません。
-                    </p>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-xs">
+        現在は一時受付停止中のため、<br>
+        チャットを送信できません。
+    </p>
 
-                    <p class="text-xs text-slate-400 mt-6">
-    <span id="countdown">5</span>秒後にマイページへ戻ります...
-</p>
-                </div>
-            `;
+    <p class="text-xs text-slate-400 mt-6">
+        <span id="countdown">5</span>秒後にマイページへ戻ります...
+    </p>
+</div>
+`;
 
-            let sec = 5;
-
+// ★HTMLを追加した後に取得する
 const countdown = document.getElementById("countdown");
+
+let sec = 5;
 
 const timer = setInterval(() => {
     sec--;
@@ -132,10 +133,8 @@ const timer = setInterval(() => {
     if (sec <= 0) {
         clearInterval(timer);
 
-        // フェードアウト開始
         document.body.classList.add("page-leave");
 
-        // アニメーション終了後に遷移
         setTimeout(() => {
             window.location.replace("mypage.html");
         }, 600);
