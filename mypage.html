@@ -31,86 +31,7 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
 
-        /* カウントダウンウィジェット */
-        .countdown-widget {
-            background: linear-gradient(135deg, #130182 0%, #3b1fc1 100%);
-            border-radius: 20px;
-            padding: 16px 20px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            min-width: 200px;
-            box-shadow: 0 8px 24px rgba(19,1,130,0.25);
-            flex-shrink: 0;
-        }
-        .countdown-widget::before {
-            content: '';
-            position: absolute;
-            top: -30px; right: -30px;
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.07);
-        }
-        .countdown-widget::after {
-            content: '';
-            position: absolute;
-            bottom: -20px; left: -20px;
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-        }
-        .countdown-days {
-            font-size: 48px;
-            font-weight: 900;
-            line-height: 1;
-            letter-spacing: -0.03em;
-            font-variant-numeric: tabular-nums;
-        }
-        .countdown-days-unit {
-            font-size: 14px;
-            font-weight: 700;
-            opacity: 0.75;
-            margin-left: 2px;
-        }
-        .countdown-label {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            opacity: 0.7;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        .countdown-event {
-            font-size: 13px;
-            font-weight: 800;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .countdown-date-sub {
-            font-size: 10px;
-            opacity: 0.55;
-            font-weight: 600;
-            margin-top: 2px;
-        }
-        @keyframes countPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .countdown-dot {
-            width: 6px; height: 6px;
-            background: #a5f3fc;
-            border-radius: 50%;
-            display: inline-block;
-            animation: countPulse 2s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        .announcement-important {
-    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-    border-left: 4px solid #dc2626 !important;
-    border-color: #fecaca !important;
-}
+   
 
 .announcement-important .announcement-icon {
     color: #dc2626 !important;
@@ -155,23 +76,7 @@
                 </div>
             </div>
 
-            <div class="countdown-widget">
-                <p class="countdown-label">Next Event</p>
-                <div class="flex items-baseline gap-1 relative z-10">
-                    <span class="countdown-days" id="countdown-days">--</span>
-                    <span class="countdown-days-unit">日</span>
-                </div>
-                <div class="countdown-event relative z-10">
-                    <span class="countdown-dot"></span>
-                    <span>学校説明会</span>
-                </div>
-                <div class="text-xs text-white/90 relative z-10 flex items-center gap-1 mb-2">
-                    <i class="fas fa-map-marker-alt text-red-400 text-[10px]"></i>
-                    <span>熊本城ホール / 第一高校</span> 
-                </div>
-                <p class="countdown-date-sub relative z-10">7月30日（木）まで</p>
-            </div>
-        </div>
+         
 
 
         <div id="announcement-banner" class="hidden mb-8 space-y-3 animate__animated animate__fadeInDown">
