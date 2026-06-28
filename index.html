@@ -221,11 +221,12 @@
         }
 
         
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
     const splash = document.getElementById("splash-screen");
 
     // 初回だけ1.5秒、2回目以降は0.3秒
     const firstLaunch = !localStorage.getItem("splashShown");
+    const delay = firstLaunch ? 1500 : 300;
 
     localStorage.setItem("splashShown", "true");
 
