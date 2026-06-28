@@ -133,125 +133,134 @@
 
     <footer class="mt-8 text-xs text-gray-400 font-medium">&copy; 2026 第一高校 生徒会</footer>
 
-    <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+<script>
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
-        // 各種動的要素の取得
-        const statusContainer = document.getElementById("status-container");
-        const statusSpinner = document.getElementById("status-spinner");
-        const statusSuccessIcon = document.getElementById("status-success-icon");
-        const statusErrorIcon = document.getElementById("status-error-icon");
-        const statusText = document.getElementById("status-text");
-        const loginBtnWrapper = document.getElementById("login-btn-wrapper");
+    // ── 自動ログイン：保存済みセッションを確認 ──────────────────────────
+    (function checkSavedSession() {
+        const saved = localStorage.getItem("login_session");
+        if (!saved) return;
 
-        // ✨ 旧showAlertを大改造した、リッチなステータス切り替えシステム
-        function showStatus(message, type) {
-            statusText.innerText = message;
-            statusContainer.classList.remove("hidden");
-
-            // 全てのアニメーションアイコンを一旦非表示にリセット
-            statusSpinner.classList.add("hidden");
-            statusSuccessIcon.classList.add("hidden");
-            statusErrorIcon.classList.add("hidden");
-            statusText.classList.remove("animate-pulse", "text-green-600", "text-red-600", "text-gray-600");
-
-            if (type === 'info') {
-                // アカウント確認中のぐるぐるローディング
-                statusSpinner.classList.remove("hidden");
-                statusText.classList.add("animate-pulse", "text-gray-600");
-            } else if (type === 'success') {
-                // 認証成功！グリーンの跳ねるチェック
-                statusSuccessIcon.classList.remove("hidden");
-                statusText.classList.add("text-green-600");
-                loginBtnWrapper.classList.add("opacity-30", "pointer-events-none"); // ボタンを薄くして触れなくする
-            } else if (type === 'error') {
-                // エラー発生！レッドの警告マーク
-                statusErrorIcon.classList.remove("hidden");
-                statusText.classList.add("text-red-600");
+        try {
+            const { email, role, expires } = JSON.parse(saved);
+            if (Date.now() > expires) {
+                // 期限切れ → 削除してログイン画面を表示
+                localStorage.removeItem("login_session");
+                return;
             }
+            // 有効なセッションがあればそのまま飛ばす
+            sessionStorage.setItem("user_email", email);
+            sessionStorage.setItem("user_role", role);
+            window.location.href = role === "admin" ? "admin.html" : "mypage.html";
+        } catch (e) {
+            localStorage.removeItem("login_session");
         }
+    })();
 
-        function decodeJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
+    // ── 以下は既存コードそのまま ────────────────────────────────────────
+    const statusContainer  = document.getElementById("status-container");
+    const statusSpinner    = document.getElementById("status-spinner");
+    const statusSuccessIcon= document.getElementById("status-success-icon");
+    const statusErrorIcon  = document.getElementById("status-error-icon");
+    const statusText       = document.getElementById("status-text");
+    const loginBtnWrapper  = document.getElementById("login-btn-wrapper");
+
+    function showStatus(message, type) {
+        statusText.innerText = message;
+        statusContainer.classList.remove("hidden");
+        statusSpinner.classList.add("hidden");
+        statusSuccessIcon.classList.add("hidden");
+        statusErrorIcon.classList.add("hidden");
+        statusText.classList.remove("animate-pulse","text-green-600","text-red-600","text-gray-600");
+
+        if (type === 'info') {
+            statusSpinner.classList.remove("hidden");
+            statusText.classList.add("animate-pulse","text-gray-600");
+        } else if (type === 'success') {
+            statusSuccessIcon.classList.remove("hidden");
+            statusText.classList.add("text-green-600");
+            loginBtnWrapper.classList.add("opacity-30","pointer-events-none");
+        } else if (type === 'error') {
+            statusErrorIcon.classList.remove("hidden");
+            statusText.classList.add("text-red-600");
         }
+    }
 
-        async function handleCredentialResponse(response) {
-            // 💡 1. ログインが始まったら、くるくるローディングを滑らかに起動！
-            showStatus("学校アカウントを確認しています...", "info");
-            
-            try {
-                const responsePayload = decodeJwt(response.credential);
-                const email = responsePayload.email;
+    function decodeJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g,'+').replace(/_/g,'/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join('')
+        );
+        return JSON.parse(jsonPayload);
+    }
 
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ email: email })
-                });
-                
-                const result = await res.json();
-                console.log("GASから返ってきた役職:", result.role);
+    async function handleCredentialResponse(response) {
+        showStatus("学校アカウントを確認しています...", "info");
 
-                if (result.status === "success") {
-                    // 💡 2. 成功したら、ローディングが「✓」にパッと切り替わって弾みます！
-                    showStatus("認証成功！マイページへ移動します...", "success");
-                    
-                    sessionStorage.setItem("user_email", result.email || email);
-                    sessionStorage.setItem("user_role", result.role);
+        try {
+            const responsePayload = decodeJwt(response.credential);
+            const email = responsePayload.email;
 
-                    // 💡 3. あえて1.2秒だけアニメーションを見せる「最高の余韻」を持たせて移動
-                    setTimeout(() => {
-                        if (result.role === "admin") {
-                            window.location.href = "admin.html";
-                        } else {
-                            window.location.href = "mypage.html";
-                        }
-                    }, 1200);
-                } else {
-                    showStatus("ユーザー情報が見つかりません。登録を確認してください。", "error");
-                }
-            } catch (error) {
-                console.error(error);
-                showStatus("通信エラーが発生しました。電波の良い場所で試してください。", "error");
+            const res = await fetch(GAS_API_URL, {
+                method: "POST",
+                body: JSON.stringify({ email })
+            });
+            const result = await res.json();
+
+            if (result.status === "success") {
+                showStatus("認証成功！マイページへ移動します...", "success");
+
+                const finalEmail = result.email || email;
+                const finalRole  = result.role;
+
+                sessionStorage.setItem("user_email", finalEmail);
+                sessionStorage.setItem("user_role",  finalRole);
+
+                // ── ここが追加部分：30日間有効なセッションを保存 ──
+                const DAYS = 30;
+                localStorage.setItem("login_session", JSON.stringify({
+                    email:   finalEmail,
+                    role:    finalRole,
+                    expires: Date.now() + DAYS * 24 * 60 * 60 * 1000
+                }));
+
+                setTimeout(() => {
+                    window.location.href = finalRole === "admin" ? "admin.html" : "mypage.html";
+                }, 1200);
+
+            } else {
+                showStatus("ユーザー情報が見つかりません。登録を確認してください。", "error");
             }
+        } catch (error) {
+            console.error(error);
+            showStatus("通信エラーが発生しました。電波の良い場所で試してください。", "error");
         }
+    }
 
-        
-window.addEventListener("DOMContentLoaded", () => {
-    const splash = document.getElementById("splash-screen");
+    // スプラッシュ画面（変更なし）
+    window.addEventListener("DOMContentLoaded", () => {
+        const splash = document.getElementById("splash-screen");
+        const firstLaunch = !localStorage.getItem("splashShown");
+        const delay = firstLaunch ? 3000 : 1000;
+        localStorage.setItem("splashShown","true");
 
-    // 初回だけ1.5秒、2回目以降は0.3秒
-    const firstLaunch = !localStorage.getItem("splashShown");
-    const delay = firstLaunch ? 3000 : 1000;
-
-    localStorage.setItem("splashShown", "true");
-
-    // Loading...
-    const loadingTimer = setInterval(() => {
-        const text = document.getElementById("loading-text");
-        if (!text) return;
-
-        const next = ((parseInt(text.dataset.dots || "0")) + 1) % 4;
-        text.dataset.dots = next;
-        text.textContent = "Loading" + ".".repeat(next);
-    }, 400);
-
-    setTimeout(() => {
-        splash.classList.add("hide");
-
-        clearInterval(loadingTimer);
+        const loadingTimer = setInterval(() => {
+            const text = document.getElementById("loading-text");
+            if (!text) return;
+            const next = ((parseInt(text.dataset.dots||"0")) + 1) % 4;
+            text.dataset.dots = next;
+            text.textContent = "Loading" + ".".repeat(next);
+        }, 400);
 
         setTimeout(() => {
-            splash.remove();
-        }, 700);
-
-    }, delay);
-});
-    
-    </script>
+            splash.classList.add("hide");
+            clearInterval(loadingTimer);
+            setTimeout(() => splash.remove(), 700);
+        }, delay);
+    });
+</script>
 </body>
 </html>
