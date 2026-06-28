@@ -1,6 +1,6 @@
 {
   "name": "デジタル目安箱",
-  "short_name": "目安箱",
+  "short_name": "デジタル目安箱",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
