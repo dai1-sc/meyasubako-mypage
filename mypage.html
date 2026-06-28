@@ -227,12 +227,13 @@
         }
 
         const logoutBtn = document.getElementById("btn-logout");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                sessionStorage.clear();
-                window.location.href = "index.html";
-            });
-        }
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("login_session"); // ← これを追加
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+}
 
         function updateCountdown() {
             const el = document.getElementById("countdown-days");
@@ -504,6 +505,7 @@ if (latest.important) {
                 btn.innerText = "報告を送信する";
             }
         }
+        
     </script>
 </body>
 </html>
