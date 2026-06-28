@@ -1097,10 +1097,11 @@
             window.location.href = `council_chat.html?id=${id}`;
         }
 
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
+function logout() {
+    localStorage.removeItem("login_session"); // ← これを追加
+    sessionStorage.clear();
+    window.location.href = "index.html";
+}
 
 
         // 3者承認用関数
