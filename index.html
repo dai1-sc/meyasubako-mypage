@@ -226,7 +226,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // 初回だけ1.5秒、2回目以降は0.3秒
     const firstLaunch = !localStorage.getItem("splashShown");
-    const delay = firstLaunch ? 3000 : 300;
+    const delay = firstLaunch ? 3000 : 1000;
 
     localStorage.setItem("splashShown", "true");
 
