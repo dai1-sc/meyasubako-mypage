@@ -396,45 +396,44 @@ else {
         // 2. ステータスを「その場」で変更して反映
         // ==========================================
         async function updateStatus(suggestionId, selectElement) {
-            const newStatus = selectElement.value;
-            selectElement.disabled = true;
+    const newStatus = selectElement.value;
+    selectElement.disabled = true;
 
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    const message = document.getElementById(`rejectMessage-${suggestionId}`).value;
+    try {
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "updateStatus",
+                email: userEmail,
+                suggestionId: suggestionId,
+                status: newStatus
+            })
+        });
 
-body: JSON.stringify({
-    action: "sendChatMessage",
-    email: userEmail,
-    suggestionId: suggestionId,
-    sender: "council",
-    message: message
-})
-                const result = await res.json();
+        const result = await res.json();
 
-                if (result.status === "success") {
-                    const targetIdx = allData.findIndex(item => item.id === suggestionId);
-                    if (targetIdx !== -1) allData[targetIdx].status = newStatus;
+        if (result.status === "success") {
+            const targetIdx = allData.findIndex(item => item.id === suggestionId);
+            if (targetIdx !== -1) allData[targetIdx].status = newStatus;
 
-                    selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
-                    if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
-                    if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
-                    if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
-                    if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
-                    if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
-                    
-                    filterAndRenderData(); // 最新状態に再描画
-                } else {
-                    alert("変更に失敗しました: " + result.message);
-                }
-            } catch (error) {
-                console.error(error);
-                alert("通信エラーが発生しました。");
-            } finally {
-                selectElement.disabled = false;
-            }
+            selectElement.className = "text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm ";
+            if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("bg-blue-50", "text-blue-700", "border-blue-200");
+            if (newStatus === "生徒会検討中") selectElement.classList.add("bg-yellow-50", "text-yellow-700", "border-yellow-200");
+            if (newStatus === "先生方検討中") selectElement.classList.add("bg-purple-50", "text-purple-700", "border-purple-200");
+            if (newStatus === "開示請求") selectElement.classList.add("bg-red-50", "text-red-700", "border-red-200");
+            if (newStatus === "回答完了") selectElement.classList.add("bg-green-50", "text-green-700", "border-green-200");
+            
+            filterAndRenderData();
+        } else {
+            alert("変更に失敗しました: " + result.message);
         }
+    } catch (error) {
+        console.error(error);
+        alert("通信エラーが発生しました。");
+    } finally {
+        selectElement.disabled = false;
+    }
+}
 
         // 開示請求の承認
         async function approveRequest(suggestionId, roleToApprove) {
