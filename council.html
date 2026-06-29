@@ -290,50 +290,52 @@
 
 if (canChat) {
     chatButtonHTML = `
-        <div class="flex flex-col items-center gap-2">
+<div class="flex flex-col items-center gap-3">
 
-            <button onclick="openCouncilChat('${item.id}')"
-                class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95">
+    <button onclick="openCouncilChat('${item.id}')"
+        class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95">
 
-                <i class="fas fa-comments text-sm"></i>
+        <i class="fas fa-comments text-sm"></i>
 
-                ${item.hasUnread
-                    ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>'
-                    : ''}
+        ${item.hasUnread
+            ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>'
+            : ''}
 
-            </button>
+    </button>
 
-            <select id="rejectType-${item.id}"
-                class="text-[10px] border rounded px-1 py-1 w-28">
+    <div class="w-full">
 
-                <select id="rejectType-${item.id}"
-    onchange="changeRejectTemplate('${item.id}')"
-    class="text-[10px] border rounded px-1 py-1 w-32">
+        <select
+            id="rejectType-${item.id}"
+            onchange="changeRejectTemplate('${item.id}')"
+            class="w-full text-[11px] border rounded-lg p-2">
 
-    <option value="">却下対応</option>
-    <option value="A">🟢 対応困難</option>
-    <option value="B">🟠 内容不十分</option>
-    <option value="C">🔵 他部署へ案内</option>
+            <option value="">却下対応</option>
+            <option value="A">🟢 対応困難</option>
+            <option value="B">🟠 内容不十分</option>
+            <option value="C">🔵 他部署へ案内</option>
 
-</select>
+        </select>
 
-<textarea
-    id="rejectMessage-${item.id}"
-    rows="5"
-    class="w-48 text-[10px] border rounded p-2 resize-y"
-    placeholder="定型文がここに表示されます"
-></textarea>
+        <textarea
+            id="rejectMessage-${item.id}"
+            rows="3"
+            class="hidden w-full border rounded-lg p-2 text-xs resize-none mt-2"
+            placeholder="定型文がここに表示されます"></textarea>
 
-<button
-    onclick="sendRejectMessage('${item.id}')"
-    class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">
+        <button
+            id="rejectBtn-${item.id}"
+            onclick="sendRejectMessage('${item.id}')"
+            class="hidden w-full mt-2 bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded-lg transition">
 
-    送信
+            送信
 
-</button>
+        </button>
 
-        </div>
-    `;
+    </div>
+
+</div>
+`;
 }
 else {
     chatButtonHTML = `
@@ -541,56 +543,73 @@ if(message===""){
     }
 
 }
-        function changeRejectTemplate(id){
+        function changeRejectTemplate(id) {
 
-    const type=document.getElementById(`rejectType-${id}`).value;
-    const box=document.getElementById(`rejectMessage-${id}`);
+    const type = document.getElementById(`rejectType-${id}`).value;
+    const box = document.getElementById(`rejectMessage-${id}`);
+    const btn = document.getElementById(`rejectBtn-${id}`);
 
-    if(type==="A"){
+    // 初期状態
+    box.classList.add("hidden");
+    btn.classList.add("hidden");
+    box.readOnly = false;
+    box.value = "";
 
-        box.value=
+    if (type === "") return;
+
+    // 送信ボタンは全パターン表示
+    btn.classList.remove("hidden");
+
+    // ==========================
+    // A：対応困難
+    // ==========================
+    if (type === "A") {
+
+        // 編集欄は表示しない
+        box.classList.add("hidden");
+
+        box.value =
 `この度は貴重なご意見をお寄せいただきありがとうございます。
 
 生徒会にて内容を慎重に検討いたしましたが、学校の規則や設備、安全面などを総合的に考慮した結果、現時点での対応は困難であると判断いたしました。
 
 ご理解いただきますようお願いいたします。`;
 
-        box.readOnly=true;
-
     }
 
-    else if(type==="B"){
+    // ==========================
+    // B：内容不十分
+    // ==========================
+    else if (type === "B") {
 
-        box.value=
+        box.classList.remove("hidden");
+
+        box.value =
 `この度は貴重なご意見をありがとうございます。
 
 内容を確認いたしましたが、現時点では状況やご要望を十分に把握することができませんでした。
 
 差し支えなければ、より詳しい内容や具体的な状況についてチャットにてお知らせください。`;
 
-        box.readOnly=false;
-
     }
 
-    else if(type==="C"){
+    // ==========================
+    // C：他部署へ案内
+    // ==========================
+    else if (type === "C") {
 
-        box.value=
+        box.classList.remove("hidden");
+
+        box.value =
 `この度はご意見をありがとうございます。
 
-ご相談内容を確認したところ、生徒会では対応が難しく、以下の部署へご相談いただくことをおすすめします。
+ご相談内容を確認したところ、生徒会では対応が難しい内容となります。
 
-【ここを書き換えてください】
+以下の【】内を、案内先の部署名に書き換えてから送信してください。
+
+【例：学年主任・担任・事務室・保健室・情報担当教員】
 
 必要に応じて、生徒会でもできる限りサポートいたします。`;
-
-        box.readOnly=false;
-
-    }
-
-    else{
-
-        box.value="";
-        box.readOnly=false;
 
     }
 
