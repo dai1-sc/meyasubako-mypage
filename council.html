@@ -303,40 +303,38 @@ if (canChat) {
 
     </button>
 
-    <div class="w-full">
+ <div class="w-full mt-2 flex flex-col items-center">
 
-        <select
-            id="rejectType-${item.id}"
-            onchange="changeRejectTemplate('${item.id}')"
-            class="w-full text-[11px] border rounded-lg p-2">
+    <select
+        id="rejectType-${item.id}"
+        onchange="changeRejectTemplate('${item.id}')"
+        class="w-full text-[11px] border rounded-lg p-2">
 
-            <option value="">却下対応</option>
-            <option value="A">🟢 対応困難</option>
-            <option value="B">🟠 内容不十分</option>
-            <option value="C">🔵 他部署へ案内</option>
+        <option value="">却下対応</option>
+        <option value="A">🟢 対応困難</option>
+        <option value="B">🟠 内容不十分</option>
+        <option value="C">🔵 他部署へ案内</option>
 
-        </select>
+    </select>
 
-        <textarea
-            id="rejectMessage-${item.id}"
-            rows="3"
-            class="hidden w-full border rounded-lg p-2 text-xs resize-none mt-2"
-            placeholder="定型文がここに表示されます"></textarea>
+    <textarea
+        id="rejectMessage-${item.id}"
+        rows="3"
+        class="hidden w-full border rounded-lg p-2 text-xs resize-none mt-2"
+        placeholder="定型文がここに表示されます">
+    </textarea>
 
-        <button
-            id="rejectBtn-${item.id}"
-            onclick="sendRejectMessage('${item.id}')"
-            class="hidden w-full mt-2 bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded-lg transition">
+    <button
+        id="rejectBtn-${item.id}"
+        onclick="sendRejectMessage('${item.id}')"
+        class="hidden mt-2 px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition">
 
-            送信
+        <i class="fas fa-paper-plane mr-1"></i>送信
 
-        </button>
-
-    </div>
+    </button>
 
 </div>
-`;
-}
+
 else {
     chatButtonHTML = `
         <button disabled
