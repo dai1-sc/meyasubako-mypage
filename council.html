@@ -402,13 +402,15 @@ else {
             try {
                 const res = await fetch(GAS_API_URL, {
                     method: "POST",
-                    body: JSON.stringify({
-                        action: "updateStatus",
-                        suggestionId: suggestionId,
-                        status: newStatus,
-                        email: userEmail
-                    })
-                });
+                    const message = document.getElementById(`rejectMessage-${suggestionId}`).value;
+
+body: JSON.stringify({
+    action: "sendChatMessage",
+    email: userEmail,
+    suggestionId: suggestionId,
+    sender: "council",
+    message: message
+})
                 const result = await res.json();
 
                 if (result.status === "success") {
@@ -529,11 +531,21 @@ if(message===""){
         const result = await res.json();
 
         if(result.status==="success"){
-            alert("定型文を送信しました。");
-            loadCouncilData();
-        }else{
-            alert(result.message);
-        }
+
+    // ステータスを回答完了へ
+    await fetch(GAS_API_URL,{
+        method:"POST",
+        body:JSON.stringify({
+            action:"updateStatus",
+            suggestionId:suggestionId,
+            status:"回答完了",
+            email:userEmail
+        })
+    });
+
+    alert("定型文を送信しました。");
+    loadCouncilData();
+}
 
     } catch(e){
         console.error(e);
