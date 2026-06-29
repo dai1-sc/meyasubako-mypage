@@ -97,6 +97,7 @@
                             <th class="p-4">タイトル / 内容の要約</th>
                             <th class="p-4 w-32">対応ステータス</th>
                             <th class="p-4 w-28 text-center">対話チャット</th>
+                             <th class="p-4 w-28 text-center">定型返信</th>
                         </tr>
                     </thead>
                     <tbody id="suggestion-table-body" class="divide-y divide-gray-50 text-sm text-gray-700">
@@ -286,20 +287,64 @@
                 const canChat = (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "admin");
                 
                 let chatButtonHTML = "";
-                if (canChat) {
-                    chatButtonHTML = `
-                        <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95 duration-150">
-                            <i class="fas fa-comments text-sm"></i>
-                            ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
-                        </button>
-                    `;
-                } else {
-                    chatButtonHTML = `
-                        <button disabled class="inline-flex items-center justify-center w-9 h-9 bg-gray-100 text-gray-300 rounded-xl cursor-not-allowed" title="チャット権限がありません（委員長・役員以上のみ）">
-                            <i class="fas fa-lock text-sm"></i>
-                        </button>
-                    `;
-                }
+
+if (canChat) {
+    chatButtonHTML = `
+        <div class="flex flex-col items-center gap-2">
+
+            <button onclick="openCouncilChat('${item.id}')"
+                class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95">
+
+                <i class="fas fa-comments text-sm"></i>
+
+                ${item.hasUnread
+                    ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>'
+                    : ''}
+
+            </button>
+
+            <select id="rejectType-${item.id}"
+                class="text-[10px] border rounded px-1 py-1 w-28">
+
+                <select id="rejectType-${item.id}"
+    onchange="changeRejectTemplate('${item.id}')"
+    class="text-[10px] border rounded px-1 py-1 w-32">
+
+    <option value="">却下対応</option>
+    <option value="A">🟢 対応困難</option>
+    <option value="B">🟠 内容不十分</option>
+    <option value="C">🔵 他部署へ案内</option>
+
+</select>
+
+<textarea
+    id="rejectMessage-${item.id}"
+    rows="5"
+    class="w-48 text-[10px] border rounded p-2 resize-y"
+    placeholder="定型文がここに表示されます"
+></textarea>
+
+<button
+    onclick="sendRejectMessage('${item.id}')"
+    class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded">
+
+    送信
+
+</button>
+
+        </div>
+    `;
+}
+else {
+    chatButtonHTML = `
+        <button disabled
+            class="inline-flex items-center justify-center w-9 h-9 bg-gray-100 text-gray-300 rounded-xl">
+
+            <i class="fas fa-lock text-sm"></i>
+
+        </button>
+    `;
+}
 
                 tr.innerHTML = `
                     <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
@@ -450,7 +495,106 @@
         function openCouncilChat(id) {
             window.location.href = `council_chat.html?id=${id}`;
         }
+async function sendRejectMessage(suggestionId) {
 
+    const type = document.getElementById(`rejectType-${suggestionId}`).value;
+    const message =
+document.getElementById(`rejectMessage-${suggestionId}`).value.trim();
+
+if(message===""){
+    alert("送信する文章を入力してください。");
+    return;
+}
+
+    if (!type) {
+        alert("却下理由を選択してください。");
+        return;
+    }
+
+    if (!confirm("この定型文を送信しますか？")) return;
+
+    try {
+
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+    action: "sendRejectMessage",
+    email: userEmail,
+    suggestionId: suggestionId,
+    rejectType: type,
+    message: message
+})
+        });
+
+        const result = await res.json();
+
+        if(result.status==="success"){
+            alert("定型文を送信しました。");
+            loadCouncilData();
+        }else{
+            alert(result.message);
+        }
+
+    } catch(e){
+        console.error(e);
+        alert("通信エラー");
+    }
+
+}
+        function changeRejectTemplate(id){
+
+    const type=document.getElementById(`rejectType-${id}`).value;
+    const box=document.getElementById(`rejectMessage-${id}`);
+
+    if(type==="A"){
+
+        box.value=
+`この度は貴重なご意見をお寄せいただきありがとうございます。
+
+生徒会にて内容を慎重に検討いたしましたが、学校の規則や設備、安全面などを総合的に考慮した結果、現時点での対応は困難であると判断いたしました。
+
+ご理解いただきますようお願いいたします。`;
+
+        box.readOnly=true;
+
+    }
+
+    else if(type==="B"){
+
+        box.value=
+`この度は貴重なご意見をありがとうございます。
+
+内容を確認いたしましたが、現時点では状況やご要望を十分に把握することができませんでした。
+
+差し支えなければ、より詳しい内容や具体的な状況についてチャットにてお知らせください。`;
+
+        box.readOnly=false;
+
+    }
+
+    else if(type==="C"){
+
+        box.value=
+`この度はご意見をありがとうございます。
+
+ご相談内容を確認したところ、生徒会では対応が難しく、以下の部署へご相談いただくことをおすすめします。
+
+【ここを書き換えてください】
+
+必要に応じて、生徒会でもできる限りサポートいたします。`;
+
+        box.readOnly=false;
+
+    }
+
+    else{
+
+        box.value="";
+        box.readOnly=false;
+
+    }
+
+}
         window.onload = loadCouncilData;
 
         // ==========================================
