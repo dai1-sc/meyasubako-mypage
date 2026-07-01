@@ -140,7 +140,10 @@
         
         // 取得した全データを保持するグローバル配列変数
         let allData = [];
-
+let allData = [];
+let initialLoaded = false;   // 初回ロード済みフラグ
+let loadInProgress = false;  // 同時ロード防止ガード
+        
         console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
 
         if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson" && userRole !== "admin") {
@@ -153,14 +156,19 @@
         // ==========================================
         // 1. 生徒会用の一覧データをGASから取得
         // ==========================================
-        async function loadCouncilData() {
-            tableBody.innerHTML = `
-                <tr id="table-loading">
-                    <td colspan="5" class="text-center py-12 text-gray-400">
-                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
-                        <span class="text-xs">目安箱のデータを取得中...</span>
-                    </td>
-                </tr>`;
+        async function loadCouncilData(force = false) {
+    // force=true のときは強制再取得（更新ボタンなどから呼ぶ）
+    if (!force && initialLoaded) return;
+    if (loadInProgress) return; // 既に実行中なら無視
+    loadInProgress = true;
+
+    tableBody.innerHTML = `
+        <tr id="table-loading">
+            <td colspan="5" class="text-center py-12 text-gray-400">
+                <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
+                <span class="text-xs">目安箱のデータを取得中...</span>
+            </td>
+        </tr>`;
 
             const userEmail = sessionStorage.getItem("user_email");
             const userRole = sessionStorage.getItem("user_role");
@@ -186,7 +194,10 @@
                 console.error(error);
                 tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。GASのURLやデプロイを確認してください。</td></tr>`;
             }
-        }
+                } finally {
+        loadInProgress = false;
+    }
+}
 
         // ==========================================
         // 🌟 データを絞り込んでテーブルを描画する関数（アニメーション対応）
@@ -641,7 +652,7 @@ if(message===""){
     }
 
 }
-        document.getElementById("btn-refresh").addEventListener("click", loadCouncilData);
+       document.getElementById("btn-refresh").addEventListener("click", () => loadCouncilData(true));
 
 window.onload = loadCouncilData;
         // ==========================================
