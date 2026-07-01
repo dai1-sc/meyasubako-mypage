@@ -701,15 +701,31 @@ function closePdfShare() {
 
 // 🔄 リアルタイムでPDF共有情報を監視する
 async function monitorPdfShare() {
+    console.log("📄 PDF監視を実行中...", userEmail);
+    
     try {
-        const res = await fetch(`${GAS_API_URL}?action=getPdfShare&email=${encodeURIComponent(userEmail)}`);
+        const url = `${GAS_API_URL}?action=getPdfShare&email=${encodeURIComponent(userEmail)}`;
+        console.log("📄 リクエストURL:", url);
+        
+        const res = await fetch(url);
         const data = await res.json();
         
-        if (data.status === "success" && data.pdfUrl && data.pdfUrl.trim() !== "") {
-            showPdfShare(data.pdfUrl);
+        console.log("📄 GASからの応答:", data);
+        
+        if (data.status === "success") {
+            console.log("📄 pdfUrl:", data.pdfUrl);
+            
+            if (data.pdfUrl && data.pdfUrl.trim() !== "") {
+                console.log("✅ PDFリンクを表示します:", data.pdfUrl);
+                showPdfShare(data.pdfUrl);
+            } else {
+                console.log("⏭️ 共有されたPDFがありません");
+            }
+        } else {
+            console.log("❌ エラーステータス:", data);
         }
     } catch (e) {
-        console.error("PDF監視エラー:", e);
+        console.error("❌ PDF監視エラー:", e);
     }
 }
 
