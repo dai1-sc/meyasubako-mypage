@@ -702,6 +702,21 @@
             </div>
         </div>
 
+        <!-- 📄 PDF共有セクション -->
+<div class="card p-5 flex flex-col md:flex-row gap-6 fade-in delay-5">
+    <div class="md:w-2/5 space-y-3">
+        <p class="sec-title"><i class="fas fa-file-pdf text-red-600 animate-pulse"></i> 回答予定PDF共有</p>
+        <p class="text-xs text-gray-500 leading-relaxed">生徒会が作成した回答案のPDFリンクを生徒に共有します。</p>
+        
+        <div class="space-y-2">
+            <input type="url" id="pdf-url-input" placeholder="https://drive.google.com/file/d/..." class="form-input">
+            <button onclick="sharePdf()" class="btn-brand">
+                <i class="fas fa-share-alt text-xs"></i> リンクを生徒に共有
+            </button>
+        </div>
+    </div>
+</div>
+        
         <!-- 意見一覧テーブル -->
         <div class="card overflow-hidden fade-in delay-5">
             <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
@@ -831,7 +846,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600 font-medium">担 当:</span>
                                     <div>
-                                        ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] hover:bg-purple-700 font-bold shadow-sm transition">承認する</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
+                                        ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="('${item.id}', 'teacher')" class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] hover:bg-purple-700 font-bold shadow-sm transition">承認する</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
                                     </div>
                                 </div>
                             </div>
@@ -1106,30 +1121,30 @@ function logout() {
 
         // 3者承認用関数
         async function approveRequest(suggestionId, roleToApprove) {
-            if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
-            const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
-            try {
-                const response = await fetch(GAS, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "approveDisclosure",
-                        email: senderEmail,
-                        suggestionId: suggestionId,
-                        role: roleToApprove
-                    })
-                });
-                const res = await response.json();
-                if (res.status === "success") {
-                    alert("承認を記録しました！");
-                    loadAdminData();
-                } else {
-                    alert("エラー: " + res.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
+    if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
+    const senderEmail = typeof userEmail !== 'undefined' ? userEmail : sessionStorage.getItem("user_email") || "";
+    try {
+        const response = await fetch(GAS_API_URL, {  // ← GAS を GAS_API_URL に修正
+            method: "POST",
+            body: JSON.stringify({
+                action: "approveDisclosure",
+                email: senderEmail,
+                suggestionId: suggestionId,
+                role: roleToApprove
+            })
+        });
+        const res = await response.json();
+        if (res.status === "success") {
+            alert("承認を記録しました！");
+            loadAdminData();
+        } else {
+            alert("エラー: " + res.message);
         }
+    } catch (e) {
+        console.error(e);
+        alert("通信に失敗しました。");
+    }
+}
         // ==========================================
         // 新機能: 一斉アナウンスの投稿
         // ==========================================
@@ -1534,6 +1549,37 @@ maintenanceBadge.classList.remove("hidden");
         // 💡 メンションアラートの「会話を見る」ボタンをチャット画面へ繋ぐ
 function openChatFromMention(suggestionId) {
     openChatModal(suggestionId);
+}
+        // 📄 PDFリンクを生徒に共有する
+async function sharePdf() {
+    const urlInput = document.getElementById("pdf-url-input");
+    const pdfUrl = urlInput.value.trim();
+    
+    if (!pdfUrl) return alert("PDFのリンクを入力してください。");
+    if (!pdfUrl.startsWith("http")) return alert("有効なURLではありません。");
+    if (!confirm(`このリンクを全生徒に共有しますか？\n\n${pdfUrl}`)) return;
+
+    try {
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "sharePdf",
+                email: userEmail,
+                pdfUrl: pdfUrl
+            })
+        });
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            alert("PDFリンクを全生徒に共有しました！");
+            urlInput.value = "";
+        } else {
+            alert("共有に失敗しました: " + result.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信エラーが発生しました。");
+    }
 }
     </script>
 </body>
