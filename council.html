@@ -46,8 +46,25 @@
         </div>
     </nav>
 
+    
     <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
-        
+        <!-- 📄 回答予定PDF共有エリア -->
+<div id="pdf-share-panel" class="hidden bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-xl p-4 shadow-md animate__animated animate__fadeInDown">
+    <div class="flex items-start justify-between gap-4">
+        <div class="flex-1">
+            <h3 class="text-sm font-bold text-blue-900 mb-1 flex items-center gap-2">
+                <i class="fas fa-file-pdf text-red-600"></i>回答予定PDFが共有されました
+            </h3>
+            <a id="pdf-link-display" href="#" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline break-all font-mono bg-white px-2 py-1 rounded border border-blue-200">
+                リンク読み込み中...
+            </a>
+            <p class="text-xs text-gray-600 mt-2">📌 このリンクから回答案の確認ができます。</p>
+        </div>
+        <button onclick="closePdfShare()" class="text-gray-400 hover:text-gray-600 shrink-0">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+    </div>
+</div>
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate__animated animate__fadeInUp animate__fast">
             <div class="flex-1">
                 <h1 class="text-xl font-bold text-gray-800 mb-3">届いた意見・要望の管理</h1>
@@ -635,6 +652,41 @@ window.onload = loadCouncilData;
         sessionStorage.clear();
         window.location.href = "index.html";
     }
+});
+        // 📄 PDF共有パネルを表示する関数
+function showPdfShare(pdfUrl) {
+    const panel = document.getElementById("pdf-share-panel");
+    const linkDisplay = document.getElementById("pdf-link-display");
+    
+    linkDisplay.href = pdfUrl;
+    linkDisplay.textContent = pdfUrl;
+    panel.classList.remove("hidden");
+}
+
+// 📄 PDF共有パネルを閉じる関数
+function closePdfShare() {
+    document.getElementById("pdf-share-panel").classList.add("hidden");
+}
+
+// 🔄 リアルタイムでPDF共有情報を監視する
+async function monitorPdfShare() {
+    try {
+        const res = await fetch(`${GAS_API_URL}?action=getPdfShare&email=${encodeURIComponent(userEmail)}`);
+        const data = await res.json();
+        
+        if (data.status === "success" && data.pdfUrl) {
+            showPdfShare(data.pdfUrl);
+        }
+    } catch (e) {
+        console.error("PDF監視エラー:", e);
+    }
+}
+
+// ページロード時にPDF監視を開始
+window.addEventListener("load", () => {
+    loadCouncilData();
+    monitorPdfShare(); // 初回チェック
+    setInterval(monitorPdfShare, 5000); // 5秒ごとに監視
 });
     </script>
 </body>
