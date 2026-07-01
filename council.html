@@ -653,19 +653,50 @@ window.onload = loadCouncilData;
         window.location.href = "index.html";
     }
 });
-        // 📄 PDF共有パネルを表示する関数
+// 📄 PDF共有パネルを表示する関数
 function showPdfShare(pdfUrl) {
     const panel = document.getElementById("pdf-share-panel");
-    const linkDisplay = document.getElementById("pdf-link-display");
     
-    linkDisplay.href = pdfUrl;
-    linkDisplay.textContent = pdfUrl;
+    // パネルが存在しない場合は作成
+    if (!panel) {
+        console.warn("PDF共有パネルのHTMLが見つかりません。作成します。");
+        const newPanel = document.createElement("div");
+        newPanel.id = "pdf-share-panel";
+        newPanel.className = "bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-xl p-4 shadow-md animate__animated animate__fadeInDown mx-4 md:mx-6 mt-6";
+        newPanel.innerHTML = `
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-blue-900 mb-1 flex items-center gap-2">
+                        <i class="fas fa-file-pdf text-red-600"></i>回答予定PDFが共有されました
+                    </h3>
+                    <a id="pdf-link-display" href="${pdfUrl}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline break-all font-mono bg-white px-2 py-1 rounded border border-blue-200">
+                        ${pdfUrl}
+                    </a>
+                    <p class="text-xs text-gray-600 mt-2">📌 このリンクから回答案の確認ができます。</p>
+                </div>
+                <button onclick="closePdfShare()" class="text-gray-400 hover:text-gray-600 shrink-0">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+        `;
+        document.querySelector("main").insertBefore(newPanel, document.querySelector("main").firstChild);
+        return;
+    }
+    
+    const linkDisplay = document.getElementById("pdf-link-display");
+    if (linkDisplay) {
+        linkDisplay.href = pdfUrl;
+        linkDisplay.textContent = pdfUrl;
+    }
     panel.classList.remove("hidden");
 }
 
 // 📄 PDF共有パネルを閉じる関数
 function closePdfShare() {
-    document.getElementById("pdf-share-panel").classList.add("hidden");
+    const panel = document.getElementById("pdf-share-panel");
+    if (panel) {
+        panel.classList.add("hidden");
+    }
 }
 
 // 🔄 リアルタイムでPDF共有情報を監視する
@@ -674,7 +705,7 @@ async function monitorPdfShare() {
         const res = await fetch(`${GAS_API_URL}?action=getPdfShare&email=${encodeURIComponent(userEmail)}`);
         const data = await res.json();
         
-        if (data.status === "success" && data.pdfUrl) {
+        if (data.status === "success" && data.pdfUrl && data.pdfUrl.trim() !== "") {
             showPdfShare(data.pdfUrl);
         }
     } catch (e) {
@@ -683,10 +714,17 @@ async function monitorPdfShare() {
 }
 
 // ページロード時にPDF監視を開始
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
     loadCouncilData();
     monitorPdfShare(); // 初回チェック
     setInterval(monitorPdfShare, 5000); // 5秒ごとに監視
+});
+
+// フォールバック：DOMContentEvent が発火しない場合
+window.addEventListener("load", () => {
+    if (typeof allData === 'undefined' || allData.length === 0) {
+        loadCouncilData();
+    }
 });
     </script>
 </body>
