@@ -348,17 +348,15 @@ if (latest.important) {
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
                     // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
-                    const publishBadge = item.publishToHomepage ? `<div class="absolute left-4 top-4 inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</div>` : '';
-
-                    card.innerHTML = `
-                        ${unreadBadge}
-                        ${publishBadge}
-                        <div class="flex items-center space-x-2 text-[11px] font-black text-slate-400 mb-2.5">
-                            <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
-                            <span class="font-mono">${item.date}</span>
-                        </div>
-                        <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
-                        <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
+                  card.innerHTML = `
+    ${unreadBadge}
+    <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
+        <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
+        ${publishBadge}
+        <span class="font-mono">${item.date}</span>
+    </div>
+    <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
+    <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
                         
                         <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                             <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
