@@ -295,88 +295,91 @@ if (latest.important) {
             }
         }
 
-        async function loadSuggestions() {
-            try {
-                const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
-                const data = await res.json();
+      async function loadSuggestions() {
+    try {
+        const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
+        const data = await res.json();
 
-                document.getElementById("list-loading").classList.add("hidden");
-                const listContainer = document.getElementById("suggestion-list");
-                listContainer.innerHTML = "";
+        document.getElementById("list-loading").classList.add("hidden");
+        const listContainer = document.getElementById("suggestion-list");
+        listContainer.innerHTML = "";
 
-                if (!data || data.length === 0) {
-                    document.getElementById("list-empty").classList.remove("hidden");
-                    return;
-                }
-
-                document.getElementById("list-empty").classList.add("hidden");
-
-                data.forEach((item, index) => {
-                    let statusText = "受付";
-                    let stepClass = "w-1/3";
-                    let statusColor = "bg-indigo-600";
-
-                    if (item.status === "生徒会検討中") {
-                        statusText = "生徒会で検討中";
-                        stepClass = "w-2/3";
-                        statusColor = "bg-amber-500";
-                    } 
-                    else if (item.status === "先生方検討中") {
-                        statusText = "先生方で検討中";
-                        stepClass = "w-2/3";
-                        statusColor = "bg-purple-500";
-                    } 
-                    else if (item.status === "回答完了") {
-                        statusText = "回答・対応完了";
-                        stepClass = "w-full";
-                        statusColor = "bg-emerald-500";
-                    }
-
-                    const unreadBadge = item.hasUnread 
-                        ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
-                             <i class="fas fa-comment-dots"></i> 返信あり
-                           </span>`
-                        : '';
-
-                    const borderClass = item.hasUnread 
-                        ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10" 
-                        : "border-slate-100 hover:border-slate-200";
-
-                    const card = document.createElement("div");
-                    card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
-                    card.style.animationDelay = `${index * 0.08}s`;
-                    card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
-
-                    // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
-                  card.innerHTML = `
-    ${unreadBadge}
-    <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
-        <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
-        ${publishBadge}
-        <span class="font-mono">${item.date}</span>
-    </div>
-    <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
-    <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
-                        
-                        <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                            <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
-                                <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
-                                <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
-                                <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
-                            </div>
-                            <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                                <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
-                            </div>
-                        </div>
-                    `;
-                    listContainer.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
-            }
+        if (!data || data.length === 0) {
+            document.getElementById("list-empty").classList.remove("hidden");
+            return;
         }
+
+        document.getElementById("list-empty").classList.add("hidden");
+
+        data.forEach((item, index) => {
+            let statusText = "受付";
+            let stepClass = "w-1/3";
+            let statusColor = "bg-indigo-600";
+
+            if (item.status === "生徒会検討中") {
+                statusText = "生徒会で検討中";
+                stepClass = "w-2/3";
+                statusColor = "bg-amber-500";
+            } else if (item.status === "先生方検討中") {
+                statusText = "先生方で検討中";
+                stepClass = "w-2/3";
+                statusColor = "bg-purple-500";
+            } else if (item.status === "回答完了") {
+                statusText = "回答・対応完了";
+                stepClass = "w-full";
+                statusColor = "bg-emerald-500";
+            }
+
+            const unreadBadge = item.hasUnread
+                ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
+                     <i class="fas fa-comment-dots"></i> 返信あり
+                   </span>`
+                : '';
+
+            const borderClass = item.hasUnread
+                ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10"
+                : "border-slate-100 hover:border-slate-200";
+
+            const card = document.createElement("div");
+            card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
+            card.style.animationDelay = `${index * 0.08}s`;
+            card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
+
+            // publishBadge を定義（boolean/文字列どちらにも対応）
+            const publishBadge = (!!item.publishToHomepage)
+                ? `<span class="inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</span>`
+                : '';
+
+            // ヘッダー行を flex-wrap にしてバッジとカテゴリが重ならないようにする
+            card.innerHTML = `
+                ${unreadBadge}
+                <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
+                    <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
+                    ${publishBadge}
+                    <span class="font-mono">${item.date}</span>
+                </div>
+                <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
+                <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
+                
+                <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
+                        <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
+                        <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
+                        <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
+                    </div>
+                    <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+                        <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
+                    </div>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
+    }
+}
 
         document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
             e.preventDefault();
