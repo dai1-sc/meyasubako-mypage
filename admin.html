@@ -702,19 +702,32 @@
             </div>
         </div>
 
-        <!-- 📄 PDF共有セクション -->
-<div class="card p-5 flex flex-col md:flex-row gap-6 fade-in delay-5">
-    <div class="md:w-2/5 space-y-3">
+     <!-- 📄 PDF共有セクション -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 fade-in delay-5">
+    
+    <!-- 左：共有リンク入力フォーム -->
+    <div class="card p-5 space-y-3">
         <p class="sec-title"><i class="fas fa-file-pdf text-red-600 animate-pulse"></i> 回答予定PDF共有</p>
         <p class="text-xs text-gray-500 leading-relaxed">生徒会が作成した回答案のPDFリンクを生徒に共有します。</p>
         
         <div class="space-y-2">
             <input type="url" id="pdf-url-input" placeholder="https://drive.google.com/file/d/..." class="form-input">
             <button onclick="sharePdf()" class="btn-brand">
-                <i class="fas fa-share-alt text-xs"></i> リンクを生徒に共有
+                <i class="fas fa-share-alt text-xs"></i> リンクを生徒に共有する
             </button>
         </div>
     </div>
+
+    <!-- 右：共有履歴 -->
+    <div class="card p-5 flex flex-col">
+        <p class="sec-title mb-3"><i class="fas fa-history"></i> 共有リンク履歴</p>
+        <div class="overflow-y-auto max-h-64 rounded-lg border border-gray-100 flex-1">
+            <div id="pdf-history-box" class="divide-y divide-gray-100">
+                <div class="text-center py-6 text-gray-400 text-xs">読み込み中...</div>
+            </div>
+        </div>
+    </div>
+
 </div>
         
         <!-- 意見一覧テーブル -->
@@ -1251,6 +1264,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. 🚨 メンションSOSと不具合報告の即時チェック
     try { loadAdminMentions(); } catch(e) { console.error("メンション取得エラー:", e); }
     try { loadBugReports(); } catch(e) { console.error("不具合報告取得エラー:", e); }
+    try { if (typeof loadBlocklistData === "function") loadBlocklistData(); } catch(e) { console.error(e); }
+    try { if (typeof loadAnnouncementHistory === "function") loadAnnouncementHistory(); } catch(e) { console.error(e); }
+    
+    // 📄 PDF共有履歴の読み込みを追加
+    try { if (typeof loadPdfShareHistory === "function") loadPdfShareHistory(); } catch(e) { console.error("PDF履歴読込エラー:", e); }
+    
+    try { loadAdminMentions(); } catch(e) { console.error("メンション取得エラー:", e); }
+    try { loadBugReports(); } catch(e) { console.error("不具合報告取得エラー:", e); }
 });
         // ==========================================
         // 新機能: アナウンスの削除
@@ -1550,7 +1571,7 @@ maintenanceBadge.classList.remove("hidden");
 function openChatFromMention(suggestionId) {
     openChatModal(suggestionId);
 }
-        // 📄 PDFリンクを生徒に共有する
+// 📄 PDFリンクを生徒に共有する
 async function sharePdf() {
     const urlInput = document.getElementById("pdf-url-input");
     const pdfUrl = urlInput.value.trim();
@@ -1573,8 +1594,85 @@ async function sharePdf() {
         if (result.status === "success") {
             alert("PDFリンクを全生徒に共有しました！");
             urlInput.value = "";
+            loadPdfShareHistory(); // 履歴を更新
         } else {
             alert("共有に失敗しました: " + result.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信エラーが発生しました。");
+    }
+}
+
+// 📄 PDF共有履歴を読み込む
+async function loadPdfShareHistory() {
+    const historyBox = document.getElementById("pdf-history-box");
+    
+    try {
+        const res = await fetch(`${GAS_API_URL}?action=getPdfShareHistory&email=${encodeURIComponent(userEmail)}`);
+        const data = await res.json();
+        
+        if (data.status === "success") {
+            historyBox.innerHTML = "";
+            
+            if (data.list.length === 0) {
+                historyBox.innerHTML = `<div class="text-center py-6 text-gray-400 text-xs">まだ共有履歴がありません。</div>`;
+                return;
+            }
+            
+            data.list.forEach((item, index) => {
+                const div = document.createElement("div");
+                div.className = "p-3 hover:bg-gray-50 transition";
+                div.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[10px] text-gray-400 font-mono mb-1">
+                                <i class="fas fa-calendar-alt"></i> ${item.sharedDate}
+                            </p>
+                            <a href="${item.url}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline break-all block font-mono bg-blue-50 p-2 rounded border border-blue-200">
+                                ${item.url}
+                            </a>
+                            <p class="text-[10px] text-gray-500 mt-1">
+                                <i class="fas fa-user"></i> 共有者: ${item.sharedBy}
+                            </p>
+                        </div>
+                        <button onclick="deletePdfShare('${item.id}')" class="text-gray-300 hover:text-red-500 transition shrink-0 mt-1" title="この共有を削除">
+                            <i class="fas fa-trash-alt text-sm"></i>
+                        </button>
+                    </div>
+                `;
+                historyBox.appendChild(div);
+            });
+            
+        } else {
+            historyBox.innerHTML = `<div class="text-center py-6 text-red-500 text-xs">読み込みに失敗しました。</div>`;
+        }
+    } catch (e) {
+        console.error(e);
+        historyBox.innerHTML = `<div class="text-center py-6 text-red-500 text-xs">エラーが発生しました。</div>`;
+    }
+}
+
+// 📄 PDF共有を削除
+async function deletePdfShare(shareId) {
+    if (!confirm("この共有リンクを削除しますか？")) return;
+    
+    try {
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "deletePdfShare",
+                email: userEmail,
+                shareId: shareId
+            })
+        });
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            alert("共有リンクを削除しました。");
+            loadPdfShareHistory(); // 履歴を更新
+        } else {
+            alert("削除に失敗しました: " + result.message);
         }
     } catch (e) {
         console.error(e);
