@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - マイページ</title>
     <link class="w-8 h-8 object-contain" rel="icon" href="log.png" type="image/png">
-     <!-- ブラウザ用 -->
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
-<!-- iPhone・iPad ホーム画面 -->
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-<!-- Android・PWA -->
 <link rel="manifest" href="manifest.json">
 
 <meta name="theme-color" content="#130182">
@@ -39,16 +36,158 @@
 }
 
 .announcement-important .announcement-icon {
-    color: #dc2626 !important;
-}
+    color: #dc2626 !important; }
 
 .announcement-important .announcement-label {
     background: #dc2626 !important;
-    color: white !important;
-}
+    color: white !important; }
+
+        /* ==========================================================================
+           🎋 七夕限定 演出用カスタマイズCSS (視認性と既存のシステムを維持)
+           ========================================================================== */
+        
+        /* ⑦ ネイビーのグラデーション背景 (固定・スクロール対応) */
+        body {
+            background: linear-gradient(180deg, #09052d 0%, #12015d 50%, #26104d 100%) !important;
+            background-attachment: fixed !important;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ① 星空の背景（アニメーション）*/
+        .starry-sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ② 流れ星 */
+        .shooting-star {
+            position: fixed;
+            top: -10px;
+            right: 10%;
+            width: 2px;
+            height: 80px;
+            background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+            transform: rotate(45deg);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            animation: shoot 7s infinite linear;
+        }
+        @keyframes shoot {
+            0% { transform: translate(0, 0) rotate(45deg); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translate(-400px, 400px) rotate(45deg); opacity: 0; }
+            100% { transform: translate(-400px, 400px) rotate(45deg); opacity: 0; }
+        }
+
+        /* ③ 笹の葉 (左右上部・透明度30%・ゆらゆら揺れる) */
+        .bamboo-left, .bamboo-right {
+            position: fixed;
+            top: 0;
+            font-size: 7rem;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 10;
+            user-select: none;
+        }
+        .bamboo-left { left: 10px; transform-origin: top left; animation: swayLeft 6s infinite ease-in-out; }
+        .bamboo-right { right: 10px; transform-origin: top right; animation: swayRight 6.5s infinite ease-in-out; }
+        @keyframes swayLeft {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(4deg); }
+        }
+        @keyframes swayRight {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-4deg); }
+        }
+
+        /* ⑤ 星がふわっと浮いて消えるアニメーション */
+        .floating-stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .float-sparkle {
+            position: absolute;
+            color: rgba(255, 223, 0, 0.6);
+            font-size: 14px;
+            animation: floatUp 8s infinite linear;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) translateX(0) scale(0.5); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-5vh) translateX(50px) scale(1.2); opacity: 0; }
+        }
+
+        /* ⑥ ガラスっぽさ追加 (元のデザイン・文字視認性を壊さない) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+
+        /* ⑨ ボタンにキラッ（光が横切るアニメーション） */
+        #btn-submit {
+            position: relative;
+            overflow: hidden;
+        }
+        #btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-30deg);
+            animation: shine 4s infinite ease-in-out;
+        }
+        @keyframes shine {
+            0% { left: -150%; }
+            15% { left: 150%; }
+            100% { left: 150%; }
+        }
     </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
+<body class="font-sans min-h-screen text-slate-800 antialiased">
+
+    <div class="starry-sky">
+        <div class="star" style="top: 15%; left: 20%; width: 3px; height: 3px; animation-delay: 0.5s;"></div>
+        <div class="star" style="top: 25%; left: 75%; width: 2px; height: 2px; animation-delay: 1.2s;"></div>
+        <div class="star" style="top: 45%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+        <div class="star" style="top: 65%; left: 85%; width: 3px; height: 3px; animation-delay: 2.1s;"></div>
+        <div class="star" style="top: 80%; left: 40%; width: 2px; height: 2px; animation-delay: 1.7s;"></div>
+        <div class="star" style="top: 50%; left: 60%; width: 3px; height: 3px; animation-delay: 0.8s;"></div>
+    </div>
+
+    <div class="shooting-star"></div>
+
+    <div class="floating-stars">
+        <div class="float-sparkle" style="left: 15%; animation-delay: 0s; animation-duration: 12s;">✨</div>
+        <div class="float-sparkle" style="left: 45%; animation-delay: 3s; animation-duration: 14s;">⭐</div>
+        <div class="float-sparkle" style="left: 80%; animation-delay: 6s; animation-duration: 11s;">✨</div>
+    </div>
+
+    <div class="bamboo-left">🎋</div>
+    <div class="bamboo-right">🎋</div>
 
     <nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
         <div class="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
@@ -68,27 +207,34 @@
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
+    <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24 relative z-10">
 
-        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
+        <div class="mb-6 bg-gradient-to-r from-amber-500/20 via-indigo-600/30 to-purple-600/20 border border-amber-400/40 p-4 rounded-2xl text-center shadow-lg backdrop-blur-md animate__animated animate__fadeInDown">
+            <p class="text-xs font-black text-amber-200 tracking-wider flex items-center justify-center gap-1.5">
+                <span>🎋</span> 今日は七夕。みなさんの願いや想いが、学校をより良くする一歩になります。 <span>✨</span>
+            </p>
+        </div>
+
+        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white glass-card p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
             <div class="flex-1">
-                <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
+                <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center flex-wrap gap-2">
                     こんにちは！<span class="animate-bounce">👋</span>
+                    <span class="text-[10px] bg-gradient-to-r from-teal-500 to-indigo-600 text-white font-extrabold px-2 py-0.5 rounded-full shadow-sm tracking-normal flex items-center gap-1 animate__animated animate__pulse animate__infinite">
+                        🎋 七夕限定デザイン
+                    </span>
                 </h1>
+    
                 <p class="text-xs text-slate-400 mt-1 font-medium">ここでは、あなたの意見の進捗確認や、生徒会との個別の相談・対話ができます。</p>
                 <div class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 self-start mt-3 inline-flex items-center shadow-inner">
                     <i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
                 </div>
-            </div>
-             </div>
-
-         
-
+           </div>
+        </div>
 
         <div id="announcement-banner" class="hidden mb-8 space-y-3 animate__animated animate__fadeInDown">
             <div id="announcement-card" class="bg-gradient-to-r from-indigo-50/70 to-purple-50/70 border-l-4 border-indigo-600 p-5 rounded-r-3xl shadow-sm border border-l-0 border-indigo-100/50">
                 <div class="flex items-center gap-2 mb-2">
-                    <i class="fas fa-bullhorn announcement-icon text-indigo-600 animate-pulse text-sm"></i>
+                   <i class="fas fa-bullhorn announcement-icon text-indigo-600 animate-pulse text-sm"></i>
                     <span class="announcement-label text-[11px] font-black text-indigo-800 tracking-wider bg-indigo-100 px-2.5 py-0.5 rounded-full">生徒会からのお知らせ</span>
                     <span id="student-announcement-date" class="text-[10px] text-slate-400 ml-auto font-mono font-medium">--/-- --:--</span>
                 </div>
@@ -99,25 +245,25 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            <div class="md:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24 animate__animated animate__fadeInDown animate__delay-1s">
+            <div class="md:col-span-1 bg-white glass-card p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24 animate__animated animate__fadeInDown animate__delay-1s">
                 <h2 class="text-base font-black text-slate-800 mb-5 flex items-center tracking-wide">
                     <i class="fas fa-pen-fancy brand-text mr-2 text-indigo-600"></i>意見を届ける
                 </h2>
                 <form id="suggestion-form" class="space-y-4">
                     <div>
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">カテゴリ</label>
+                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">カテゴリ</label>
                         <div class="relative">
                             <select id="form-category" class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-3.5 pr-10 py-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 appearance-none cursor-pointer" required>
-                                <option value="校則・制服">校則・制服について</option>
+                                 <option value="校則・制服">校則・制服について</option>
                                 <option value="行事・イベント">行事・イベントについて</option>
                                 <option value="部活動">部活動について</option>
-                                <option value="施設・設備">学校の施設・設備について</option>
+                                 <option value="施設・設備">学校の施設・設備について</option>
                                 <option value="その他">その他</option>
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
+                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </div>
-                        </div>
+                         </div>
                     </div>
                     <div>
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">意見のタイトル</label>
@@ -125,48 +271,48 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">詳しい内容</label>
-                        <textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 resize-none leading-relaxed" required></textarea>
+                         <textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 resize-none leading-relaxed" required></textarea>
                     </div>
 
-                    <!-- ここで公開確認チェックボックスを追加 -->
                     <div class="flex items-start gap-2">
                         <input id="form-publish" type="checkbox" class="mt-1 w-4 h-4 rounded border-slate-300 focus:ring-indigo-500" />
                         <label for="form-publish" class="text-xs font-bold text-slate-600 leading-tight">この投書に対する回答をホームページで公開してもいいですか？（公開されるのは生徒会の回答部分のみで、投稿者の情報は匿名のままです）</label>
                     </div>
 
-                    <div id="maintenance-alert" class="hidden bg-red-50 border border-red-100 text-red-600 text-xs p-3.5 rounded-2xl font-bold flex items-start gap-2 animate-pulse">
+                     <div id="maintenance-alert" class="hidden bg-red-50 border border-red-100 text-red-600 text-xs p-3.5 rounded-2xl font-bold flex items-start gap-2 animate-pulse">
                         <i class="fas fa-exclamation-triangle mt-0.5 text-sm"></i>
                         <span class="leading-relaxed">現在、生徒会目安箱は受付停止期間（またはメンテナンス中）のため、新しい意見の送信はできません。</span>
                     </div>
-                    <button type="submit" id="btn-submit" class="w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5">
+            
+                     <button type="submit" id="btn-submit" class="w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5">
                         匿名で送信する
                     </button>
                 </form>
             </div>
 
-            <div class="md:col-span-2 space-y-4 animate__animated animate__fadeInDown animate__delay-1s">
+             <div class="md:col-span-2 space-y-4 animate__animated animate__fadeInDown animate__delay-1s">
     
-                <h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
-                    <i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
+                <h2 class="text-base font-black text-white flex items-baseline tracking-wide mb-1">
+                    <i class="fas fa-history text-amber-300 mr-2 self-center"></i>
                     あなたの投書と進捗
-                    <span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
+                     <span class="text-xs text-slate-300 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
                 </h2>
 
                 <div id="list-loading" class="space-y-4 py-2">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
-                        <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+                    <div class="bg-white glass-card p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
+                        <div class="flex space-x-2"><div class="h-5 bg-slate-200 rounded-lg w-20"></div><div class="h-5 bg-slate-200 rounded-lg w-16"></div></div>
+                        <div class="h-6 bg-slate-200 rounded-xl w-3/4"></div>
+                        <div class="space-y-2"><div class="h-4 bg-slate-200 rounded-lg w-full"></div><div class="h-4 bg-slate-200 rounded-lg w-5/6"></div></div>
+                        <div class="pt-2"><div class="h-2 bg-slate-200 rounded-full w-full"></div></div>
+                     </div>
+                    <div class="bg-white glass-card p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
+                        <div class="flex space-x-2"><div class="h-5 bg-slate-200 rounded-lg w-16"></div><div class="h-5 bg-slate-200 rounded-lg w-16"></div></div>
+                        <div class="h-6 bg-slate-200 rounded-xl w-1/2"></div>
+                        <div class="pt-2"><div class="h-2 bg-slate-200 rounded-full w-full"></div></div>
                     </div>
                 </div>
 
-                <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
+                <div id="list-empty" class="hidden bg-white glass-card p-12 rounded-3xl border-2 border-dashed border-slate-300 text-center text-slate-400 animate__animated animate__fadeIn">
                     <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
                         <i class="fas fa-folder-open"></i>
                     </div>
@@ -191,12 +337,12 @@
                 <textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-700 transition duration-300 resize-none mb-4 leading-relaxed" required></textarea>
 
                 <div class="mb-5">
-                    <label class="block text-[11px] font-black text-slate-400 tracking-wider mb-1.5">スクリーンショット・画像を添付（任意）</label>
+                     <label class="block text-[11px] font-black text-slate-400 tracking-wider mb-1.5">スクリーンショット・画像を添付（任意）</label>
                     <input type="file" id="bug-file" accept="image/*" class="w-full text-xs border border-slate-200 p-2 rounded-2xl bg-slate-50 focus:outline-none file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-black file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer transition">
                 </div>
 
                 <div class="flex gap-2.5">
-                    <button onclick="toggleBugModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 text-xs font-black py-3 rounded-2xl transition duration-300">
+                     <button onclick="toggleBugModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 text-xs font-black py-3 rounded-2xl transition duration-300">
                         キャンセル
                     </button>
                     <button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-xs font-black py-3 rounded-2xl transition duration-300 shadow-lg shadow-slate-800/10">
