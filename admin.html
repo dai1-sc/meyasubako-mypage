@@ -1300,37 +1300,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("通信に失敗しました。");
             }
         }
-        async function toggleSystem(status) {
-            const statusText = status === 'active' ? '【通常稼働（受付中）】' : '【一時受付停止（メンテナンス）】';
-            if (!confirm(`システムを ${statusText} に切り替えますか？`)) return;
+        // 置き換え：toggleSystem
+async function toggleSystem(status) {
+    const statusText = status === 'active' ? '【通常稼働（受付中）】' : '【一時受付停止（メンテナンス）】';
+    if (!confirm(`システムを ${statusText} に切り替えますか？`)) return;
 
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "toggleSystemStatus",
-                        email: userEmail,
-                        newStatus: status
-                    })
-                });
-                const result = await res.json();
-                if (result.status === "success") {
-    alert(`システムを正常に ${statusText} へ切り替えました。`);
-
-    // 画面表示を最新状態に更新
-    await loadSystemStatus();
-
-} else {
-    alert("設定変更エラー: " + result.message);
-}
-            } catch (e) {
-                console.error(e);
-                alert("通信に失敗しました。");
-            }
-        }
-        async function loadSystemStatus() {
     try {
-        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
+        const res = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "toggleSystemStatus",
+                email: userEmail,
+                newStatus: status
+            })
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+            alert(`システムを正常に ${statusText} へ切り替えました。`);
+
+            // 他タブに変更を通知（storage イベントで他タブが自動的に再取得します）
+            try {
+                localStorage.setItem('systemStatusChanged', JSON.stringify({ ts: Date.now(), status: status }));
+            } catch(e){ console.warn("localStorage set error:", e); }
+
+            // このタブの表示を確実に最新化
+            await loadSystemStatus();
+
+        } else {
+            alert("設定変更エラー: " + result.message);
+        }
+    } catch (e) {
+        console.error(e);
+        alert("通信に失敗しました。");
+    }
+}
+
+// 置き換え：loadSystemStatus
+async function loadSystemStatus() {
+    try {
+        // キャッシュバスター付きで常に最新を取得
+        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus&_=${Date.now()}`);
         const result = await res.json();
 
         if (result.status !== "success") return;
@@ -1338,7 +1347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const activeBtn = document.getElementById("sys-btn-active");
         const mainBtn = document.getElementById("sys-btn-main");
         const activeBadge = document.getElementById("active-badge");
-const maintenanceBadge = document.getElementById("maintenance-badge");
+        const maintenanceBadge = document.getElementById("maintenance-badge");
 
         // 一旦リセット
         activeBtn.classList.remove("active-option", "inactive-option");
@@ -1347,19 +1356,31 @@ const maintenanceBadge = document.getElementById("maintenance-badge");
         if (result.systemStatus === "active") {
             activeBtn.classList.add("active-option");
             mainBtn.classList.add("inactive-option");
-            activeBadge.classList.remove("hidden");
-maintenanceBadge.classList.add("hidden");
+            if (activeBadge) activeBadge.classList.remove("hidden");
+            if (maintenanceBadge) maintenanceBadge.classList.add("hidden");
         } else {
             activeBtn.classList.add("inactive-option");
             mainBtn.classList.add("maintenance-option");
-            activeBadge.classList.add("hidden");
-maintenanceBadge.classList.remove("hidden");
+            if (activeBadge) activeBadge.classList.add("hidden");
+            if (maintenanceBadge) maintenanceBadge.classList.remove("hidden");
         }
 
     } catch (e) {
         console.error(e);
     }
 }
+
+// 初期化：DOMContentLoaded 内（既にある箇所に追加してください）
+document.addEventListener("DOMContentLoaded", () => {
+    try { loadSystemStatus(); } catch(e){ console.error("loadSystemStatus error:", e); }
+
+    // 他タブで systemStatus が変更されたら最新を取りに行く
+    window.addEventListener('storage', (ev) => {
+        if (ev.key === 'systemStatusChanged') {
+            try { loadSystemStatus(); } catch(e){ console.error(e); }
+        }
+    });
+});
         // ==========================================
         // 🚨【対応完了ボタン付き】自分（@admin）宛てのメンションSOSをロードする
         // ==========================================
