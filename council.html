@@ -139,9 +139,198 @@
 
         const tableBody = document.getElementById("suggestion-table-body");
 
-        // loadCouncilData：重複実行を防ぎ、初回ロードを一度だけ行う
+        // -------------------------
+        // 追加：欠落していた関数群
+        // -------------------------
+
+        // チャット画面へ遷移
+        function openCouncilChat(id) {
+            if (!id) return;
+            window.location.href = `council_chat.html?id=${encodeURIComponent(id)}`;
+        }
+
+        // ステータス変更をGASに送信してローカル反映
+        async function updateStatus(suggestionId, selectElement) {
+            if (!suggestionId || !selectElement) return;
+            const newStatus = selectElement.value;
+            selectElement.disabled = true;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateStatus",
+                        suggestionId: suggestionId,
+                        status: newStatus,
+                        email: userEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    const idx = allData.findIndex(it => it.id === suggestionId);
+                    if (idx !== -1) allData[idx].status = newStatus;
+
+                    // visual classes (best-effort)
+                    selectElement.classList.remove("s-blue","s-yellow","s-purple","s-green","s-red");
+                    if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("s-blue");
+                    else if (newStatus === "生徒会検討中") selectElement.classList.add("s-yellow");
+                    else if (newStatus === "先生方検討中") selectElement.classList.add("s-purple");
+                    else if (newStatus === "回答完了") selectElement.classList.add("s-green");
+                    else if (newStatus === "開示請求") selectElement.classList.add("s-red");
+
+                    // 再描画（current filters preserved）
+                    try { filterAndRenderData(); } catch(e){ console.warn(e); }
+                } else {
+                    alert("変更に失敗しました: " + (result.message || "不明なエラー"));
+                }
+            } catch (e) {
+                console.error("updateStatus error:", e);
+                alert("通信エラーが発生しました。");
+            } finally {
+                selectElement.disabled = false;
+            }
+        }
+
+        // 却下テンプレートの切り替え
+        function changeRejectTemplate(id) {
+            const typeEl = document.getElementById(`rejectType-${id}`);
+            const box = document.getElementById(`rejectMessage-${id}`);
+            const btn = document.getElementById(`rejectBtn-${id}`);
+            if (!typeEl || !box || !btn) return;
+
+            const type = typeEl.value;
+            box.classList.add("hidden");
+            btn.classList.add("hidden");
+            box.readOnly = false;
+            box.value = "";
+
+            if (!type) return;
+            btn.classList.remove("hidden");
+
+            if (type === "A") {
+                box.classList.add("hidden");
+                box.value =
+`この度は貴重なご意見をお寄せいただきありがとうございます。
+
+生徒会にて内容を慎重に検討いたしましたが、学校の規則や設備、安全面などを総合的に考慮した結果、現時点での対応は困難であると判断いたしました。
+
+ご理解いただきますようお願いいたします。`;
+            } else if (type === "B") {
+                box.classList.remove("hidden");
+                box.value =
+`この度は貴重なご意見をありがとうございます。
+
+内容を確認いたしましたが、現時点では状況やご要望を十分に把握することができませんでした。
+
+差し支えなければ、より詳しい内容や具体的な状況についてチャットにてお知らせください。`;
+            } else if (type === "C") {
+                box.classList.remove("hidden");
+                box.value =
+`この度はご意見をありがとうございます。
+
+ご相談内容を確認したところ、生徒会では対応が難しい内容となります。
+
+以下の【】内を、案内先の部署名に書き換えてから送信してください。
+
+【例：学年主任・担任・事務室・保健室・情報担当教員】
+
+必要に応じて、生徒会でもできる限りサポートいたします。`;
+            }
+        }
+
+        // 却下メッセージを送信（チャットに流す）、ステータスを更新
+        async function sendRejectMessage(suggestionId) {
+            const type = document.getElementById(`rejectType-${suggestionId}`).value;
+            const message = document.getElementById(`rejectMessage-${suggestionId}`).value.trim();
+            if (!type) { alert("却下理由を選択してください。"); return; }
+            if (!message) { alert("送信する文章を入力してください。"); return; }
+            if (!confirm("この定型文を送信しますか？")) return;
+
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "sendRejectMessage",
+                        email: userEmail,
+                        suggestionId: suggestionId,
+                        rejectType: type,
+                        message: message
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    // ステータスを回答完了にする（GAS 側でも行われる, だがここで再取得）
+                    await loadCouncilData(true);
+                    alert("定型文を送信しました。");
+                } else {
+                    alert("送信エラー: " + (result.message || "不明なエラー"));
+                }
+            } catch (e) {
+                console.error("sendRejectMessage error:", e);
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        // 委員会とメモの保存
+        async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
+            try {
+                // ローカル更新
+                const idx = allData.findIndex(it => it.id === suggestionId);
+                if (idx !== -1) {
+                    allData[idx].committee = committee;
+                    allData[idx].replyMemo = replyMemo;
+                }
+
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "updateCommitteeAndMemo",
+                        email: userEmail,
+                        suggestionId: suggestionId,
+                        committee: committee,
+                        replyMemo: replyMemo
+                    })
+                });
+                const result = await res.json();
+                if (result.status !== "success") {
+                    alert("保存エラー: " + (result.message || "不明なエラー"));
+                }
+            } catch (e) {
+                console.error("saveCommitteeAndMemo error:", e);
+            }
+        }
+
+        // 開示承認（副会長 / 管理者 / 教師）
+        async function approveRequest(suggestionId, roleToApprove) {
+            if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
+            try {
+                const res = await fetch(GAS_API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "approveDisclosure",
+                        email: userEmail,
+                        suggestionId: suggestionId,
+                        role: roleToApprove
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert("承認を記録しました！");
+                    await loadCouncilData(true);
+                } else {
+                    alert("エラー: " + (result.message || "不明なエラー"));
+                }
+            } catch (e) {
+                console.error("approveRequest error:", e);
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        // -------------------------
+        // 既存のロード / レンダリング
+        // -------------------------
         async function loadCouncilData(force = false) {
-            // force=true の場合は強制再取得
             if (!force && initialLoaded) return;
             if (loadInProgress) return;
             loadInProgress = true;
@@ -154,7 +343,6 @@
                     </td>
                 </tr>`;
 
-            // 権限チェック（外側の userRole を利用）
             if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson") {
                 console.error("権限がありません");
                 loadInProgress = false;
@@ -173,8 +361,6 @@
 
                 allData = data;
                 filterAndRenderData();
-
-                // 成功したら初回ロードフラグを立てる
                 initialLoaded = true;
 
             } catch (error) {
@@ -189,7 +375,7 @@
             const statusFilter = document.getElementById("filter-status").value;
             const committeeFilter = document.getElementById("filter-committee").value;
 
-            tableBody.innerHTML = ""; // テーブルを初期化
+            tableBody.innerHTML = "";
 
             const filteredData = allData.filter(item => {
                 let matchStatus = true;
@@ -230,12 +416,6 @@
                 if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200";
                 if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
 
-                // approvalControls, committeeSelectHTML, memoHTML, chatButtonHTML ...（元のコードと同様）
-                // ここでは元のテンプレートをそのまま再利用します（省略せずにそのまま残してください）
-                // --- 以下は元の render ロジックをそのまま貼る必要があります ---
-                // 省略せずに元の block をそのまま使ってください（長いので略しませんが、元の file の同様の箇所をここに移して下さい）
-                // 実際の差し替えでは、元の filterAndRenderData の中身をそのままここに残してください。
-                // For brevity in this message I will just reuse the original building block:
                 let approvalControlsHTML = "";
                 if (item.status === "開示請求") {
                     approvalControlsHTML = `
@@ -266,8 +446,8 @@
                 }
 
                 let committeeSelectHTML = `
-                    <select id="commit-${item.id}" 
-                            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)" 
+                    <select id="commit-${item.id}"
+                            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)"
                             class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm cursor-pointer transition hover:border-gray-400">
                         <option value="未割り当て" ${(!item.committee || item.committee === '未割り当て') ? 'selected' : ''}>❓ 未割り当て</option>
                         <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
@@ -284,7 +464,7 @@
                         <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
                         <div class="flex gap-1.5">
                             <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo || ''}</textarea>
-                            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)" 
+                            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)"
                                     class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm active:scale-95">
                                 保存
                             </button>
@@ -434,6 +614,13 @@
             loadCouncilData();
             monitorPdfShare();
             setInterval(monitorPdfShare, 5000);
+
+            // 他タブで変更があれば強制再取得（optional）
+            window.addEventListener('storage', (ev) => {
+                if (ev.key === 'systemStatusChanged' || ev.key === 'councilDataChanged') {
+                    loadCouncilData(true);
+                }
+            });
         });
     </script>
 </body>
