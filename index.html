@@ -244,7 +244,7 @@
     window.addEventListener("DOMContentLoaded", () => {
         const splash = document.getElementById("splash-screen");
         const firstLaunch = !localStorage.getItem("splashShown");
-        const delay = firstLaunch ? 3000 : 1000;
+        const delay = firstLaunch ? 4000 : 2000;
         localStorage.setItem("splashShown","true");
 
         const loadingTimer = setInterval(() => {
