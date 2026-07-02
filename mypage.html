@@ -31,21 +31,144 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
 
-   
         .announcement-important {
-    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-    border-left: 4px solid #dc2626 !important;
-    border-color: #fecaca !important;
-}
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
+            border-left: 4px solid #dc2626 !important;
+            border-color: #fecaca !important;
+        }
 
-.announcement-important .announcement-icon {
-    color: #dc2626 !important;
-}
+        .announcement-important .announcement-icon {
+            color: #dc2626 !important;
+        }
 
-.announcement-important .announcement-label {
-    background: #dc2626 !important;
-    color: white !important;
-}
+        .announcement-important .announcement-label {
+            background: #dc2626 !important;
+            color: white !important;
+        }
+
+        /* ====== Tanabata decorations ====== */
+        /* container under the nav */
+        #tanabata-decor {
+            position: relative;
+            pointer-events: none; /* 装飾なのでクリックは無効 */
+        }
+        /* star field */
+        .tanabata-stars {
+            position: absolute;
+            inset: 0;
+            z-index: 15;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .tanabata-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle at 30% 30%, #fff7d6, rgba(255,255,255,0.0));
+            border-radius: 50%;
+            opacity: 0.9;
+            transform: translate3d(0,0,0);
+            will-change: transform, opacity;
+            animation: star-twinkle 3s infinite ease-in-out;
+        }
+        @keyframes star-twinkle {
+            0% { transform: scale(0.7); opacity: 0.6; }
+            50% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(0.7); opacity: 0.6; }
+        }
+
+        /* bamboo and tanzaku (short strips) */
+        .tanabata-bamboo {
+            display:flex;
+            gap: 12px;
+            align-items:flex-start;
+            padding: 12px 14px;
+            z-index: 20;
+            position: relative;
+        }
+        .tanabata-bamboo .bamboo-stem {
+            width: 6px;
+            height: 80px;
+            background: linear-gradient(180deg,#2e7d32,#1b5e20);
+            border-radius: 6px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+        }
+        .tanabata-bamboo .tanzaku-list {
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            margin-left: 10px;
+        }
+        .tanzaku {
+            width: 120px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight:700;
+            color:#0f172a;
+            background: linear-gradient(180deg,#fff7c3,#fffbeb);
+            box-shadow: 0 6px 14px rgba(19,1,130,0.06);
+            transform-origin: top left;
+            animation: tanzaku-sway 3.6s ease-in-out infinite;
+            pointer-events: auto;
+        }
+        .tanzaku:nth-child(2) { animation-delay: 0.2s; background: linear-gradient(180deg,#d6f7ff,#ecfeff); color:#042b40; }
+        .tanzaku:nth-child(3) { animation-delay: 0.4s; background: linear-gradient(180deg,#ffd6f0,#fff0fb); color:#3b0b2f; }
+        @keyframes tanzaku-sway {
+            0% { transform: rotate(-3deg) translateY(0); }
+            50% { transform: rotate(3deg) translateY(2px); }
+            100% { transform: rotate(-3deg) translateY(0); }
+        }
+
+        /* small badge on top-right of bamboo (date label) */
+        .tanabata-date-badge {
+            background: linear-gradient(90deg,#fde68a,#fef3c7);
+            color: #92400e;
+            font-weight: 800;
+            font-size:12px;
+            padding:6px 10px;
+            border-radius:999px;
+            box-shadow: 0 6px 18px rgba(249,115,22,0.08);
+            margin-left:auto;
+        }
+
+        /* small floating ribbon on the right-bottom corner (decorative) */
+        .tanabata-floating {
+            position: fixed;
+            right: 18px;
+            bottom: 90px;
+            z-index: 40;
+            pointer-events: none;
+            display:flex;
+            gap:8px;
+            align-items:center;
+            transform-origin:center;
+            animation: floatY 4s ease-in-out infinite;
+        }
+        .tanabata-floating .ribbon {
+            width: 48px;
+            height: 80px;
+            background: linear-gradient(180deg,#fff7c3,#ffd6a5);
+            border-radius: 10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:800;
+            color:#6b2d00;
+            box-shadow: 0 12px 26px rgba(19,1,130,0.08);
+        }
+        @keyframes floatY {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-8px) rotate(-1deg); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Responsiveness */
+        @media (max-width: 640px) {
+            .tanzaku { width: 90px; font-size:11px; padding:5px 8px; }
+            .tanabata-floating { display: none; } /* モバイルでは非表示 */
+        }
+
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
@@ -67,6 +190,23 @@
             </div>
         </div>
     </nav>
+
+    <!-- Tanabata decorations (will show conditionally by JS) -->
+    <div id="tanabata-decor" class="hidden" aria-hidden="true" role="presentation">
+        <div class="tanabata-stars" id="tanabata-stars" aria-hidden="true"></div>
+
+        <div class="max-w-4xl mx-auto px-5">
+            <div class="tanabata-bamboo rounded-xl bg-white/0 p-2 flex items-center">
+                <div class="bamboo-stem" aria-hidden="true"></div>
+                <div class="tanzaku-list">
+                    <div class="tanzaku">みんなの願いがかないますように</div>
+                    <div class="tanzaku">安全で楽しい学校生活を</div>
+                    <div class="tanzaku">七夕 7/7</div>
+                </div>
+                <div class="tanabata-date-badge ml-auto">7月7日 - 七夕</div>
+            </div>
+        </div>
+    </div>
 
     <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
 
@@ -206,14 +346,54 @@
             </div>
         </div>
     </main>
-<footer class="max-w-4xl mx-auto text-center text-xs text-slate-400 py-6 select-none">
-  <div class="text-[13px] font-medium text-slate-500">© 2026 第一高校 生徒会 All Rights Reserved.</div>
-</footer>
+
+    <!-- floating ribbon (decorative) -->
+    <div class="tanabata-floating hidden" id="tanabata-floating" aria-hidden="true">
+        <div class="ribbon">願</div>
+        <div class="ribbon">短</div>
+    </div>
+
     <script>
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
         const userEmail = sessionStorage.getItem("user_email");
         const userRole = sessionStorage.getItem("user_role");
+
+        // Show Tanabata decorations on 7/7 or if preview ?tanabata=1
+        (function tanabataInit(){
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const forceShow = urlParams.get('tanabata') === '1';
+                const now = new Date();
+                const isTanabataDay = (now.getMonth() === 6 && now.getDate() === 7); // July is month 6
+                if (forceShow || isTanabataDay) {
+                    const decor = document.getElementById('tanabata-decor');
+                    const floating = document.getElementById('tanabata-floating');
+                    const starsContainer = document.getElementById('tanabata-stars');
+                    if (decor) decor.classList.remove('hidden');
+                    if (floating) floating.classList.remove('hidden');
+
+                    // create some stars at random positions
+                    if (starsContainer) {
+                        const starCount = 20;
+                        for (let i = 0; i < starCount; i++) {
+                            const s = document.createElement('div');
+                            s.className = 'tanabata-star';
+                            // random positions across the nav + decor width region
+                            s.style.left = (5 + Math.random()*90) + '%';
+                            s.style.top = (Math.random()*60 + 5) + '%';
+                            s.style.width = (2 + Math.random()*5) + 'px';
+                            s.style.height = s.style.width;
+                            s.style.animationDuration = (2 + Math.random()*3) + 's';
+                            s.style.opacity = (0.5 + Math.random()*0.6);
+                            starsContainer.appendChild(s);
+                        }
+                    }
+                }
+            } catch(e) {
+                console.error('tanabata init error', e);
+            }
+        })();
 
         if (!userEmail) {
             window.location.href = "index.html";
@@ -236,13 +416,13 @@
         }
 
         const logoutBtn = document.getElementById("btn-logout");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("login_session"); // ← これを追加
-        sessionStorage.clear();
-        window.location.href = "index.html";
-    });
-}
+        if (logoutBtn) {
+            logoutBtn.addEventListener("click", () => {
+                localStorage.removeItem("login_session"); // ← これを追加
+                sessionStorage.clear();
+                window.location.href = "index.html";
+            });
+        }
 
         function updateCountdown() {
             const el = document.getElementById("countdown-days");
@@ -279,11 +459,11 @@ if (logoutBtn) {
                     const latest = data.list[0];
                     const card = document.getElementById("announcement-card");
 
-if (latest.important) {
-    card.classList.add("announcement-important");
-} else {
-    card.classList.remove("announcement-important");
-}
+                    if (latest.important) {
+                        card.classList.add("announcement-important");
+                    } else {
+                        card.classList.remove("announcement-important");
+                    }
                     titleEl.textContent = latest.title;
                     contentEl.textContent = latest.content;
                     dateEl.textContent = latest.date;
@@ -297,91 +477,90 @@ if (latest.important) {
             }
         }
 
-      async function loadSuggestions() {
-    try {
-        const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
-        const data = await res.json();
+        async function loadSuggestions() {
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
+                const data = await res.json();
 
-        document.getElementById("list-loading").classList.add("hidden");
-        const listContainer = document.getElementById("suggestion-list");
-        listContainer.innerHTML = "";
+                document.getElementById("list-loading").classList.add("hidden");
+                const listContainer = document.getElementById("suggestion-list");
+                listContainer.innerHTML = "";
 
-        if (!data || data.length === 0) {
-            document.getElementById("list-empty").classList.remove("hidden");
-            return;
-        }
+                if (!data || data.length === 0) {
+                    document.getElementById("list-empty").classList.remove("hidden");
+                    return;
+                }
 
-        document.getElementById("list-empty").classList.add("hidden");
+                document.getElementById("list-empty").classList.add("hidden");
 
-        data.forEach((item, index) => {
-            let statusText = "受付";
-            let stepClass = "w-1/3";
-            let statusColor = "bg-indigo-600";
+                data.forEach((item, index) => {
+                    let statusText = "受付";
+                    let stepClass = "w-1/3";
+                    let statusColor = "bg-indigo-600";
 
-            if (item.status === "生徒会検討中") {
-                statusText = "生徒会で検討中";
-                stepClass = "w-2/3";
-                statusColor = "bg-amber-500";
-            } else if (item.status === "先生方検討中") {
-                statusText = "先生方で検討中";
-                stepClass = "w-2/3";
-                statusColor = "bg-purple-500";
-            } else if (item.status === "回答完了") {
-                statusText = "回答・対応完了";
-                stepClass = "w-full";
-                statusColor = "bg-emerald-500";
+                    if (item.status === "生徒会検討中") {
+                        statusText = "生徒会で検討中";
+                        stepClass = "w-2/3";
+                        statusColor = "bg-amber-500";
+                    } 
+                    else if (item.status === "先生方検討中") {
+                        statusText = "先生方で検討中";
+                        stepClass = "w-2/3";
+                        statusColor = "bg-purple-500";
+                    } 
+                    else if (item.status === "回答完了") {
+                        statusText = "回答・対応完了";
+                        stepClass = "w-full";
+                        statusColor = "bg-emerald-500";
+                    }
+
+                    const unreadBadge = item.hasUnread 
+                        ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
+                             <i class="fas fa-comment-dots"></i> 返信あり
+                           </span>`
+                        : '';
+
+                    const borderClass = item.hasUnread 
+                        ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10" 
+                        : "border-slate-100 hover:border-slate-200";
+
+                    const card = document.createElement("div");
+                    card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
+                    card.style.animationDelay = `${index * 0.08}s`;
+                    card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
+
+                    // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
+                    const publishBadge = item.publishToHomepage ? `<div class="absolute left-4 top-4 inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</div>` : '';
+
+                    card.innerHTML = `
+                        ${unreadBadge}
+                        ${publishBadge}
+                        <div class="flex items-center space-x-2 text-[11px] font-black text-slate-400 mb-2.5">
+                            <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
+                            <span class="font-mono">${item.date}</span>
+                        </div>
+                        <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
+                        <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
+                        
+                        <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
+                                <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
+                                <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
+                                <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
+                            </div>
+                            <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+                                <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
             }
-
-            const unreadBadge = item.hasUnread
-                ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
-                     <i class="fas fa-comment-dots"></i> 返信あり
-                   </span>`
-                : '';
-
-            const borderClass = item.hasUnread
-                ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10"
-                : "border-slate-100 hover:border-slate-200";
-
-            const card = document.createElement("div");
-            card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
-            card.style.animationDelay = `${index * 0.08}s`;
-            card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
-
-            // publishBadge を定義（boolean/文字列どちらにも対応）
-            const publishBadge = (!!item.publishToHomepage)
-                ? `<span class="inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</span>`
-                : '';
-
-            // ヘッダー行を flex-wrap にしてバッジとカテゴリが重ならないようにする
-            card.innerHTML = `
-                ${unreadBadge}
-                <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
-                    <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
-                    ${publishBadge}
-                    <span class="font-mono">${item.date}</span>
-                </div>
-                <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
-                <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
-                
-                <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
-                        <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
-                        <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
-                        <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
-                    </div>
-                    <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                        <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
-                    </div>
-                </div>
-            `;
-            listContainer.appendChild(card);
-        });
-
-    } catch (error) {
-        console.error(error);
-        document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
-    }
-}
+        }
 
         document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -408,7 +587,7 @@ if (latest.important) {
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    alert("投書を受け付けました！生徒会からの返答をお待ちください。");
+                    alert("意見を匿名で安全に受け付けました！生徒会からの返答・対話をお待ちください。");
                     document.getElementById("suggestion-form").reset();
                     loadSuggestions();
                 } else {
@@ -419,7 +598,7 @@ if (latest.important) {
                 alert("通信エラーが発生しました。");
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerText = "送信する";
+                btnSubmit.innerText = "匿名で送信する";
                 btnSubmit.classList.remove("opacity-50", "pointer-events-none");
             }
         });
@@ -431,39 +610,23 @@ if (latest.important) {
         };
 
         async function checkSystemStatus() {
-    const alertEl = document.getElementById("maintenance-alert");
-    const btnSubmit = document.getElementById("btn-submit");
+            const alertEl = document.getElementById("maintenance-alert");
+            const btnSubmit = document.getElementById("btn-submit");
 
-    try {
-        // キャッシュバスターを付与
-        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus&_=${Date.now()}`);
-        const data = await res.json();
+            try {
+                const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
+                const data = await res.json();
 
-        if (data.status === "success" && data.systemStatus === "maintenance") {
-            alertEl.classList.remove("hidden");
-            btnSubmit.disabled = true;
-            btnSubmit.className = "w-full bg-slate-200 text-slate-400 font-bold py-3.5 rounded-2xl text-xs shadow-inner cursor-not-allowed tracking-widest";
-            btnSubmit.innerText = "ただいま受付停止中です";
-        } else {
-            // 受付中なら隠す（保険）
-            if (alertEl) alertEl.classList.add("hidden");
-            if (btnSubmit) {
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = "匿名で送信する";
-                btnSubmit.className = "w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5";
+                if (data.status === "success" && data.systemStatus === "maintenance") {
+                    alertEl.classList.remove("hidden");
+                    btnSubmit.disabled = true;
+                    btnSubmit.className = "w-full bg-slate-200 text-slate-400 font-bold py-3.5 rounded-2xl text-xs shadow-inner cursor-not-allowed tracking-widest";
+                    btnSubmit.innerText = "ただいま受付停止中です";
+                }
+            } catch (e) {
+                console.error("システムステータスの取得に失敗しました:", e);
             }
         }
-    } catch (e) {
-        console.error("システムステータスの取得に失敗しました:", e);
-    }
-}
-
-// 他タブの通知を受けて最新化
-window.addEventListener('storage', (ev) => {
-    if (ev.key === 'systemStatusChanged') {
-        try { checkSystemStatus(); } catch(e){ console.error(e); }
-    }
-});
 
         function toggleBugModal() {
             const modal = document.getElementById("bug-modal");
