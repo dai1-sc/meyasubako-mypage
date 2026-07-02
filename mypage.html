@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - マイページ</title>
     <link class="w-8 h-8 object-contain" rel="icon" href="log.png" type="image/png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#130182">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="デジタル目安箱">
+     <!-- ブラウザ用 -->
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
+<!-- iPhone・iPad ホーム画面 -->
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<!-- Android・PWA -->
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#130182">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="デジタル目安箱">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -25,130 +31,26 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
 
+   
         .announcement-important {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-            border-left: 4px solid #dc2626 !important;
-            border-color: #fecaca !important;
-        }
-        .announcement-important .announcement-icon { color: #dc2626 !important; }
-        .announcement-important .announcement-label { background: #dc2626 !important; color: white !important; }
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
+    border-left: 4px solid #dc2626 !important;
+    border-color: #fecaca !important;
+}
 
-        /* ========== 七夕デコレーション ========== */
-        #tanabata-decor {
-            position: fixed;
-            right: 18px;
-            top: 90px;
-            width: 160px;
-            pointer-events: none;
-            z-index: 40;
-        }
+.announcement-important .announcement-icon {
+    color: #dc2626 !important;
+}
 
-        /* hide decorations on very small screens */
-        @media (max-width: 640px) {
-            #tanabata-decor { display: none; }
-        }
-
-        .bamboo {
-            width: 100%;
-            height: auto;
-            display: block;
-            transform-origin: center top;
-            animation: bamboo-sway 6s ease-in-out infinite;
-            opacity: 0.95;
-        }
-
-        @keyframes bamboo-sway {
-            0% { transform: rotate(-1deg); }
-            50% { transform: rotate(1.5deg); }
-            100% { transform: rotate(-1deg); }
-        }
-
-        .tanzaku {
-            position: absolute;
-            left: 10%;
-            top: 12%;
-            transform-origin: top center;
-            animation: tanzaku-sway 4s ease-in-out infinite;
-            display: flex;
-            gap: 6px;
-            flex-direction: column;
-        }
-        .tanzaku .card {
-            width: 86px;
-            padding: 6px 8px;
-            border-radius: 6px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-            font-size: 11px;
-            font-weight: 700;
-            color: #083344;
-            text-align: center;
-            transform-origin: top center;
-            background: linear-gradient(180deg,#fff9f0, #fff2ea);
-        }
-        .tanzaku .t-1 { background: linear-gradient(180deg,#fef3c7,#fff6db); }
-        .tanzaku .t-2 { background: linear-gradient(180deg,#e0f2fe,#eaf8ff); color:#0b3b5b; }
-        .tanzaku .t-3 { background: linear-gradient(180deg,#f0fdf4,#ecfff1); color:#0a5b37; }
-
-        @keyframes tanzaku-sway {
-            0% { transform: rotate(-6deg); }
-            50% { transform: rotate(6deg); }
-            100% { transform: rotate(-6deg); }
-        }
-
-        /* 流れ星アニメーション（背景） */
-        .shooting-star {
-            position: fixed;
-            top: -10vh;
-            left: 0;
-            width: 2px;
-            height: 2px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
-            opacity: 0;
-            transform: rotate(-20deg);
-            z-index: 30;
-            pointer-events: none;
-        }
-        @keyframes star-move {
-            0% { transform: translate3d(0,0,0) scaleX(1); opacity: 0; }
-            10% { opacity: 1; }
-            100% { transform: translate3d(120vw, 80vh, 0) scaleX(1.4); opacity: 0; }
-        }
-
-        /* small responsive tweaks for card badges */
-        .card .publish-badge {
-            position: absolute;
-            left: 14px;
-            top: 14px;
-            font-size: 11px;
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 6px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(4,120,87,0.06);
-            display: inline-flex;
-            gap: 6px;
-            align-items: center;
-            box-shadow: 0 6px 14px rgba(6,95,70,0.04);
-            z-index: 6;
-        }
-
-        /* ensure card inner content doesn't hide behind badge */
-        .card .content-top {
-            padding-left: 0.5rem;
-            padding-top: 22px;
-        }
-
-        /* make category and date wrap nicely */
-        .meta-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-
-        /* small helper to show unseen badge */
-        .unread-badge { position:absolute; right:14px; top:14px; z-index:7; }
-
+.announcement-important .announcement-label {
+    background: #dc2626 !important;
+    color: white !important;
+}
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
 
-    <nav class="brand-bg text-white shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
+    <nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
         <div class="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2.5 transform hover:scale-105 transition duration-300 cursor-pointer">
                 <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain drop-shadow">
@@ -166,36 +68,7 @@
         </div>
     </nav>
 
-    <!-- 七夕デコレーション（右側） -->
-    <div id="tanabata-decor" aria-hidden="true">
-        <!-- 笹の葉（簡易SVG） -->
-        <svg class="bamboo" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-            <defs>
-                <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0" stop-color="#68d391" />
-                    <stop offset="1" stop-color="#2f855a" />
-                </linearGradient>
-            </defs>
-            <rect x="90" y="0" width="20" height="400" rx="10" fill="#9AE6B4"/>
-            <!-- 笹の葉を描く -->
-            <path d="M100 40 C 30 60, 30 120, 100 140" fill="url(#g)" opacity="0.95"/>
-            <path d="M100 80 C 170 100, 170 160, 100 180" fill="url(#g)" opacity="0.95"/>
-            <path d="M100 150 C 30 170, 30 230, 100 250" fill="url(#g)" opacity="0.95"/>
-            <path d="M100 220 C 170 240, 170 300, 100 320" fill="url(#g)" opacity="0.95"/>
-        </svg>
-
-        <!-- 短冊（短冊は絶対配置でぶら下がる） -->
-        <div class="tanzaku" style="left: 8px; top: 40px;">
-            <div class="card t-1">夢が叶いますように</div>
-            <div class="card t-2">もっと部活が楽しくなりますように</div>
-            <div class="card t-3">テストがうまくいきますように</div>
-        </div>
-    </div>
-
-    <!-- 流れ星（ランダムに生成してアニメを当てるためJSで複数生成） -->
-    <div id="stars-container"></div>
-
-    <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24 relative">
+    <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
 
         <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
             <div class="flex-1">
@@ -207,7 +80,10 @@
                     <i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
                 </div>
             </div>
-        </div>
+             </div>
+
+         
+
 
         <div id="announcement-banner" class="hidden mb-8 space-y-3 animate__animated animate__fadeInDown">
             <div id="announcement-card" class="bg-gradient-to-r from-indigo-50/70 to-purple-50/70 border-l-4 border-indigo-600 p-5 rounded-r-3xl shadow-sm border border-l-0 border-indigo-100/50">
@@ -347,9 +223,9 @@
 
             const councilBtn = document.getElementById("council-toggle-btn");
             if (councilBtn && (
-                userRole === "council" ||
-                userRole === "chairperson" ||
-                userRole === "vice_president" ||
+                userRole === "council" || 
+                userRole === "chairperson" || 
+                userRole === "vice_president" || 
                 userRole === "teacher"
             )) {
                 councilBtn.classList.remove("hidden");
@@ -358,32 +234,13 @@
         }
 
         const logoutBtn = document.getElementById("btn-logout");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                localStorage.removeItem("login_session");
-                sessionStorage.clear();
-                window.location.href = "index.html";
-            });
-        }
-
-        /* 流れ星をいくつかランダムに生成してアニメを当てる（見た目の飾り） */
-        (function createShootingStars(){
-            const container = document.getElementById('stars-container');
-            if(!container) return;
-            const count = 3;
-            for(let i=0;i<count;i++){
-                const s = document.createElement('div');
-                s.className = 'shooting-star';
-                const delay = Math.random()*6;
-                s.style.left = `${Math.random()*30}vw`;
-                s.style.top = `${-10 - Math.random()*10}vh`;
-                s.style.width = `${2 + Math.random()*2}px`;
-                s.style.height = `${2 + Math.random()*8}px`;
-                s.style.opacity = 0;
-                s.style.animation = `star-move 2s ${delay}s linear infinite`;
-                container.appendChild(s);
-            }
-        })();
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("login_session"); // ← これを追加
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+}
 
         function updateCountdown() {
             const el = document.getElementById("countdown-days");
@@ -392,7 +249,7 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const target = new Date(today.getFullYear(), 6, 30);
+            const target = new Date(today.getFullYear(), 6, 30); 
             if (target < today) target.setFullYear(target.getFullYear() + 1);
 
             const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
@@ -420,11 +277,11 @@
                     const latest = data.list[0];
                     const card = document.getElementById("announcement-card");
 
-                    if (latest.important) {
-                        card.classList.add("announcement-important");
-                    } else {
-                        card.classList.remove("announcement-important");
-                    }
+if (latest.important) {
+    card.classList.add("announcement-important");
+} else {
+    card.classList.remove("announcement-important");
+}
                     titleEl.textContent = latest.title;
                     contentEl.textContent = latest.content;
                     dateEl.textContent = latest.date;
@@ -463,48 +320,44 @@
                         statusText = "生徒会で検討中";
                         stepClass = "w-2/3";
                         statusColor = "bg-amber-500";
-                    }
+                    } 
                     else if (item.status === "先生方検討中") {
                         statusText = "先生方で検討中";
                         stepClass = "w-2/3";
                         statusColor = "bg-purple-500";
-                    }
+                    } 
                     else if (item.status === "回答完了") {
                         statusText = "回答・対応完了";
                         stepClass = "w-full";
                         statusColor = "bg-emerald-500";
                     }
 
-                    const unreadBadge = item.hasUnread
-                        ? `<span class="unread-badge bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
+                    const unreadBadge = item.hasUnread 
+                        ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
                              <i class="fas fa-comment-dots"></i> 返信あり
                            </span>`
                         : '';
 
-                    const borderClass = item.hasUnread
-                        ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10"
+                    const borderClass = item.hasUnread 
+                        ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10" 
                         : "border-slate-100 hover:border-slate-200";
-
-                    const publishBadge = item.publishToHomepage
-                        ? `<div class="publish-badge"><i class="fas fa-check text-xs"></i><span>公開OK</span></div>`
-                        : '';
 
                     const card = document.createElement("div");
                     card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
-                    // カード内の構成 (publishBadge を絶対配置で表示。重なりを防ぐため content-top に余白を入れている)
-                    card.innerHTML = `
-                        ${publishBadge}
-                        ${unreadBadge}
-                        <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5 content-top">
-                            <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
-                            <span class="font-mono">${item.date}</span>
-                        </div>
-                        <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
-                        <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
-
+                    // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
+                  card.innerHTML = `
+    ${unreadBadge}
+    <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
+        <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
+        ${publishBadge}
+        <span class="font-mono">${item.date}</span>
+    </div>
+    <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
+    <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
+                        
                         <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                             <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
                                 <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
@@ -662,7 +515,7 @@
                 btn.innerText = "報告を送信する";
             }
         }
-
+        
     </script>
 </body>
 </html>
