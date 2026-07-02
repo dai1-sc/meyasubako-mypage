@@ -431,23 +431,39 @@ if (latest.important) {
         };
 
         async function checkSystemStatus() {
-            const alertEl = document.getElementById("maintenance-alert");
-            const btnSubmit = document.getElementById("btn-submit");
+    const alertEl = document.getElementById("maintenance-alert");
+    const btnSubmit = document.getElementById("btn-submit");
 
-            try {
-                const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
-                const data = await res.json();
+    try {
+        // キャッシュバスターを付与
+        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus&_=${Date.now()}`);
+        const data = await res.json();
 
-                if (data.status === "success" && data.systemStatus === "maintenance") {
-                    alertEl.classList.remove("hidden");
-                    btnSubmit.disabled = true;
-                    btnSubmit.className = "w-full bg-slate-200 text-slate-400 font-bold py-3.5 rounded-2xl text-xs shadow-inner cursor-not-allowed tracking-widest";
-                    btnSubmit.innerText = "ただいま受付停止中です";
-                }
-            } catch (e) {
-                console.error("システムステータスの取得に失敗しました:", e);
+        if (data.status === "success" && data.systemStatus === "maintenance") {
+            alertEl.classList.remove("hidden");
+            btnSubmit.disabled = true;
+            btnSubmit.className = "w-full bg-slate-200 text-slate-400 font-bold py-3.5 rounded-2xl text-xs shadow-inner cursor-not-allowed tracking-widest";
+            btnSubmit.innerText = "ただいま受付停止中です";
+        } else {
+            // 受付中なら隠す（保険）
+            if (alertEl) alertEl.classList.add("hidden");
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "匿名で送信する";
+                btnSubmit.className = "w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5";
             }
         }
+    } catch (e) {
+        console.error("システムステータスの取得に失敗しました:", e);
+    }
+}
+
+// 他タブの通知を受けて最新化
+window.addEventListener('storage', (ev) => {
+    if (ev.key === 'systemStatusChanged') {
+        try { checkSystemStatus(); } catch(e){ console.error(e); }
+    }
+});
 
         function toggleBugModal() {
             const modal = document.getElementById("bug-modal");
