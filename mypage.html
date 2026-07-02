@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デジタル目安箱 - マイページ</title>
-    <link class="w-8 h-8 object-contain" rel="icon" href="log.png" type="image/png">
-     <!-- ブラウザ用 -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デジタル目安箱 - マイページ</title>
+<link class="w-8 h-8 object-contain" rel="icon" href="log.png" type="image/png">
+<!-- ブラウザ用 -->
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <!-- iPhone・iPad ホーム画面 -->
@@ -18,604 +18,431 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="デジタル目安箱">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <style>
-        .brand-bg { background-color: #130182; }
-        .brand-text { color: #130182; }
-        .brand-border { border-color: #130182; }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<style>
+.brand-bg { background-color: #130182; }
+.brand-text { color: #130182; }
+.brand-border { border-color: #130182; }
 
-        .announcement-important {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-            border-left: 4px solid #dc2626 !important;
-            border-color: #fecaca !important;
-        }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
 
-        .announcement-important .announcement-icon {
-            color: #dc2626 !important;
-        }
 
-        .announcement-important .announcement-label {
-            background: #dc2626 !important;
-            color: white !important;
-        }
+.announcement-important {
+background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
+border-left: 4px solid #dc2626 !important;
+border-color: #fecaca !important;
+}
 
-        /* ====== Tanabata decorations ====== */
-        /* container under the nav */
-        #tanabata-decor {
-            position: relative;
-            pointer-events: none; /* 装飾なのでクリックは無効 */
-        }
-        /* star field */
-        .tanabata-stars {
-            position: absolute;
-            inset: 0;
-            z-index: 15;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .tanabata-star {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle at 30% 30%, #fff7d6, rgba(255,255,255,0.0));
-            border-radius: 50%;
-            opacity: 0.9;
-            transform: translate3d(0,0,0);
-            will-change: transform, opacity;
-            animation: star-twinkle 3s infinite ease-in-out;
-        }
-        @keyframes star-twinkle {
-            0% { transform: scale(0.7); opacity: 0.6; }
-            50% { transform: scale(1.4); opacity: 1; }
-            100% { transform: scale(0.7); opacity: 0.6; }
-        }
+.announcement-important .announcement-icon {
+color: #dc2626 !important;
+}
 
-        /* bamboo and tanzaku (short strips) */
-        .tanabata-bamboo {
-            display:flex;
-            gap: 12px;
-            align-items:flex-start;
-            padding: 12px 14px;
-            z-index: 20;
-            position: relative;
-        }
-        .tanabata-bamboo .bamboo-stem {
-            width: 6px;
-            height: 80px;
-            background: linear-gradient(180deg,#2e7d32,#1b5e20);
-            border-radius: 6px;
-            box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
-        }
-        .tanabata-bamboo .tanzaku-list {
-            display:flex;
-            flex-direction:column;
-            gap:8px;
-            margin-left: 10px;
-        }
-        .tanzaku {
-            width: 120px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight:700;
-            color:#0f172a;
-            background: linear-gradient(180deg,#fff7c3,#fffbeb);
-            box-shadow: 0 6px 14px rgba(19,1,130,0.06);
-            transform-origin: top left;
-            animation: tanzaku-sway 3.6s ease-in-out infinite;
-            pointer-events: auto;
-        }
-        .tanzaku:nth-child(2) { animation-delay: 0.2s; background: linear-gradient(180deg,#d6f7ff,#ecfeff); color:#042b40; }
-        .tanzaku:nth-child(3) { animation-delay: 0.4s; background: linear-gradient(180deg,#ffd6f0,#fff0fb); color:#3b0b2f; }
-        @keyframes tanzaku-sway {
-            0% { transform: rotate(-3deg) translateY(0); }
-            50% { transform: rotate(3deg) translateY(2px); }
-            100% { transform: rotate(-3deg) translateY(0); }
-        }
-
-        /* small badge on top-right of bamboo (date label) */
-        .tanabata-date-badge {
-            background: linear-gradient(90deg,#fde68a,#fef3c7);
-            color: #92400e;
-            font-weight: 800;
-            font-size:12px;
-            padding:6px 10px;
-            border-radius:999px;
-            box-shadow: 0 6px 18px rgba(249,115,22,0.08);
-            margin-left:auto;
-        }
-
-        /* small floating ribbon on the right-bottom corner (decorative) */
-        .tanabata-floating {
-            position: fixed;
-            right: 18px;
-            bottom: 90px;
-            z-index: 40;
-            pointer-events: none;
-            display:flex;
-            gap:8px;
-            align-items:center;
-            transform-origin:center;
-            animation: floatY 4s ease-in-out infinite;
-        }
-        .tanabata-floating .ribbon {
-            width: 48px;
-            height: 80px;
-            background: linear-gradient(180deg,#fff7c3,#ffd6a5);
-            border-radius: 10px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-weight:800;
-            color:#6b2d00;
-            box-shadow: 0 12px 26px rgba(19,1,130,0.08);
-        }
-        @keyframes floatY {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-8px) rotate(-1deg); }
-            100% { transform: translateY(0); }
-        }
-
-        /* Responsiveness */
-        @media (max-width: 640px) {
-            .tanzaku { width: 90px; font-size:11px; padding:5px 8px; }
-            .tanabata-floating { display: none; } /* モバイルでは非表示 */
-        }
-
-    </style>
+.announcement-important .announcement-label {
+background: #dc2626 !important;
+color: white !important;
+}
+</style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
 
-    <nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
-        <div class="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-2.5 transform hover:scale-105 transition duration-300 cursor-pointer">
-                <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain drop-shadow">
-                <span class="font-black tracking-widest text-base">デジタル目安箱</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-black px-3.5 py-2 rounded-xl transition-all duration-300 shadow-md shadow-amber-500/20 items-center gap-1.5 hover:-translate-y-0.5">
-                    <i class="fas fa-users-cog"></i> 生徒会用ページへ
-                </button>
+<nav class="brand-bg text-white shadow-lg shadow-indigo-900/10 sticky top-0 z-30 backdrop-blur-md bg-opacity-95 animate__animated animate__fadeInDown animate__fast">
+<div class="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
+<div class="flex items-center space-x-2.5 transform hover:scale-105 transition duration-300 cursor-pointer">
+<img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain drop-shadow">
+<span class="font-black tracking-widest text-base">デジタル目安箱</span>
+</div>
+<div class="flex items-center space-x-2">
+<button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-black px-3.5 py-2 rounded-xl transition-all duration-300 shadow-md shadow-amber-500/20 items-center gap-1.5 hover:-translate-y-0.5">
+<i class="fas fa-users-cog"></i> 生徒会用ページへ
+</button>
 
-                <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl transition-all duration-300 font-bold border border-white/10 hover:border-white/20">
-                    ログアウト
-                </button>
-            </div>
-        </div>
-    </nav>
+<button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl transition-all duration-300 font-bold border border-white/10 hover:border-white/20">
+ログアウト
+</button>
+</div>
+</div>
+</nav>
 
-    <!-- Tanabata decorations (will show conditionally by JS) -->
-    <div id="tanabata-decor" class="hidden" aria-hidden="true" role="presentation">
-        <div class="tanabata-stars" id="tanabata-stars" aria-hidden="true"></div>
+<main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
 
-        <div class="max-w-4xl mx-auto px-5">
-            <div class="tanabata-bamboo rounded-xl bg-white/0 p-2 flex items-center">
-                <div class="bamboo-stem" aria-hidden="true"></div>
-                <div class="tanzaku-list">
-                    <div class="tanzaku">みんなの願いがかないますように</div>
-                    <div class="tanzaku">安全で楽しい学校生活を</div>
-                    <div class="tanzaku">七夕 7/7</div>
-                </div>
-                <div class="tanabata-date-badge ml-auto">7月7日 - 七夕</div>
-            </div>
-        </div>
-    </div>
-
-    <main class="max-w-4xl mx-auto px-4 pt-8 md:pb-8 pb-24">
-
-        <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
-            <div class="flex-1">
-                <h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
-                    こんにちは！<span class="animate-bounce">👋</span>
-                </h1>
-                <p class="text-xs text-slate-400 mt-1 font-medium">ここでは、あなたの意見の進捗確認や、生徒会との個別の相談・対話ができます。</p>
-                <div class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 self-start mt-3 inline-flex items-center shadow-inner">
-                    <i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
-                </div>
-            </div>
-             </div>
-
-         
+<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 animate__animated animate__fadeInDown">
+<div class="flex-1">
+<h1 class="text-2xl font-black text-slate-800 tracking-wide flex items-center gap-2">
+こんにちは！<span class="animate-bounce">👋</span>
+</h1>
+<p class="text-xs text-slate-400 mt-1 font-medium">ここでは、あなたの意見の進捗確認や、生徒会との個別の相談・対話ができます。</p>
+<div class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-100 self-start mt-3 inline-flex items-center shadow-inner">
+<i class="fas fa-user-circle mr-2 text-indigo-500 text-sm"></i><span id="user-display" class="font-mono">---</span>
+</div>
+</div>
+</div>
 
 
-        <div id="announcement-banner" class="hidden mb-8 space-y-3 animate__animated animate__fadeInDown">
-            <div id="announcement-card" class="bg-gradient-to-r from-indigo-50/70 to-purple-50/70 border-l-4 border-indigo-600 p-5 rounded-r-3xl shadow-sm border border-l-0 border-indigo-100/50">
-                <div class="flex items-center gap-2 mb-2">
-                    <i class="fas fa-bullhorn announcement-icon text-indigo-600 animate-pulse text-sm"></i>
-                    <span class="announcement-label text-[11px] font-black text-indigo-800 tracking-wider bg-indigo-100 px-2.5 py-0.5 rounded-full">生徒会からのお知らせ</span>
-                    <span id="student-announcement-date" class="text-[10px] text-slate-400 ml-auto font-mono font-medium">--/-- --:--</span>
-                </div>
-                <h3 id="student-announcement-title" class="text-sm font-black text-slate-800 mb-1">読み込み中...</h3>
-                <p id="student-announcement-content" class="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed font-medium">お知らせを取得しています。</p>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-            <div class="md:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24 animate__animated animate__fadeInDown animate__delay-1s">
-                <h2 class="text-base font-black text-slate-800 mb-5 flex items-center tracking-wide">
-                    <i class="fas fa-pen-fancy brand-text mr-2 text-indigo-600"></i>意見を届ける
-                </h2>
-                <form id="suggestion-form" class="space-y-4">
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">カテゴリ</label>
-                        <div class="relative">
-                            <select id="form-category" class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-3.5 pr-10 py-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 appearance-none cursor-pointer" required>
-                                <option value="校則・制服">校則・制服について</option>
-                                <option value="行事・イベント">行事・イベントについて</option>
-                                <option value="部活動">部活動について</option>
-                                <option value="施設・設備">学校の施設・設備について</option>
-                                <option value="その他">その他</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">意見のタイトル</label>
-                        <input type="text" id="form-title" placeholder="（例）部活動着を着て下校させてほしい" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300" required>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">詳しい内容</label>
-                        <textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 resize-none leading-relaxed" required></textarea>
-                    </div>
+<div id="announcement-banner" class="hidden mb-8 space-y-3 animate__animated animate__fadeInDown">
+<div id="announcement-card" class="bg-gradient-to-r from-indigo-50/70 to-purple-50/70 border-l-4 border-indigo-600 p-5 rounded-r-3xl shadow-sm border border-l-0 border-indigo-100/50">
+<div class="flex items-center gap-2 mb-2">
+<i class="fas fa-bullhorn announcement-icon text-indigo-600 animate-pulse text-sm"></i>
+<span class="announcement-label text-[11px] font-black text-indigo-800 tracking-wider bg-indigo-100 px-2.5 py-0.5 rounded-full">生徒会からのお知らせ</span>
+<span id="student-announcement-date" class="text-[10px] text-slate-400 ml-auto font-mono font-medium">--/-- --:--</span>
+</div>
+<h3 id="student-announcement-title" class="text-sm font-black text-slate-800 mb-1">読み込み中...</h3>
+<p id="student-announcement-content" class="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed font-medium">お知らせを取得しています。</p>
+</div>
+</div>
 
-                    <!-- ここで公開確認チェックボックスを追加 -->
-                    <div class="flex items-start gap-2">
-                        <input id="form-publish" type="checkbox" class="mt-1 w-4 h-4 rounded border-slate-300 focus:ring-indigo-500" />
-                        <label for="form-publish" class="text-xs font-bold text-slate-600 leading-tight">この投書に対する回答をホームページで公開してもいいですか？（公開されるのは生徒会の回答部分のみで、投稿者の情報は匿名のままです）</label>
-                    </div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-                    <div id="maintenance-alert" class="hidden bg-red-50 border border-red-100 text-red-600 text-xs p-3.5 rounded-2xl font-bold flex items-start gap-2 animate-pulse">
-                        <i class="fas fa-exclamation-triangle mt-0.5 text-sm"></i>
-                        <span class="leading-relaxed">現在、生徒会目安箱は受付停止期間（またはメンテナンス中）のため、新しい意見の送信はできません。</span>
-                    </div>
-                    <button type="submit" id="btn-submit" class="w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5">
-                        匿名で送信する
-                    </button>
-                </form>
-            </div>
+<div class="md:col-span-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-100 h-fit md:sticky md:top-24 animate__animated animate__fadeInDown animate__delay-1s">
+<h2 class="text-base font-black text-slate-800 mb-5 flex items-center tracking-wide">
+<i class="fas fa-pen-fancy brand-text mr-2 text-indigo-600"></i>意見を届ける
+</h2>
+<form id="suggestion-form" class="space-y-4">
+<div>
+<label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">カテゴリ</label>
+<div class="relative">
+<select id="form-category" class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-3.5 pr-10 py-3 text-xs font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 appearance-none cursor-pointer" required>
+<option value="校則・制服">校則・制服について</option>
+<option value="行事・イベント">行事・イベントについて</option>
+<option value="部活動">部活動について</option>
+<option value="施設・設備">学校の施設・設備について</option>
+<option value="その他">その他</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400">
+<i class="fas fa-chevron-down text-xs"></i>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">意見のタイトル</label>
+<input type="text" id="form-title" placeholder="（例）部活動着を着て下校させてほしい" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300" required>
+</div>
+<div>
+<label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">詳しい内容</label>
+<textarea id="form-content" rows="5" placeholder="具体的な理由や提案があれば細かく記入してください。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-xs font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition duration-300 resize-none leading-relaxed" required></textarea>
+</div>
 
-            <div class="md:col-span-2 space-y-4 animate__animated animate__fadeInDown animate__delay-1s">
-    
-                <h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
-                    <i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
-                    あなたの投書と進捗
-                    <span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
-                </h2>
+<!-- ここで公開確認チェックボックスを追加 -->
+<div class="flex items-start gap-2">
+<input id="form-publish" type="checkbox" class="mt-1 w-4 h-4 rounded border-slate-300 focus:ring-indigo-500" />
+<label for="form-publish" class="text-xs font-bold text-slate-600 leading-tight">この投書に対する回答をホームページで公開してもいいですか？（公開されるのは生徒会の回答部分のみで、投稿者の情報は匿名のままです）</label>
+</div>
 
-                <div id="list-loading" class="space-y-4 py-2">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
-                        <div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
-                        <div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
-                        <div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
-                        <div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
-                    </div>
-                </div>
+<div id="maintenance-alert" class="hidden bg-red-50 border border-red-100 text-red-600 text-xs p-3.5 rounded-2xl font-bold flex items-start gap-2 animate-pulse">
+<i class="fas fa-exclamation-triangle mt-0.5 text-sm"></i>
+<span class="leading-relaxed">現在、生徒会目安箱は受付停止期間（またはメンテナンス中）のため、新しい意見の送信はできません。</span>
+</div>
+<button type="submit" id="btn-submit" class="w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5">
+匿名で送信する
+</button>
+</form>
+</div>
 
-                <div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
-                    <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-                    <p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
-                </div>
+<div class="md:col-span-2 space-y-4 animate__animated animate__fadeInDown animate__delay-1s">
 
-                <div id="suggestion-list" class="space-y-4"></div>
-            </div>
-        </div>
+<h2 class="text-base font-black text-slate-800 flex items-baseline tracking-wide mb-1">
+<i class="fas fa-history brand-text mr-2 text-indigo-600 self-center"></i>
+あなたの投書と進捗
+<span class="text-xs text-slate-400 font-medium ml-1.5">（投書をタップすると生徒会と連絡を取ることが可能です）</span>
+</h2>
 
-        <button onclick="toggleBugModal()" class="fixed bottom-6 right-6 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-black px-4 py-3 rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 flex items-center gap-1.5 z-40 border border-slate-700 hover:-translate-y-1">
-            <i class="fas fa-bug text-red-400 text-sm"></i> 不具合を報告
-        </button>
+<div id="list-loading" class="space-y-4 py-2">
+<div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse">
+<div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-20"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+<div class="h-6 bg-slate-100 rounded-xl w-3/4"></div>
+<div class="space-y-2"><div class="h-4 bg-slate-100 rounded-lg w-full"></div><div class="h-4 bg-slate-100 rounded-lg w-5/6"></div></div>
+<div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+</div>
+<div class="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 animate-pulse opacity-60">
+<div class="flex space-x-2"><div class="h-5 bg-slate-100 rounded-lg w-16"></div><div class="h-5 bg-slate-100 rounded-lg w-16"></div></div>
+<div class="h-6 bg-slate-100 rounded-xl w-1/2"></div>
+<div class="pt-2"><div class="h-2 bg-slate-100 rounded-full w-full"></div></div>
+</div>
+</div>
 
-        <div id="bug-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div id="bug-modal-card" class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
-                <h3 class="font-black text-slate-800 text-base mb-1 flex items-center gap-2">
-                    <i class="fas fa-bug text-red-500"></i> システムの不具合・バグ報告
-                </h3>
-                <p class="text-[11px] font-medium text-slate-400 mb-4 leading-relaxed">ボタンが動かない、画面が崩れるなど、目安箱システムの不具合を開発者（管理者）に直接報告できます。</p>
+<div id="list-empty" class="hidden bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center text-slate-400 animate__animated animate__fadeIn">
+<div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+<i class="fas fa-folder-open"></i>
+</div>
+<p class="text-xs font-bold text-slate-400">まだ投稿された意見はありません。</p>
+</div>
 
-                <textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-700 transition duration-300 resize-none mb-4 leading-relaxed" required></textarea>
+<div id="suggestion-list" class="space-y-4"></div>
+</div>
+</div>
 
-                <div class="mb-5">
-                    <label class="block text-[11px] font-black text-slate-400 tracking-wider mb-1.5">スクリーンショット・画像を添付（任意）</label>
-                    <input type="file" id="bug-file" accept="image/*" class="w-full text-xs border border-slate-200 p-2 rounded-2xl bg-slate-50 focus:outline-none file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-black file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer transition">
-                </div>
+<button onclick="toggleBugModal()" class="fixed bottom-6 right-6 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-black px-4 py-3 rounded-full shadow-xl shadow-slate-900/20 transition-all duration-300 flex items-center gap-1.5 z-40 border border-slate-700 hover:-translate-y-1">
+<i class="fas fa-bug text-red-400 text-sm"></i> 不具合を報告
+</button>
 
-                <div class="flex gap-2.5">
-                    <button onclick="toggleBugModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 text-xs font-black py-3 rounded-2xl transition duration-300">
-                        キャンセル
-                    </button>
-                    <button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-xs font-black py-3 rounded-2xl transition duration-300 shadow-lg shadow-slate-800/10">
-                        報告を送信する
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
+<div id="bug-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+<div id="bug-modal-card" class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
+<h3 class="font-black text-slate-800 text-base mb-1 flex items-center gap-2">
+<i class="fas fa-bug text-red-500"></i> システムの不具合・バグ報告
+</h3>
+<p class="text-[11px] font-medium text-slate-400 mb-4 leading-relaxed">ボタンが動かない、画面が崩れるなど、目安箱システムの不具合を開発者（管理者）に直接報告できます。</p>
 
-    <!-- floating ribbon (decorative) -->
-    <div class="tanabata-floating hidden" id="tanabata-floating" aria-hidden="true">
-        <div class="ribbon">願</div>
-        <div class="ribbon">短</div>
-    </div>
+<textarea id="bug-content" rows="4" placeholder="（例）チャットの送信ボタンを押しても反応しません。iPhoneから使っています。" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-xs font-medium focus:outline-none focus:ring-4 focus:ring-slate-100 focus:border-slate-700 transition duration-300 resize-none mb-4 leading-relaxed" required></textarea>
 
-    <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+<div class="mb-5">
+<label class="block text-[11px] font-black text-slate-400 tracking-wider mb-1.5">スクリーンショット・画像を添付（任意）</label>
+<input type="file" id="bug-file" accept="image/*" class="w-full text-xs border border-slate-200 p-2 rounded-2xl bg-slate-50 focus:outline-none file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[11px] file:font-black file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer transition">
+</div>
 
-        const userEmail = sessionStorage.getItem("user_email");
-        const userRole = sessionStorage.getItem("user_role");
+<div class="flex gap-2.5">
+<button onclick="toggleBugModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 active:scale-98 text-slate-600 text-xs font-black py-3 rounded-2xl transition duration-300">
+キャンセル
+</button>
+<button onclick="submitBugReport()" id="btn-bug-submit" class="flex-1 bg-slate-800 hover:bg-slate-900 active:scale-98 text-white text-xs font-black py-3 rounded-2xl transition duration-300 shadow-lg shadow-slate-800/10">
+報告を送信する
+</button>
+</div>
+</div>
+</div>
+</main>
+<footer class="max-w-4xl mx-auto text-center text-xs text-slate-400 py-6 select-none">
+<div class="text-[13px] font-medium text-slate-500">© 2026 第一高校 生徒会 All Rights Reserved.</div>
+</footer>
+<script>
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
-        // Show Tanabata decorations on 7/7 or if preview ?tanabata=1
-        (function tanabataInit(){
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const forceShow = urlParams.get('tanabata') === '1';
-                const now = new Date();
-                const isTanabataDay = (now.getMonth() === 6 && now.getDate() === 7); // July is month 6
-                if (forceShow || isTanabataDay) {
-                    const decor = document.getElementById('tanabata-decor');
-                    const floating = document.getElementById('tanabata-floating');
-                    const starsContainer = document.getElementById('tanabata-stars');
-                    if (decor) decor.classList.remove('hidden');
-                    if (floating) floating.classList.remove('hidden');
+const userEmail = sessionStorage.getItem("user_email");
+const userRole = sessionStorage.getItem("user_role");
 
-                    // create some stars at random positions
-                    if (starsContainer) {
-                        const starCount = 20;
-                        for (let i = 0; i < starCount; i++) {
-                            const s = document.createElement('div');
-                            s.className = 'tanabata-star';
-                            // random positions across the nav + decor width region
-                            s.style.left = (5 + Math.random()*90) + '%';
-                            s.style.top = (Math.random()*60 + 5) + '%';
-                            s.style.width = (2 + Math.random()*5) + 'px';
-                            s.style.height = s.style.width;
-                            s.style.animationDuration = (2 + Math.random()*3) + 's';
-                            s.style.opacity = (0.5 + Math.random()*0.6);
-                            starsContainer.appendChild(s);
-                        }
-                    }
-                }
-            } catch(e) {
-                console.error('tanabata init error', e);
-            }
-        })();
+if (!userEmail) {
+window.location.href = "index.html";
+} else {
+const userDisplay = document.getElementById("user-display");
+if (userDisplay) {
+userDisplay.innerText = userEmail;
+}
 
-        if (!userEmail) {
-            window.location.href = "index.html";
-        } else {
-            const userDisplay = document.getElementById("user-display");
-            if (userDisplay) {
-                userDisplay.innerText = userEmail;
-            }
+const councilBtn = document.getElementById("council-toggle-btn");
+if (councilBtn && (
+userRole === "council" || 
+userRole === "chairperson" || 
+userRole === "vice_president" || 
+userRole === "teacher"
+)) {
+councilBtn.classList.remove("hidden");
+councilBtn.classList.add("flex");
+}
+}
 
-            const councilBtn = document.getElementById("council-toggle-btn");
-            if (councilBtn && (
-                userRole === "council" || 
-                userRole === "chairperson" || 
-                userRole === "vice_president" || 
-                userRole === "teacher"
-            )) {
-                councilBtn.classList.remove("hidden");
-                councilBtn.classList.add("flex");
-            }
-        }
+const logoutBtn = document.getElementById("btn-logout");
+if (logoutBtn) {
+logoutBtn.addEventListener("click", () => {
+localStorage.removeItem("login_session"); // ← これを追加
+sessionStorage.clear();
+window.location.href = "index.html";
+});
+}
 
-        const logoutBtn = document.getElementById("btn-logout");
-        if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                localStorage.removeItem("login_session"); // ← これを追加
-                sessionStorage.clear();
-                window.location.href = "index.html";
-            });
-        }
+function updateCountdown() {
+const el = document.getElementById("countdown-days");
+if (!el) return;
 
-        function updateCountdown() {
-            const el = document.getElementById("countdown-days");
-            if (!el) return;
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+const target = new Date(today.getFullYear(), 6, 30); 
+if (target < today) target.setFullYear(target.getFullYear() + 1);
 
-            const target = new Date(today.getFullYear(), 6, 30); 
-            if (target < today) target.setFullYear(target.getFullYear() + 1);
+const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
 
-            const diff = Math.round((target - today) / (1000 * 60 * 60 * 24));
+if (diff === 0) {
+el.textContent = "0";
+el.closest(".countdown-widget").querySelector(".countdown-label").textContent = "🎉 Today!";
+} else {
+el.textContent = diff;
+}
+}
+updateCountdown();
 
-            if (diff === 0) {
-                el.textContent = "0";
-                el.closest(".countdown-widget").querySelector(".countdown-label").textContent = "🎉 Today!";
-            } else {
-                el.textContent = diff;
-            }
-        }
-        updateCountdown();
+async function loadLatestAnnouncement() {
+const banner = document.getElementById("announcement-banner");
+const titleEl = document.getElementById("student-announcement-title");
+const contentEl = document.getElementById("student-announcement-content");
+const dateEl = document.getElementById("student-announcement-date");
 
-        async function loadLatestAnnouncement() {
-            const banner = document.getElementById("announcement-banner");
-            const titleEl = document.getElementById("student-announcement-title");
-            const contentEl = document.getElementById("student-announcement-content");
-            const dateEl = document.getElementById("student-announcement-date");
+try {
+const res = await fetch(`${GAS_API_URL}?action=getAnnouncements`);
+const data = await res.json();
 
-            try {
-                const res = await fetch(`${GAS_API_URL}?action=getAnnouncements`);
-                const data = await res.json();
+if (data.status === "success" && data.list && data.list.length > 0) {
+const latest = data.list[0];
+const card = document.getElementById("announcement-card");
 
-                if (data.status === "success" && data.list && data.list.length > 0) {
-                    const latest = data.list[0];
-                    const card = document.getElementById("announcement-card");
+if (latest.important) {
+card.classList.add("announcement-important");
+} else {
+card.classList.remove("announcement-important");
+}
+titleEl.textContent = latest.title;
+contentEl.textContent = latest.content;
+dateEl.textContent = latest.date;
+banner.classList.remove("hidden");
+} else {
+banner.classList.add("hidden");
+}
+} catch (e) {
+console.error("アナウンスの取得に失敗しました:", e);
+if (banner) banner.classList.add("hidden");
+}
+}
 
-                    if (latest.important) {
-                        card.classList.add("announcement-important");
-                    } else {
-                        card.classList.remove("announcement-important");
-                    }
-                    titleEl.textContent = latest.title;
-                    contentEl.textContent = latest.content;
-                    dateEl.textContent = latest.date;
-                    banner.classList.remove("hidden");
-                } else {
-                    banner.classList.add("hidden");
-                }
-            } catch (e) {
-                console.error("アナウンスの取得に失敗しました:", e);
-                if (banner) banner.classList.add("hidden");
-            }
-        }
+async function loadSuggestions() {
+try {
+const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
+const data = await res.json();
 
-        async function loadSuggestions() {
-            try {
-                const res = await fetch(`${GAS_API_URL}?action=getStudentData&email=${encodeURIComponent(userEmail)}`);
-                const data = await res.json();
+document.getElementById("list-loading").classList.add("hidden");
+const listContainer = document.getElementById("suggestion-list");
+listContainer.innerHTML = "";
 
-                document.getElementById("list-loading").classList.add("hidden");
-                const listContainer = document.getElementById("suggestion-list");
-                listContainer.innerHTML = "";
+if (!data || data.length === 0) {
+document.getElementById("list-empty").classList.remove("hidden");
+return;
+}
 
-                if (!data || data.length === 0) {
-                    document.getElementById("list-empty").classList.remove("hidden");
-                    return;
-                }
+document.getElementById("list-empty").classList.add("hidden");
 
-                document.getElementById("list-empty").classList.add("hidden");
+data.forEach((item, index) => {
+let statusText = "受付";
+let stepClass = "w-1/3";
+let statusColor = "bg-indigo-600";
 
-                data.forEach((item, index) => {
-                    let statusText = "受付";
-                    let stepClass = "w-1/3";
-                    let statusColor = "bg-indigo-600";
+if (item.status === "生徒会検討中") {
+statusText = "生徒会で検討中";
+stepClass = "w-2/3";
+statusColor = "bg-amber-500";
+} else if (item.status === "先生方検討中") {
+statusText = "先生方で検討中";
+stepClass = "w-2/3";
+statusColor = "bg-purple-500";
+} else if (item.status === "回答完了") {
+statusText = "回答・対応完了";
+stepClass = "w-full";
+statusColor = "bg-emerald-500";
+}
 
-                    if (item.status === "生徒会検討中") {
-                        statusText = "生徒会で検討中";
-                        stepClass = "w-2/3";
-                        statusColor = "bg-amber-500";
-                    } 
-                    else if (item.status === "先生方検討中") {
-                        statusText = "先生方で検討中";
-                        stepClass = "w-2/3";
-                        statusColor = "bg-purple-500";
-                    } 
-                    else if (item.status === "回答完了") {
-                        statusText = "回答・対応完了";
-                        stepClass = "w-full";
-                        statusColor = "bg-emerald-500";
-                    }
+const unreadBadge = item.hasUnread
+? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
+                    <i class="fas fa-comment-dots"></i> 返信あり
+                  </span>`
+: '';
 
-                    const unreadBadge = item.hasUnread 
-                        ? `<span class="absolute top-4 right-4 bg-amber-500 text-white text-[10px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 animate-pulse shadow-sm shadow-amber-500/20">
-                             <i class="fas fa-comment-dots"></i> 返信あり
-                           </span>`
-                        : '';
+const borderClass = item.hasUnread
+? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10"
+: "border-slate-100 hover:border-slate-200";
 
-                    const borderClass = item.hasUnread 
-                        ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10" 
-                        : "border-slate-100 hover:border-slate-200";
+const card = document.createElement("div");
+card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
+card.style.animationDelay = `${index * 0.08}s`;
+card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
-                    const card = document.createElement("div");
-                    card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
-                    card.style.animationDelay = `${index * 0.08}s`;
-                    card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
+// publishBadge を定義（boolean/文字列どちらにも対応）
+const publishBadge = (!!item.publishToHomepage)
+? `<span class="inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</span>`
+: '';
 
-                    // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
-                    const publishBadge = item.publishToHomepage ? `<div class="absolute left-4 top-4 inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</div>` : '';
+// ヘッダー行を flex-wrap にしてバッジとカテゴリが重ならないようにする
+card.innerHTML = `
+               ${unreadBadge}
+               <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
+                   <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
+                   ${publishBadge}
+                   <span class="font-mono">${item.date}</span>
+               </div>
+               <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
+               <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
+               
+               <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                   <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
+                       <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
+                       <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
+                       <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
+                   </div>
+                   <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
+                       <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
+                   </div>
+               </div>
+           `;
+listContainer.appendChild(card);
+});
 
-                    card.innerHTML = `
-                        ${unreadBadge}
-                        ${publishBadge}
-                        <div class="flex items-center space-x-2 text-[11px] font-black text-slate-400 mb-2.5">
-                            <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
-                            <span class="font-mono">${item.date}</span>
-                        </div>
-                        <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
-                        <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
-                        
-                        <div class="space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                            <div class="flex justify-between text-[10px] font-black text-slate-400 tracking-wider">
-                                <span class="${item.status==='新規受付' || item.status==='受付' ? 'text-indigo-600' : ''}">① 受付完了</span>
-                                <span class="${item.status==='生徒会検討中' || item.status==='先生方検討中' ? 'text-amber-500' : ''}">② 検討中</span>
-                                <span class="${item.status==='回答完了' ? 'text-emerald-500' : ''}">③ 回答公開済み</span>
-                            </div>
-                            <div class="w-full bg-slate-200/70 h-2 rounded-full overflow-hidden">
-                                <div class="${statusColor} h-full ${stepClass} transition-all duration-1000 rounded-full"></div>
-                            </div>
-                        </div>
-                    `;
-                    listContainer.appendChild(card);
-                });
+} catch (error) {
+console.error(error);
+document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
+}
+}
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById("list-loading").innerHTML = `<p class="text-xs font-bold text-red-500 py-6">データの読み込みに失敗しました。電波環境を確認してください。</p>`;
-            }
-        }
+document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
+e.preventDefault();
+const btnSubmit = document.getElementById("btn-submit");
 
-        document.getElementById("suggestion-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const btnSubmit = document.getElementById("btn-submit");
+btnSubmit.disabled = true;
+btnSubmit.innerText = "送信しています...";
+btnSubmit.classList.add("opacity-50", "pointer-events-none");
 
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = "送信しています...";
-            btnSubmit.classList.add("opacity-50", "pointer-events-none");
+const payload = {
+action: "submitSuggestion",
+email: userEmail,
+category: document.getElementById("form-category").value,
+title: document.getElementById("form-title").value,
+content: document.getElementById("form-content").value,
+publishToHomepage: !!document.getElementById("form-publish").checked
+};
 
-            const payload = {
-                action: "submitSuggestion",
-                email: userEmail,
-                category: document.getElementById("form-category").value,
-                title: document.getElementById("form-title").value,
-                content: document.getElementById("form-content").value,
-                publishToHomepage: !!document.getElementById("form-publish").checked
-            };
+try {
+const res = await fetch(GAS_API_URL, {
+method: "POST",
+body: JSON.stringify(payload)
+});
+const result = await res.json();
 
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
+if (result.status === "success") {
+alert("投書を受け付けました！生徒会からの返答をお待ちください。");
+document.getElementById("suggestion-form").reset();
+loadSuggestions();
+} else {
+alert("送信エラー: " + result.message);
+}
+} catch (error) {
+console.error(error);
+alert("通信エラーが発生しました。");
+} finally {
+btnSubmit.disabled = false;
+btnSubmit.innerText = "送信する";
+btnSubmit.classList.remove("opacity-50", "pointer-events-none");
+}
+});
 
-                if (result.status === "success") {
-                    alert("意見を匿名で安全に受け付けました！生徒会からの返答・対話をお待ちください。");
-                    document.getElementById("suggestion-form").reset();
-                    loadSuggestions();
-                } else {
-                    alert("送信エラー: " + result.message);
-                }
-            } catch (error) {
-                console.error(error);
-                alert("通信エラーが発生しました。");
-            } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = "匿名で送信する";
-                btnSubmit.classList.remove("opacity-50", "pointer-events-none");
-            }
-        });
+window.onload = function() {
+checkSystemStatus();
+loadLatestAnnouncement();
+loadSuggestions();
+};
 
-        window.onload = function() {
-            checkSystemStatus();
-            loadLatestAnnouncement();
-            loadSuggestions();
-        };
-
-        async function checkSystemStatus() {
+async function checkSystemStatus() {
             const alertEl = document.getElementById("maintenance-alert");
             const btnSubmit = document.getElementById("btn-submit");
+    const alertEl = document.getElementById("maintenance-alert");
+    const btnSubmit = document.getElementById("btn-submit");
 
             try {
                 const res = await fetch(`${GAS_API_URL}?action=getSystemStatus`);
                 const data = await res.json();
+    try {
+        // キャッシュバスターを付与
+        const res = await fetch(`${GAS_API_URL}?action=getSystemStatus&_=${Date.now()}`);
+        const data = await res.json();
 
                 if (data.status === "success" && data.systemStatus === "maintenance") {
                     alertEl.classList.remove("hidden");
@@ -625,81 +452,104 @@
                 }
             } catch (e) {
                 console.error("システムステータスの取得に失敗しました:", e);
-            }
-        }
+        if (data.status === "success" && data.systemStatus === "maintenance") {
+            alertEl.classList.remove("hidden");
+            btnSubmit.disabled = true;
+            btnSubmit.className = "w-full bg-slate-200 text-slate-400 font-bold py-3.5 rounded-2xl text-xs shadow-inner cursor-not-allowed tracking-widest";
+            btnSubmit.innerText = "ただいま受付停止中です";
+        } else {
+            // 受付中なら隠す（保険）
+            if (alertEl) alertEl.classList.add("hidden");
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "匿名で送信する";
+                btnSubmit.className = "w-full brand-bg text-white font-black py-3.5 rounded-2xl hover:bg-opacity-90 active:scale-[0.98] transition-all duration-300 text-xs shadow-lg shadow-indigo-600/10 tracking-widest hover:-translate-y-0.5";
+}
+}
+    } catch (e) {
+        console.error("システムステータスの取得に失敗しました:", e);
+    }
+}
 
-        function toggleBugModal() {
-            const modal = document.getElementById("bug-modal");
-            const card = document.getElementById("bug-modal-card");
+// 他タブの通知を受けて最新化
+window.addEventListener('storage', (ev) => {
+    if (ev.key === 'systemStatusChanged') {
+        try { checkSystemStatus(); } catch(e){ console.error(e); }
+    }
+});
 
-            if (modal.classList.contains("hidden")) {
-                document.getElementById("bug-content").value = "";
-                document.getElementById("bug-file").value = "";
-                modal.classList.remove("hidden");
-                card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomIn animate__fast";
-            } else {
-                card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomOut animate__fast";
-                setTimeout(() => {
-                    modal.classList.add("hidden");
-                }, 200);
-            }
-        }
+function toggleBugModal() {
+const modal = document.getElementById("bug-modal");
+const card = document.getElementById("bug-modal-card");
 
-        async function submitBugReport() {
-            const content = document.getElementById("bug-content").value.trim();
-            if (!content) { alert("報告内容を入力してください。"); return; }
+if (modal.classList.contains("hidden")) {
+document.getElementById("bug-content").value = "";
+document.getElementById("bug-file").value = "";
+modal.classList.remove("hidden");
+card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomIn animate__fast";
+} else {
+card.className = "bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate__animated animate__zoomOut animate__fast";
+setTimeout(() => {
+modal.classList.add("hidden");
+}, 200);
+}
+}
 
-            const fileInput = document.getElementById("bug-file");
-            const btn = document.getElementById("btn-bug-submit");
+async function submitBugReport() {
+const content = document.getElementById("bug-content").value.trim();
+if (!content) { alert("報告内容を入力してください。"); return; }
 
-            btn.disabled = true;
-            btn.innerText = "送信中...";
+const fileInput = document.getElementById("bug-file");
+const btn = document.getElementById("btn-bug-submit");
 
-            let imagePayload = null;
+btn.disabled = true;
+btn.innerText = "送信中...";
 
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const fileData = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-                const matches = fileData.match(/^data:(.+);base64,(.+)$/);
-                if (matches) {
-                    imagePayload = {
-                        type: matches[1],
-                        base64: matches[2]
-                    };
-                }
-            }
+let imagePayload = null;
 
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "reportBug",
-                        email: userEmail,
-                        content: content,
-                        userAgent: navigator.userAgent,
-                        image: imagePayload
-                    })
-                });
-                const result = await res.json();
-                if (result.status === "success") {
-                    alert("不具合報告を管理者に送信しました。ご協力ありがとうございました！");
-                    toggleBugModal();
-                } else {
-                    alert("送信に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                console.error(e);
-                alert("通信エラーが発生しました。");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "報告を送信する";
-            }
-        }
-        
-    </script>
+if (fileInput.files.length > 0) {
+const file = fileInput.files[0];
+const fileData = await new Promise((resolve) => {
+const reader = new FileReader();
+reader.onloadend = () => resolve(reader.result);
+reader.readAsDataURL(file);
+});
+const matches = fileData.match(/^data:(.+);base64,(.+)$/);
+if (matches) {
+imagePayload = {
+type: matches[1],
+base64: matches[2]
+};
+}
+}
+
+try {
+const res = await fetch(GAS_API_URL, {
+method: "POST",
+body: JSON.stringify({
+action: "reportBug",
+email: userEmail,
+content: content,
+userAgent: navigator.userAgent,
+image: imagePayload
+})
+});
+const result = await res.json();
+if (result.status === "success") {
+alert("不具合報告を管理者に送信しました。ご協力ありがとうございました！");
+toggleBugModal();
+} else {
+alert("送信に失敗しました: " + result.message);
+}
+} catch (e) {
+console.error(e);
+alert("通信エラーが発生しました。");
+} finally {
+btn.disabled = false;
+btn.innerText = "報告を送信する";
+}
+}
+
+</script>
 </body>
 </html>
