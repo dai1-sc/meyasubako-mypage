@@ -169,7 +169,7 @@
     <div class="bamboo-right">🎋</div>
 
 
-    <div id="coming-soon-screen" class="hidden fixed inset-0 z-[10000] flex flex-col justify-center items-center p-4 login-bg">
+   <div id="coming-soon-screen" class="hidden fixed inset-0 z-[10000] flex flex-col justify-center items-center p-4 login-bg">
         <div class="starry-sky">
             <div class="star" style="top: 10%; left: 15%; width: 3px; height: 3px; animation-delay: 0.2s;"></div>
             <div class="star" style="top: 30%; left: 80%; width: 2px; height: 2px; animation-delay: 0.7s;"></div>
@@ -179,9 +179,13 @@
         <div class="bamboo-right">🎋</div>
 
         <div class="bg-white glass-card p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 max-w-md w-full text-center relative z-10 animate__animated animate__fadeInUp">
-            <div class="flex justify-center mb-6">
-                <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-64 h-45 object-contain animate-pulse">
-            </div>
+            
+            <div class="flex justify-center mb-6 min-h-[128px] items-center">
+                <img src="logo_title.png" 
+                     alt="デジタル目安箱 ロゴ" 
+                     class="w-32 h-32 object-contain"
+                     onerror="this.style.display='none';"> </div>
+            
             <h1 class="text-2xl font-black text-gray-800 tracking-wider mb-2 flex justify-center items-center gap-1">
                 デジタル目安箱 <span class="text-xl">🎋</span>
             </h1>
@@ -195,7 +199,6 @@
         </div>
         <footer class="mt-8 text-xs text-slate-400 font-medium relative z-10">&copy; 2026 第一高校 生徒会 All Rights Reserved.</footer>
     </div>
-
 
     <div id="main-contents-wrapper">
         <div id="splash-screen" class="fixed inset-0 flex flex-col items-center justify-center z-[9999] transition-opacity duration-700">
