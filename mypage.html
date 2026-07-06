@@ -230,8 +230,9 @@
                 <span class="font-black tracking-widest text-base">デジタル目安箱</span>
             </div>
             <div class="flex items-center space-x-2">
+                <!-- 生徒用ページへ ボタン（ログアウトの左） -->
                 <button id="council-toggle-btn" onclick="window.location.href='council.html'" class="hidden text-xs bg-amber-500 hover:bg-amber-600 text-white font-black px-3.5 py-2 rounded-xl transition-all duration-300 shadow-md shadow-amber-500/20 items-center gap-1.5 hover:-translate-y-0.5">
-                    <i class="fas fa-users-cog"></i> 生徒会用ページへ
+                    <i class="fas fa-school"></i> 生徒用ページへ
                 </button>
 
                 <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl transition-all duration-300 font-bold border border-white/10 hover:border-white/20">
@@ -519,18 +520,22 @@ if (latest.important) {
                         ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/10" 
                         : "border-slate-100 hover:border-slate-200";
 
+                    // 「公開OK」バッジを定義（未定義で参照していた問題を修正）
+                    const publishBadge = item.publishToHomepage
+                        ? `<div class="inline-flex items-center text-[11px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</div>`
+                        : '';
+
                     const card = document.createElement("div");
                     card.className = `bg-white p-6 rounded-3xl shadow-sm relative transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl border ${borderClass} animate__animated animate__fadeInUp`;
                     card.style.animationDelay = `${index * 0.08}s`;
                     card.onclick = () => window.location.href = `chat.html?id=${item.id}`;
 
-                    // 「公開OK」の小バッジ（ユーザ側でも見せたい場合はここで表示）
-                  card.innerHTML = `
+                    card.innerHTML = `
     ${unreadBadge}
     <div class="flex items-center flex-wrap gap-2 text-[11px] font-black text-slate-400 mb-2.5">
         <span class="bg-slate-100 px-2.5 py-1 rounded-xl text-slate-600 font-bold">${item.category}</span>
         ${publishBadge}
-        <span class="font-mono">${item.date}</span>
+        <span class="font-mono ml-auto">${item.date}</span>
     </div>
     <h3 class="text-base font-black text-slate-800 mb-2 break-all whitespace-normal">${item.title}</h3>
     <p class="text-xs text-slate-500 mb-5 font-medium leading-relaxed break-all whitespace-pre-wrap">${item.content}</p>
