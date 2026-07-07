@@ -585,7 +585,7 @@ if (latest.important) {
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    alert("意見を匿名で安全に受け付けました！生徒会からの返答・対話をお待ちください。");
+                    alert("意見を受け付けました！生徒会からの返答・対話をお待ちください。");
                     document.getElementById("suggestion-form").reset();
                     loadSuggestions();
                 } else {
