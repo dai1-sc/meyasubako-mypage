@@ -1,627 +1,78 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>デジタル目安箱 - 生徒会管理ポータル</title>
-    <link rel="icon" href="log.png" type="image/png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#130182">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="デジタル目安箱">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <style>
-        .brand-bg { background-color: #130182; }
-        .brand-text { color: #130182; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>デジタル目安箱 - 生徒会ポータル（利用停止中）</title>
+
+  <!-- アイコン等は元ファイルに合わせる -->
+  <link rel="icon" href="log.png" type="image/png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <meta name="theme-color" content="#130182">
+
+  <!-- Tailwind を残して見た目を整えやすく -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ページ全体を中央のメンテナンスカードだけ表示する */
+    html,body{height:100%;margin:0;background:#0f172a;color:#e6eef8;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+    .center-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .card{max-width:720px;width:100%;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));border-radius:14px;padding:28px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 30px rgba(2,6,23,0.6);}
+    .logo{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .logo img{width:40px;height:40px}
+    .title{font-weight:800;color:#fff;font-size:20px}
+    .sub{color:#cbd5e1;margin-top:10px;font-size:14px;}
+    .btns{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap}
+    a.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700}
+    .btn-primary{background:#f59e0b;color:#08122b}
+    .btn-secondary{background:rgba(255,255,255,0.06);color:#e6eef8;border:1px solid rgba(255,255,255,0.04)}
+    .notice{margin-top:14px;background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;color:#dbeafe;font-size:13px;border:1px solid rgba(255,255,255,0.02)}
+    /* モバイルで少し余裕を */
+    @media (max-width:520px){ .card{padding:18px} .title{font-size:18px} }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
-    <nav class="brand-bg text-white shadow-md animate__animated animate__fadeInDown animate__fast">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <img src="logo1.png" alt="ロゴ" class="w-8 h-8 object-contain">
-                <span class="font-bold tracking-wider">デジタル目安箱 生徒会専用管理ポータル</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="window.location.href='mypage.html'" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1 hover:scale-105 active:scale-95 duration-150">
-                    <i class="fas fa-pen"></i> マイページへ
-                </button>
-                <button id="btn-logout" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition">
-                    ログアウト
-                </button>
-            </div>
+<body>
+  <div class="center-wrap">
+    <div class="card" role="status" aria-live="polite">
+      <div class="logo">
+        <img src="logo1.png" alt="ロゴ">
+        <div>
+          <div class="title">デジタル目安箱 — 生徒会ポータル（現在利用停止中）</div>
+          <div class="sub">このページは一時的にアクセスが無効化されています。</div>
         </div>
-    </nav>
+      </div>
 
-    <main class="max-w-5xl w-full mx-auto p-4 md:p-6 flex-1 flex flex-col space-y-6">
-        <!-- PDFパネル -->
-        <div id="pdf-share-panel" class="hidden bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-xl p-4 shadow-md animate__animated animate__fadeInDown">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold text-blue-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-file-pdf text-red-600"></i>回答予定PDFが共有されました
-                    </h3>
-                    <a id="pdf-link-display" href="#" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline break-all font-mono bg-white px-2 py-1 rounded border border-blue-200">
-                        リンク読み込み中...
-                    </a>
-                    <p class="text-xs text-gray-600 mt-2">📌 このリンクから回答案の確認ができます。</p>
-                </div>
-                <button onclick="closePdfShare()" class="text-gray-400 hover:text-gray-600 shrink-0">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-            </div>
-        </div>
+      <p class="notice">
+        現在、生徒会ポータル（council.html）は保守のため一時的に停止しています。停止中は一覧の取得・更新やチャット機能などすべての操作が無効化されています。運用を再開したら当ページを復帰させます。
+      </p>
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate__animated animate__fadeInUp animate__fast">
-            <div class="flex-1">
-                <h1 class="text-xl font-bold text-gray-800 mb-3">届いた意見・要望の管理</h1>
-                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl flex flex-wrap gap-4 items-center">
-                    <div class="flex items-center gap-2">
-                        <label for="filter-status" class="text-xs font-bold text-gray-600 whitespace-nowrap">🔄 対応ステータス:</label>
-                        <select id="filter-status" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5">
-                            <option value="all">すべて表示（フィルターなし）</option>
-                            <option value="受付">🔵 受付</option>
-                            <option value="生徒会検討中">🟡 生徒会検討中</option>
-                            <option value="先生方検討中">🟣 先生方検討中</option>
-                            <option value="開示請求">🔴 開示請求</option>
-                            <option value="回答完了">🟢 回答完了</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label for="filter-committee" class="text-xs font-bold text-gray-600 whitespace-nowrap">💼 担当委員会:</label>
-                        <select id="filter-committee" onchange="filterAndRenderData()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5">
-                            <option value="all">すべて表示（フィルターなし）</option>
-                            <option value="未割り当て">⏳ 未割り当て（担当なし）</option>
-                            <option value="総務委員会">💼 総務担当</option>
-                            <option value="文化専門委員会">🎨 文化担当</option>
-                            <option value="体育専門委員会">🏃 体育担当</option>
-                            <option value="会計専門委員会">💰 会計担当</option>
-                            <option value="生活専門委員会">📢 生活担当</option>
-                            <option value="ボランティア専門委員会">🌱 ボランティア担当</option>
-                        </select>
-                    </div>
-                </div>
-                <p class="text-xs text-gray-500 mt-2">生徒からの意見を確認し、ステータスの更新やチャット対応を行います。</p>
-            </div>
-            <button id="btn-refresh" class="self-start md:self-auto flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded-lg transition">
-                <i class="fas fa-sync-alt"></i>
-                <span>一覧を更新</span>
-            </button>
-        </div>
+      <div class="btns">
+        <!-- 生徒側トップに戻るボタン -->
+        <a class="btn btn-primary" href="mypage.html" aria-label="マイページへ戻る">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"><path stroke="#08122b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3l9 9-9 9"/></svg>
+          マイページへ戻る
+        </a>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-1 flex flex-col">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-gray-100 text-xs font-bold text-gray-500 tracking-wider">
-                            <th class="p-4 w-24">投稿日</th>
-                            <th class="p-4 w-28">カテゴリ</th>
-                            <th class="p-4">タイトル / 内容の要約</th>
-                            <th class="p-4 w-32">対応ステータス</th>
-                            <th class="p-4 w-28 text-center">対話チャット</th>
-                        </tr>
-                    </thead>
-                    <tbody id="suggestion-table-body" class="divide-y divide-gray-50 text-sm text-gray-700">
-                        <tr id="table-loading">
-                            <td colspan="5" class="text-center py-12 text-gray-400">
-                                <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
-                                <span class="text-xs">目安箱のデータを取得中...</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+        <!-- 管理者・生徒会向けの連絡（例） -->
+        <a class="btn btn-secondary" href="mailto:admin@school.example?subject=生徒会ポータル停止について" aria-label="管理者へ連絡">
+          <i class="fas fa-envelope" aria-hidden="true"></i> 管理者へ連絡
+        </a>
+      </div>
 
-    <script>
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
+      <p class="sub" style="margin-top:18px">（必要に応じて管理者にお問い合わせください。復帰時はこちらのページを再デプロイしてください。）</p>
+    </div>
+  </div>
 
-        const userRole = sessionStorage.getItem("user_role");
-        const userEmail = sessionStorage.getItem("user_email");
-
-        // グローバル状態
-        let allData = [];
-        let initialLoaded = false;   // 初回ロード済みフラグ
-        let loadInProgress = false;  // 同時ロード防止ガード
-
-        console.log("現在のログインユーザー:", userEmail, "権限:", userRole);
-
-        if (userRole !== "council" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson" && userRole !== "admin") {
-            alert("このページへのアクセス権限がないか、セッションが切れています。もう一度ログインし直してください。");
-            window.location.href = "index.html";
-        }
-
-        const tableBody = document.getElementById("suggestion-table-body");
-
-        // -------------------------
-        // 追加：欠落していた関数群
-        // -------------------------
-
-        // チャット画面へ遷移
-        function openCouncilChat(id) {
-            if (!id) return;
-            window.location.href = `council_chat.html?id=${encodeURIComponent(id)}`;
-        }
-
-        // ステータス変更をGASに送信してローカル反映
-        async function updateStatus(suggestionId, selectElement) {
-            if (!suggestionId || !selectElement) return;
-            const newStatus = selectElement.value;
-            selectElement.disabled = true;
-
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "updateStatus",
-                        suggestionId: suggestionId,
-                        status: newStatus,
-                        email: userEmail
-                    })
-                });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    const idx = allData.findIndex(it => it.id === suggestionId);
-                    if (idx !== -1) allData[idx].status = newStatus;
-
-                    // visual classes (best-effort)
-                    selectElement.classList.remove("s-blue","s-yellow","s-purple","s-green","s-red");
-                    if (newStatus === "受付" || newStatus === "新規受付") selectElement.classList.add("s-blue");
-                    else if (newStatus === "生徒会検討中") selectElement.classList.add("s-yellow");
-                    else if (newStatus === "先生方検討中") selectElement.classList.add("s-purple");
-                    else if (newStatus === "回答完了") selectElement.classList.add("s-green");
-                    else if (newStatus === "開示請求") selectElement.classList.add("s-red");
-
-                    // 再描画（current filters preserved）
-                    try { filterAndRenderData(); } catch(e){ console.warn(e); }
-                } else {
-                    alert("変更に失敗しました: " + (result.message || "不明なエラー"));
-                }
-            } catch (e) {
-                console.error("updateStatus error:", e);
-                alert("通信エラーが発生しました。");
-            } finally {
-                selectElement.disabled = false;
-            }
-        }
-
-        // 却下テンプレートの切り替え
-        function changeRejectTemplate(id) {
-            const typeEl = document.getElementById(`rejectType-${id}`);
-            const box = document.getElementById(`rejectMessage-${id}`);
-            const btn = document.getElementById(`rejectBtn-${id}`);
-            if (!typeEl || !box || !btn) return;
-
-            const type = typeEl.value;
-            box.classList.add("hidden");
-            btn.classList.add("hidden");
-            box.readOnly = false;
-            box.value = "";
-
-            if (!type) return;
-            btn.classList.remove("hidden");
-
-            if (type === "A") {
-                box.classList.add("hidden");
-                box.value =
-`今回はデジタル目安箱へ投書頂きありがとうございます。
-
-投書していただいた内容を精査致しました結果、誠に申し訳ありませんが今回ご希望に沿うことは難しいと判断させて頂きました。
-
-今後ともデジタル目安箱へのご愛顧をよろしくお願い致します。`;
-            } else if (type === "B") {
-                box.classList.remove("hidden");
-                box.value =
-`今回はデジタル目安箱へ投書頂きありがとうございます。
-
-投書していただいた内容を精査致しました結果、頂いた意見ではご希望の全体像を把握することが難しいと判断させて頂きました。
-
-お手数ですが、詳細を追記して頂ければ再度生徒会で検討致します。
-
-今後ともデジタル目安箱へのご愛顧をよろしくお願い致します。`;
-            } else if (type === "C") {
-                box.classList.remove("hidden");
-                box.value =
-`今回はデジタル目安箱へ投書頂きありがとうございます。
-
-投書していただいた内容について精査致しました結果、生徒会としての回答が困難であると判断させて頂きました。
-
-再度の検討をご希望の場合は、お手数ですが担当の教員・部署まで直接のお問い合わせをお願い致します。
-
-今後ともデジタル目安箱へのご愛顧をよろしくお願い致します。`;
-            }
-        }
-
-        // 却下メッセージを送信（チャットに流す）、ステータスを更新
-        async function sendRejectMessage(suggestionId) {
-            const type = document.getElementById(`rejectType-${suggestionId}`).value;
-            const message = document.getElementById(`rejectMessage-${suggestionId}`).value.trim();
-            if (!type) { alert("却下理由を選択してください。"); return; }
-            if (!message) { alert("送信する文章を入力してください。"); return; }
-            if (!confirm("この定型文を送信しますか？")) return;
-
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "sendRejectMessage",
-                        email: userEmail,
-                        suggestionId: suggestionId,
-                        rejectType: type,
-                        message: message
-                    })
-                });
-                const result = await res.json();
-                if (result.status === "success") {
-                    // ステータスを回答完了にする（GAS 側でも行われる, だがここで再取得）
-                    await loadCouncilData(true);
-                    alert("定型文を送信しました。");
-                } else {
-                    alert("送信エラー: " + (result.message || "不明なエラー"));
-                }
-            } catch (e) {
-                console.error("sendRejectMessage error:", e);
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        // 委員会とメモの保存
-        async function saveCommitteeAndMemo(suggestionId, committee, replyMemo) {
-            try {
-                // ローカル更新
-                const idx = allData.findIndex(it => it.id === suggestionId);
-                if (idx !== -1) {
-                    allData[idx].committee = committee;
-                    allData[idx].replyMemo = replyMemo;
-                }
-
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "updateCommitteeAndMemo",
-                        email: userEmail,
-                        suggestionId: suggestionId,
-                        committee: committee,
-                        replyMemo: replyMemo
-                    })
-                });
-                const result = await res.json();
-                if (result.status !== "success") {
-                    alert("保存エラー: " + (result.message || "不明なエラー"));
-                }
-            } catch (e) {
-                console.error("saveCommitteeAndMemo error:", e);
-            }
-        }
-
-        // 開示承認（副会長 / 管理者 / 教師）
-        async function approveRequest(suggestionId, roleToApprove) {
-            if (!confirm("本当にこの事案の身元開示を承認しますか？\n※この操作は取り消せません。")) return;
-            try {
-                const res = await fetch(GAS_API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        action: "approveDisclosure",
-                        email: userEmail,
-                        suggestionId: suggestionId,
-                        role: roleToApprove
-                    })
-                });
-                const result = await res.json();
-                if (result.status === "success") {
-                    alert("承認を記録しました！");
-                    await loadCouncilData(true);
-                } else {
-                    alert("エラー: " + (result.message || "不明なエラー"));
-                }
-            } catch (e) {
-                console.error("approveRequest error:", e);
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        // -------------------------
-        // 既存のロード / レンダリング
-        // -------------------------
-        async function loadCouncilData(force = false) {
-            if (!force && initialLoaded) return;
-            if (loadInProgress) return;
-            loadInProgress = true;
-
-            tableBody.innerHTML = `
-                <tr id="table-loading">
-                    <td colspan="5" class="text-center py-12 text-gray-400">
-                        <i class="fas fa-spinner animate-spin text-xl mb-2 block"></i>
-                        <span class="text-xs">目安箱のデータを取得中...</span>
-                    </td>
-                </tr>`;
-
-            if (userRole !== "council" && userRole !== "admin" && userRole !== "vice_president" && userRole !== "teacher" && userRole !== "chairperson") {
-                console.error("権限がありません");
-                loadInProgress = false;
-                return;
-            }
-
-            try {
-                const response = await fetch(`${GAS_API_URL}?action=getCouncilData&email=${encodeURIComponent(userEmail)}`);
-                const data = await response.json();
-
-                if (data.status === "error") {
-                    alert("データ取得エラー: " + data.message);
-                    loadInProgress = false;
-                    return;
-                }
-
-                allData = data;
-                filterAndRenderData();
-                initialLoaded = true;
-
-            } catch (error) {
-                console.error(error);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-12 text-red-500 text-xs">データの読み込みに失敗しました。GASのURLやデプロイを確認してください。</td></tr>`;
-            } finally {
-                loadInProgress = false;
-            }
-        }
-
-        function filterAndRenderData() {
-            const statusFilter = document.getElementById("filter-status").value;
-            const committeeFilter = document.getElementById("filter-committee").value;
-
-            tableBody.innerHTML = "";
-
-            const filteredData = allData.filter(item => {
-                let matchStatus = true;
-                if (statusFilter !== "all") {
-                    if (statusFilter === "受付") {
-                        matchStatus = (item.status === "受付" || item.status === "新規受付");
-                    } else {
-                        matchStatus = (item.status === statusFilter);
-                    }
-                }
-
-                let matchCommittee = true;
-                if (committeeFilter !== "all") {
-                    if (committeeFilter === "未割り当て") {
-                        matchCommittee = (!item.committee || item.committee === "" || item.committee === "未割り当て");
-                    } else {
-                        matchCommittee = (item.committee === committeeFilter);
-                    }
-                }
-                return matchStatus && matchCommittee;
-            });
-
-            if (filteredData.length === 0) {
-                tableBody.innerHTML = `<tr class="animate__animated animate__fadeIn"><td colspan="5" class="text-center py-12 text-gray-400 text-xs">該当する意見・要望はありません。</td></tr>`;
-                return;
-            }
-
-            filteredData.reverse();
-
-            filteredData.forEach((item, index) => {
-                const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-50/80 transition-colors border-b border-gray-100 animate__animated animate__fadeInLeft animate__faster";
-                tr.style.animationDelay = `${index * 0.03}s`;
-
-                let selectBg = "bg-blue-50 text-blue-700 border-blue-200";
-                if (item.status === "生徒会検討中") selectBg = "bg-yellow-50 text-yellow-700 border-yellow-200";
-                if (item.status === "先生方検討中") selectBg = "bg-purple-50 text-purple-700 border-purple-200";
-                if (item.status === "開示請求") selectBg = "bg-red-50 text-red-700 border-red-200";
-                if (item.status === "回答完了") selectBg = "bg-green-50 text-green-700 border-green-200";
-
-                let approvalControlsHTML = "";
-                if (item.status === "開示請求") {
-                    approvalControlsHTML = `
-                        <div class="mt-2.5 p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] space-y-1 max-w-xs shadow-sm">
-                            <div class="font-bold text-red-700 mb-1 flex items-center gap-1">
-                                <i class="fas fa-shield-alt"></i> アドレス開示請求・3者承認状況
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">副会長:</span>
-                                <div>
-                                    ${item.approvals?.vice_president ? '<span class="text-green-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'vice_president')) ? `<button onclick="approveRequest('${item.id}', 'vice_president')" class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-blue-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">管理者:</span>
-                                <div>
-                                    ${item.approvals?.admin ? '<span class="text-red-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'admin')) ? `<button onclick="approveRequest('${item.id}', 'admin')" class="bg-red-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-red-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">教 師:</span>
-                                <div>
-                                    ${item.approvals?.teacher ? '<span class="text-purple-600 font-bold">✅ 承認済</span>' : ((typeof userRole !== 'undefined' && userRole === 'teacher')) ? `<button onclick="approveRequest('${item.id}', 'teacher')" class="bg-purple-600 text-white px-1.5 py-0.5 rounded text-[9px] hover:bg-purple-700 font-bold active:scale-95 transition shadow-sm">承認</button>` : '<span class="text-gray-400">⏳ 未承認</span>'}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                let committeeSelectHTML = `
-                    <select id="commit-${item.id}"
-                            onchange="saveCommitteeAndMemo('${item.id}', this.value, document.getElementById('memo-${item.id}').value)"
-                            class="text-xs border rounded px-1.5 py-1 bg-white font-medium text-gray-700 focus:outline-none shadow-sm cursor-pointer transition hover:border-gray-400">
-                        <option value="未割り当て" ${(!item.committee || item.committee === '未割り当て') ? 'selected' : ''}>❓ 未割り当て</option>
-                        <option value="総務委員会" ${item.committee === '総務委員会' ? 'selected' : ''}>💼 総務委員会</option>
-                        <option value="文化専門委員会" ${item.committee === '文化専門委員会' ? 'selected' : ''}>🎨 文化専門委員会</option>
-                        <option value="体育専門委員会" ${item.committee === '体育専門委員会' ? 'selected' : ''}>🏃 体育専門委員会</option>
-                        <option value="会計専門委員会" ${item.committee === '会計専門委員会' ? 'selected' : ''}>💰 会計専門委員会</option>
-                        <option value="生活専門委員会" ${item.committee === '生活専門委員会' ? 'selected' : ''}>🏠 生活専門委員会</option>
-                        <option value="ボランティア専門委員会" ${item.committee === 'ボランティア専門委員会' ? 'selected' : ''}>🌱 ボランティア専門委員会</option>
-                    </select>
-                `;
-
-                let memoHTML = `
-                    <div class="mt-2.5 max-w-xs md:max-w-md">
-                        <label class="block text-[10px] font-bold text-gray-400 mb-0.5"><i class="fas fa-edit"></i> HP掲載用・回答下書きメモ</label>
-                        <div class="flex gap-1.5">
-                            <textarea id="memo-${item.id}" rows="1" class="w-full text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 font-medium text-gray-700 resize-y" placeholder="回答案を入力...">${item.replyMemo || ''}</textarea>
-                            <button onclick="saveCommitteeAndMemo('${item.id}', document.getElementById('commit-${item.id}').value, document.getElementById('memo-${item.id}').value)"
-                                    class="bg-slate-700 text-white text-[10px] font-bold px-2 rounded-lg hover:bg-slate-800 transition shrink-0 shadow-sm active:scale-95">
-                                保存
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                const canChat = (userRole === "chairperson" || userRole === "vice_president" || userRole === "teacher" || userRole === "admin");
-
-                let chatButtonHTML = "";
-                if (canChat) {
-                    chatButtonHTML = `
-                        <div class="flex flex-col items-center gap-2 w-40">
-                            <button onclick="openCouncilChat('${item.id}')" class="relative inline-flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition shadow-sm hover:scale-105 active:scale-95">
-                                <i class="fas fa-comments text-sm"></i>
-                                ${item.hasUnread ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>' : ''}
-                            </button>
-                            <select id="rejectType-${item.id}" onchange="changeRejectTemplate('${item.id}')" class="w-full text-[11px] border rounded-lg p-2">
-                                <option value="">却下対応</option>
-                                <option value="A">🟢 対応困難</option>
-                                <option value="B">🟠 内容不十分</option>
-                                <option value="C">🔵 他部署へ案内</option>
-                            </select>
-                            <textarea id="rejectMessage-${item.id}" rows="5" class="hidden w-full border rounded-lg p-2 text-xs resize-y" placeholder="定型文がここに表示されます"></textarea>
-                            <button id="rejectBtn-${item.id}" onclick="sendRejectMessage('${item.id}')" class="hidden w-full bg-red-600 hover:bg-red-700 text-white text-xs py-2 rounded-lg">送信</button>
-                        </div>
-                    `;
-                } else {
-                    chatButtonHTML = `<button disabled class="inline-flex items-center justify-center w-9 h-9 bg-gray-100 text-gray-300 rounded-xl"><i class="fas fa-lock text-sm"></i></button>`;
-                }
-
-                tr.innerHTML = `
-                    <td class="p-4 text-xs text-gray-400 whitespace-nowrap">${item.date}</td>
-                    <td class="p-4 whitespace-nowrap">
-                        <div class="space-y-1.5">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-600 block text-center w-max">${item.category}</span>
-                            <div class="text-[10px] font-bold text-gray-400">担当：${committeeSelectHTML}</div>
-                        </div>
-                    </td>
-                    <td class="p-4 min-w-[280px] md:max-w-md break-words">
-                        <div class="font-bold text-gray-800 flex items-center gap-2">
-                            <div class="text-xs text-gray-500">No.${index + 1}</div>
-                            <div>${item.title}</div>
-                            ${item.publishToHomepage ? `<div class="ml-2 inline-flex items-center text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check mr-1"></i>公開OK</div>` : ''}
-                        </div>
-                        <div class="text-xs text-gray-400 mt-1 whitespace-pre-wrap">${item.content}</div>
-                        ${item.hasTeacherResponse ? `
-                            <div class="mt-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg shadow-sm">
-                                <div class="text-[11px] font-bold text-purple-700 flex items-center gap-1">
-                                    <i class="fas fa-comment-medical"></i> 先生方からの共有回答あり
-                                </div>
-                                <div class="text-xs text-purple-900 mt-1 bg-white p-2 rounded border border-purple-100 whitespace-pre-wrap font-medium">
-                                    ${item.teacherResponseText}
-                                </div>
-                            </div>
-                        ` : ''}
-                        ${approvalControlsHTML}
-                        ${memoHTML}
-                    </td>
-                    <td class="p-4 whitespace-nowrap">
-                        <select onchange="updateStatus('${item.id}', this)" class="text-xs font-bold rounded-lg border px-2 py-1.5 focus:outline-none cursor-pointer shadow-sm transition-all hover:scale-102 ${selectBg}">
-                            <option value="受付" ${item.status === '受付' || item.status === '新規受付' ? 'selected' : ''}>🔵 受付</option>
-                            <option value="生徒会検討中" ${item.status === '生徒会検討中' ? 'selected' : ''}>🟡 生徒会検討中</option>
-                            <option value="先生方検討中" ${item.status === '先生方検討中' ? 'selected' : ''}>🟣 先生方検討中</option>
-                            <option value="開示請求" ${item.status === '開示請求' ? 'selected' : ''}>🔴 開示請求</option>
-                            <option value="回答完了" ${item.status === '回答完了' ? 'selected' : ''}>🟢 回答完了</option>
-                        </select>
-                    </td>
-                    <td class="p-4 text-center whitespace-nowrap">${chatButtonHTML}</td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-
-        // 更新ボタンは強制再取得
-        document.getElementById("btn-refresh").addEventListener("click", () => loadCouncilData(true));
-
-        // ログアウト
-        document.getElementById("btn-logout").addEventListener("click", () => {
-            if (confirm("ログアウトしますか？")) {
-                localStorage.removeItem("login_session");
-                sessionStorage.clear();
-                window.location.href = "index.html";
-            }
-        });
-
-        // PDF表示系（元のまま）
-        function showPdfShare(pdfUrl) {
-            const panel = document.getElementById("pdf-share-panel");
-            if (!panel) {
-                console.warn("PDF共有パネルのHTMLが見つかりません。作成します。");
-                const newPanel = document.createElement("div");
-                newPanel.id = "pdf-share-panel";
-                newPanel.className = "bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-xl p-4 shadow-md animate__animated animate__fadeInDown mx-4 md:mx-6 mt-6";
-                newPanel.innerHTML = `
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="flex-1">
-                            <h3 class="text-sm font-bold text-blue-900 mb-1 flex items-center gap-2">
-                                <i class="fas fa-file-pdf text-red-600"></i>回答予定PDFが共有されました
-                            </h3>
-                            <a id="pdf-link-display" href="${pdfUrl}" target="_blank" class="text-xs text-blue-600 hover:text-blue-800 underline break-all font-mono bg-white px-2 py-1 rounded border border-blue-200">
-                                ${pdfUrl}
-                            </a>
-                            <p class="text-xs text-gray-600 mt-2">📌 このリンクから回答案の確認ができます。</p>
-                        </div>
-                        <button onclick="closePdfShare()" class="text-gray-400 hover:text-gray-600 shrink-0">
-                            <i class="fas fa-times text-lg"></i>
-                        </button>
-                    </div>
-                `;
-                document.querySelector("main").insertBefore(newPanel, document.querySelector("main").firstChild);
-                return;
-            }
-
-            const linkDisplay = document.getElementById("pdf-link-display");
-            if (linkDisplay) {
-                linkDisplay.href = pdfUrl;
-                linkDisplay.textContent = pdfUrl;
-            }
-            panel.classList.remove("hidden");
-        }
-
-        function closePdfShare() {
-            const panel = document.getElementById("pdf-share-panel");
-            if (panel) panel.classList.add("hidden");
-        }
-
-        async function monitorPdfShare() {
-            try {
-                const url = `${GAS_API_URL}?action=getPdfShare&email=${encodeURIComponent(userEmail)}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.status === "success") {
-                    if (data.pdfUrl && data.pdfUrl.trim() !== "") {
-                        showPdfShare(data.pdfUrl);
-                    } else {
-                        closePdfShare();
-                    }
-                }
-            } catch (e) {
-                console.error("PDF監視エラー:", e);
-            }
-        }
-
-        // 初回ロードは DOMContentLoaded で一度だけ実行
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCouncilData();
-            monitorPdfShare();
-            setInterval(monitorPdfShare, 5000);
-
-            // 他タブで変更があれば強制再取得（optional）
-            window.addEventListener('storage', (ev) => {
-                if (ev.key === 'systemStatusChanged' || ev.key === 'councilDataChanged') {
-                    loadCouncilData(true);
-                }
-            });
-        });
-    </script>
+  <!-- 重要: 以下のスクリプトは一切サーバへ問い合わせをしないように空にしています。
+       元ファイルを復帰させるときはこのスニペットを削除して元のスクリプトを戻してください。 -->
+  <script>
+    // アクセス不可状態: 以降のJS処理を止めるため、何もしないファイルとして残します。
+    // もしページを元に戻す場合はこのファイルを元の council.html のバックアップと差し替えてください。
+    // 追記: 開発者のための簡単なログ（コンソールにだけ出る）
+    console.info("council.html は現在アクセス不可モードです（表示のみ）。");
+  </script>
 </body>
 </html>
