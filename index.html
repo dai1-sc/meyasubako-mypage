@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>デジタル目安箱 - ログインポータル</title>
     <link rel="icon" href="log.png" type="image/png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <!-- ブラウザ用 -->
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
+<!-- iPhone・iPad ホーム画面 -->
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-    <meta name="theme-color" content="#130182">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="デジタル目安箱">
+<!-- Android・PWA -->
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#130182">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="デジタル目安箱">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,273 +25,115 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         .brand-bg { background-color: #130182; }
-        
-        /* ==========================================================================
-           🎋 七夕限定 演出用カスタマイズCSS (mypage.htmlと統一)
-           ========================================================================== */
-        
-        /* ⑦ ネイビーのグラデーション背景 (固定) */
         .login-bg {
-            background: linear-gradient(180deg, #09052d 0%, #12015d 50%, #26104d 100%) !important;
-            background-attachment: fixed !important;
+            background: radial-gradient(circle at 10% 10%, rgba(19, 1, 130, 0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(19, 1, 130, 0.04) 0%, transparent 50%),
+                        #f8fafc;
         }
-        #splash-screen.hide {
-            opacity: 0;
-            pointer-events: none;
-        }
-        @keyframes floatLogo {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
-        @keyframes logoPop {
-            0% { transform: scale(.8); opacity: 0; }
-            70% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        #splash-screen.hide{
+    opacity:0;
+    pointer-events:none;
+}
+@keyframes floatLogo{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-6px);
+    }
+}
+@keyframes logoPop{
+    0%{
+        transform:scale(.8);
+        opacity:0;
+    }
+    70%{
+        transform:scale(1.05);
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
 
-        #splash-screen img {
-            animation:
-                logoPop .8s ease,
-                floatLogo 2.5s ease-in-out infinite .8s;
-        }
-        #splash-screen {
-            background: linear-gradient(180deg, #09052d 0%, #12015d 50%, #26104d 100%);
-            overflow: hidden;
-        }
-
-        /* ① 星空の背景（アニメーション）*/
-        .starry-sky {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* ② 流れ星 */
-        .shooting-star {
-            position: fixed;
-            top: -10px;
-            right: 10%;
-            width: 2px;
-            height: 80px;
-            background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
-            transform: rotate(45deg);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 1;
-            animation: shoot 7s infinite linear;
-        }
-        @keyframes shoot {
-            0% { transform: translate(0, 0) rotate(45deg); opacity: 0; }
-            55% { opacity: 1; }
-            15% { transform: translate(-400px, 400px) rotate(45deg); opacity: 0; }
-            100% { transform: translate(-400px, 400px) rotate(45deg); opacity: 0; }
-        }
-
-        /* ③ 笹の葉 */
-        .bamboo-left, .bamboo-right {
-            position: fixed;
-            top: 0;
-            font-size: 7rem;
-            opacity: 0.3;
-            pointer-events: none;
-            z-index: 10;
-            user-select: none;
-        }
-        .bamboo-left { left: 10px; transform-origin: top left; animation: swayLeft 6s infinite ease-in-out; }
-        .bamboo-right { right: 10px; transform-origin: top right; animation: swayRight 6.5s infinite ease-in-out; }
-        @keyframes swayLeft {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(4deg); }
-        }
-        @keyframes swayRight {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-4deg); }
-        }
-
-        /* ⑤ 星がふわっと浮いて消えるアニメーション */
-        .floating-stars {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .float-sparkle {
-            position: absolute;
-            color: rgba(255, 223, 0, 0.6);
-            font-size: 14px;
-            animation: floatUp 8s infinite linear;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(105vh) translateX(0) scale(0.5); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-5vh) translateX(50px) scale(1.2); opacity: 0; }
-        }
-
-        /* ⑥ ガラスっぽさ追加 */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.94) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-        }
+#splash-screen img{
+    animation:
+        logoPop .8s ease,
+        floatLogo 2.5s ease-in-out infinite .8s;
+}
+        #splash-screen{
+    background:
+        radial-gradient(circle at 10% 10%, rgba(19,1,130,.06) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(19,1,130,.04) 0%, transparent 50%),
+        #fff;
+}
     </style>
 </head>
-<body class="login-bg font-sans min-h-screen flex flex-col justify-center items-center p-4 relative overflow-hidden">
-   
-    <div class="starry-sky">
-        <div class="star" style="top: 15%; left: 20%; width: 3px; height: 3px; animation-delay: 0.5s;"></div>
-        <div class="star" style="top: 25%; left: 75%; width: 2px; height: 2px; animation-delay: 1.2s;"></div>
-        <div class="star" style="top: 45%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
-        <div class="star" style="top: 65%; left: 85%; width: 3px; height: 3px; animation-delay: 2.1s;"></div>
-        <div class="star" style="top: 80%; left: 40%; width: 2px; height: 2px; animation-delay: 1.7s;"></div>
-        <div class="star" style="top: 50%; left: 60%; width: 3px; height: 3px; animation-delay: 0.8s;"></div>
-    </div>
+<body class="login-bg font-sans min-h-screen flex flex-col justify-center items-center p-4">
+   <div id="splash-screen"
+     class="fixed inset-0 flex flex-col items-center justify-center z-[9999] transition-opacity duration-700">
 
-    <div class="shooting-star"></div>
+    <img src="log.png"
+         class="w-28 h-28"
+         alt="Logo">
 
-    <div class="floating-stars">
-        <div class="float-sparkle" style="left: 15%; animation-delay: 0s; animation-duration: 12s;">✨</div>
-        <div class="float-sparkle" style="left: 45%; animation-delay: 3s; animation-duration: 14s;">⭐</div>
-        <div class="float-sparkle" style="left: 80%; animation-delay: 6s; animation-duration: 11s;">✨</div>
-    </div>
+    <h1 class="mt-6 text-xl font-black text-[#130182]">
+        デジタル目安箱
+    </h1>
 
-    <div class="bamboo-left">🎋</div>
-    <div class="bamboo-right">🎋</div>
+    <p id="loading-text" class="mt-2 text-sm text-slate-500">
+    Loading
+</p>
 
+</div>
 
-   <div id="coming-soon-screen" class="hidden fixed inset-0 z-[10000] flex flex-col justify-center items-center p-4 login-bg">
-        <div class="starry-sky">
-            <div class="star" style="top: 10%; left: 15%; width: 3px; height: 3px; animation-delay: 0.2s;"></div>
-            <div class="star" style="top: 30%; left: 80%; width: 2px; height: 2px; animation-delay: 0.7s;"></div>
-            <div class="star" style="top: 60%; left: 25%; width: 4px; height: 4px; animation-delay: 1.1s;"></div>
+    <div class="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 max-w-md w-full text-center transition-all duration-300">
+        
+        <div class="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+            <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-35 h-35 object-contain">
         </div>
-        <div class="bamboo-left">🎋</div>
-        <div class="bamboo-right">🎋</div>
 
-        <div class="bg-white glass-card p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 max-w-md w-full text-center relative z-10 animate__animated animate__fadeInUp">
+        <h1 class="text-2xl font-black text-gray-800 tracking-wider mb-2">デジタル目安箱</h1>
+        <p class="text-sm text-gray-400 mb-8 font-medium">学校アカウント（Google）でログインしてください</p>
+
+        <div id="status-container" class="hidden mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center justify-center space-y-4 animate__animated animate__fadeIn">
             
-            <div class="flex justify-center mb-4 min-h-[160px] items-center">
-                <img src="logo_title.png" 
-                     alt="デジタル目安箱 ロゴ" 
-                     class="w-76 h-auto max-w-[80%] object-contain"
-                     onerror="this.style.display='none';">
-            </div>
+            <div id="status-spinner" class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin"></div>
             
-            <h1 class="text-2xl font-black text-gray-800 tracking-wider mb-2 flex justify-center items-center gap-1">
-                デジタル目安箱 <span class="text-xl">🎋</span>
-            </h1>
-            <div class="my-6 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
-                <p class="text-xl font-black text-indigo-900 tracking-wide">7月7日(火) 公開！</p>
-                <p class="text-xs text-indigo-500 font-semibold mt-1">ただいま公開の準備をしています</p>
+            <div id="status-success-icon" class="hidden w-14 h-14 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-green-200 animate__animated animate__bounceIn">✓</div>
+            
+            <div id="status-error-icon" class="hidden w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-red-200 animate__animated animate__shakeX">!</div>
+            
+            <p id="status-text" class="text-gray-600 font-bold tracking-wide animate-pulse text-sm"></p>
+        </div>
+        <div id="login-btn-wrapper" class="flex justify-center w-full transition-all duration-300">
+            <div id="g_id_onload"
+                 data-client_id="363133502855-gi2t4f4ek5o87vk6mam8srciorh14jg2.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_select="false">
             </div>
-            <p class="text-sm text-gray-500 font-medium mb-2 leading-relaxed">
-                システム利用開始まで、<br>今しばらくお待ちください。
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="pill" data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left">
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 flex items-start space-x-2 text-left">
+            <i class="fas fa-shield-alt text-indigo-400 mt-1 shrink-0 text-xs"></i>
+            <p class="text-[11px] text-gray-400 leading-relaxed font-medium">
+                本システムは、生徒会が意見を適切に処理するためGoogleログインを必須としていますが、投書の公開やチャット対応は<strong>原則匿名</strong>で行われます。メールアドレスが生徒会に直接開示されることは運用規定第4条2項の場合を除き、ありません。
             </p>
         </div>
-        <footer class="mt-8 text-xs text-slate-400 font-medium relative z-10">&copy; 2026 第一高校 生徒会 All Rights Reserved.</footer>
     </div>
 
-    <div id="main-contents-wrapper">
-        <div id="splash-screen" class="fixed inset-0 flex flex-col items-center justify-center z-[9999] transition-opacity duration-700">
-            <div class="starry-sky">
-                <div class="star" style="top: 10%; left: 15%; width: 3px; height: 3px; animation-delay: 0.2s;"></div>
-                <div class="star" style="top: 25%; left: 80%; width: 2px; height: 2px; animation-delay: 0.8s;"></div>
-                <div class="star" style="top: 40%; left: 30%; width: 3px; height: 3px; animation-delay: 1.4s;"></div>
-                <div class="star" style="top: 65%; left: 75%; width: 2px; height: 2px; animation-delay: 0.5s;"></div>
-                <div class="star" style="top: 85%; left: 20%; width: 4px; height: 4px; animation-delay: 1.1s;"></div>
-                <div class="star" style="top: 75%; left: 45%; width: 2px; height: 2px; animation-delay: 1.9s;"></div>
-            </div>
-            <div class="shooting-star" style="animation-delay: 0.3s; animation-duration: 5s; right: 20%;"></div>
-            <div class="shooting-star" style="animation-delay: 2.5s; animation-duration: 6s; right: 60%; top: -20px;"></div>
-            <div class="floating-stars">
-                <div class="float-sparkle" style="left: 25%; animation-delay: 0.5s; animation-duration: 7s;">✨</div>
-                <div class="float-sparkle" style="left: 70%; animation-delay: 2s; animation-duration: 9s;">⭐</div>
-            </div>
-            <div class="bamboo-left" style="font-size: 5rem; opacity: 0.2;">🎋</div>
-            <div class="bamboo-right" style="font-size: 5rem; opacity: 0.2;">🎋</div>
-
-            <img src="logo1.png" class="w-28 h-28 relative z-10" alt="Logo">
-            <h1 class="mt-6 text-xl font-black text-amber-200 tracking-wider drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] relative z-10 flex items-center gap-1.5">
-                デジタル目安箱<span class="text-base animate-pulse">🎋</span>
-            </h1>
-            <p id="loading-text" class="mt-2 text-sm text-slate-300 font-semibold tracking-widest relative z-10">Loading</p>
-        </div>
-
-        <div class="bg-white glass-card p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-100 max-w-md w-full text-center transition-all duration-300 relative z-10 animate__animated animate__fadeInUp">
-            <div class="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
-                <img src="logo_title.png" alt="デジタル目安箱 ロゴ" class="w-35 h-35 object-contain">
-            </div>
-
-            <h1 class="text-2xl font-black text-gray-800 tracking-wider mb-2">デジタル目安箱</h1>
-            <p class="text-sm text-gray-400 mb-8 font-medium">学校アカウント（Google）でログインしてください</p>
-
-            <div id="status-container" class="hidden mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center justify-center space-y-4 animate__animated animate__fadeIn">
-                <div id="status-spinner" class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin"></div>
-                <div id="status-success-icon" class="hidden w-14 h-14 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-green-200 animate__animated animate__bounceIn">✓</div>
-                <div id="status-error-icon" class="hidden w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner border border-red-200 animate__animated animate__shakeX">!</div>
-                <p id="status-text" class="text-gray-600 font-bold tracking-wide animate-pulse text-sm"></p>
-            </div>
-
-            <div id="login-btn-wrapper" class="flex justify-center w-full transition-all duration-300">
-                <div id="g_id_onload"
-                     data-client_id="363133502855-gi2t4f4ek5o87vk6mam8srciorh14jg2.apps.googleusercontent.com"
-                     data-context="signin"
-                     data-ux_mode="popup"
-                     data-callback="handleCredentialResponse"
-                     data-auto_select="false">
-                </div>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-shape="pill" data-theme="outline"
-                     data-text="signin_with"
-                     data-size="large"
-                     data-logo_alignment="left">
-                </div>
-            </div>
-
-            <div class="mt-8 pt-6 border-t border-gray-100 flex items-start space-x-2 text-left">
-                <i class="fas fa-shield-alt text-indigo-400 mt-1 shrink-0 text-xs"></i>
-                <p class="text-[11px] text-gray-400 leading-relaxed font-medium">
-                    本システムは、生徒会が意見を適切に処理するためGoogleログインを必須としていますが、投書の公開やチャット対応は<strong>原則匿名</strong>で行われます。メールアドレスが生徒会に直接開示されることは運用規定第4条2項の場合を除き、ありません。
-                </p>
-            </div>
-        </div>
-
-        <footer class="mt-8 text-xs text-slate-400 font-medium relative z-10 text-center">&copy; 2026 第一高校 生徒会 All Rights Reserved.</footer>
-    </div>
+    <footer class="mt-8 text-xs text-gray-400 font-medium">&copy; 2026 第一高校 生徒会 All Rights Reserved.</footer>
 
 <script>
-    // ── 【追加】2026年7月7日 公開日判定ロジック ──────────────────────────
-    (function checkReleaseDate() {
-        const releaseDate = new Date("2026-07-07T00:00:00+09:00"); // 日本時間の7月7日 0時
-        const now = new Date();
-
-        if (now < releaseDate) {
-            // 公開前の場合：通常コンテンツを隠し、予告画面を表示
-            document.getElementById("main-contents-wrapper").remove();
-            const soonScreen = document.getElementById("coming-soon-screen");
-            soonScreen.classList.remove("hidden");
-            
-            // これ以降の処理（自動ログインやスプラッシュ等）を行わない
-            window.stop(); 
-            throw new Error("Pre-release mode enabled.");
-        }
-    })();
-
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_n6kO6vLnOUnVAhQgAbr052pdxuMdXbiR1R9fPJDhNh5inohnrtOZXuMFCq_ex1CM/exec";
 
     // ── 自動ログイン：保存済みセッションを確認 ──────────────────────────
@@ -298,9 +144,11 @@
         try {
             const { email, role, expires } = JSON.parse(saved);
             if (Date.now() > expires) {
+                // 期限切れ → 削除してログイン画面を表示
                 localStorage.removeItem("login_session");
                 return;
             }
+            // 有効なセッションがあればそのまま飛ばす
             sessionStorage.setItem("user_email", email);
             sessionStorage.setItem("user_role", role);
             window.location.href = role === "admin" ? "admin.html" : "mypage.html";
@@ -309,12 +157,13 @@
         }
     })();
 
-    const statusContainer   = document.getElementById("status-container");
-    const statusSpinner     = document.getElementById("status-spinner");
+    // ── 以下は既存コードそのまま ────────────────────────────────────────
+    const statusContainer  = document.getElementById("status-container");
+    const statusSpinner    = document.getElementById("status-spinner");
     const statusSuccessIcon= document.getElementById("status-success-icon");
-    const statusErrorIcon   = document.getElementById("status-error-icon");
+    const statusErrorIcon  = document.getElementById("status-error-icon");
     const statusText       = document.getElementById("status-text");
-    const loginBtnWrapper   = document.getElementById("login-btn-wrapper");
+    const loginBtnWrapper  = document.getElementById("login-btn-wrapper");
 
     function showStatus(message, type) {
         statusText.innerText = message;
@@ -370,6 +219,7 @@
                 sessionStorage.setItem("user_email", finalEmail);
                 sessionStorage.setItem("user_role",  finalRole);
 
+                // ── ここが追加部分：30日間有効なセッションを保存 ──
                 const DAYS = 30;
                 localStorage.setItem("login_session", JSON.stringify({
                     email:   finalEmail,
@@ -390,13 +240,11 @@
         }
     }
 
-    // スプラッシュ画面
+    // スプラッシュ画面（変更なし）
     window.addEventListener("DOMContentLoaded", () => {
         const splash = document.getElementById("splash-screen");
-        if (!splash) return; // 予告画面の時は処理スキップ
-        
         const firstLaunch = !localStorage.getItem("splashShown");
-        const delay = firstLaunch ? 6000 : 4000;
+        const delay = firstLaunch ? 5000 : 4000;
         localStorage.setItem("splashShown","true");
 
         const loadingTimer = setInterval(() => {
