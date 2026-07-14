@@ -23,29 +23,246 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
-        .brand-bg { background-color: #130182; }
-        .brand-text { color: #130182; }
-        .brand-border { border-color: #130182; }
+        /* 夏仕様のカラーパレット定義 */
+        .brand-bg { background-color: #0077b6 !important; }
+        .brand-text { color: #0077b6 !important; }
+        .brand-border { border-color: #0077b6 !important; }
+
+        /* Tailwindの色を夏仕様（ブルー系）へ上書き */
+        .text-indigo-600 { color: #0077b6 !important; }
+        .bg-indigo-600 { background-color: #0077b6 !important; }
+        .bg-indigo-50 { background-color: rgba(144, 224, 239, 0.15) !important; }
+        .border-indigo-600 { border-color: #0077b6 !important; }
+        .border-indigo-100\/50 { border-color: rgba(0, 119, 182, 0.2) !important; }
+        .focus\:ring-indigo-50:focus { --tw-ring-color: rgba(144, 224, 239, 0.4) !important; }
+        .focus\:border-indigo-600:focus { border-color: #0077b6 !important; }
+        .shadow-indigo-600\/10 { box-shadow: 0 10px 15px -3px rgba(0, 119, 182, 0.15) !important; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
 
-   
         .announcement-important {
-    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
-    border-left: 4px solid #dc2626 !important;
-    border-color: #fecaca !important;
-}
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%) !important;
+            border-left: 4px solid #dc2626 !important;
+            border-color: #fecaca !important;
+        }
 
-.announcement-important .announcement-icon {
-    color: #dc2626 !important;
-}
+        .announcement-important .announcement-icon {
+            color: #dc2626 !important;
+        }
 
-.announcement-important .announcement-label {
-    background: #dc2626 !important;
-    color: white !important;
-}
+        .announcement-important .announcement-label {
+            background: #dc2626 !important;
+            color: white !important;
+        }
+
+        /* === 🌊 夏仕様アニメーション背景の追加スタイル === */
+        body {
+            background: linear-gradient(to bottom, #4ea8de 0%, #90e0ef 60%, #caf0f8 100%) !important;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* コンテンツカードを半透明＆すりガラスにして背景を透過 */
+        .bg-white {
+            background-color: rgba(255, 255, 255, 0.82) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* 風鈴 (CSSアート) */
+        .wind-bell-container {
+            position: fixed;
+            top: 80px;
+            left: 25px;
+            z-index: 25;
+            pointer-events: none;
+        }
+        .wind-bell {
+            transform-origin: top center;
+            animation: swing 3.5s ease-in-out infinite alternate;
+        }
+        .bell-glass {
+            width: 42px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50% 50% 35% 35%;
+            position: relative;
+            box-shadow: inset -4px -4px 10px rgba(255, 255, 255, 0.6), 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+        .bell-glass::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1.5px;
+            height: 12px;
+            background: #444;
+        }
+        .bell-clapper {
+            width: 3px;
+            height: 20px;
+            background: #ffffff;
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: top center;
+            animation: sub-swing 3.5s ease-in-out infinite alternate;
+        }
+        .bell-strip {
+            width: 14px;
+            height: 55px;
+            background: linear-gradient(to bottom, #4ea8de, #0077b6);
+            position: absolute;
+            bottom: -70px;
+            left: calc(50% - 7px);
+            transform-origin: top center;
+            animation: strip-swing 3.5s ease-in-out infinite alternate;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-weight: 900;
+            letter-spacing: 2px;
+            border-left: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* 雲のアニメーション */
+        .clouds-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            z-index: -2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 100px;
+            filter: blur(2px);
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 50%;
+        }
+        .cloud1 {
+            width: 130px;
+            height: 40px;
+            top: 30px;
+            animation: floatCloud 50s linear infinite;
+        }
+        .cloud1::before { width: 50px; height: 50px; top: -20px; left: 15px; }
+        .cloud1::after { width: 70px; height: 70px; top: -35px; right: 15px; }
+
+        .cloud2 {
+            width: 180px;
+            height: 50px;
+            top: 90px;
+            animation: floatCloud 75s linear infinite reverse;
+            opacity: 0.65;
+        }
+        .cloud2::before { width: 70px; height: 70px; top: -30px; left: 25px; }
+        .cloud2::after { width: 90px; height: 90px; top: -45px; right: 25px; }
+
+        /* 海と波のアニメーション */
+        .sea-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 180px;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background-repeat: repeat-x;
+            transform: translate3d(0, 0, 0);
+        }
+        .wave1 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,30 C300,10 420,50 600,20 C780,0 900,40 1200,10 L1200,120 L0,120 Z" fill="rgba(144,224,239,0.3)"/></svg>');
+            background-size: 1000px 120px;
+            animation: waveMotion 18s linear infinite;
+            height: 140px;
+            opacity: 0.6;
+        }
+        .wave2 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,20 C300,45 420,10 600,30 C780,50 900,15 1200,35 L1200,120 L0,120 Z" fill="rgba(72,202,228,0.4)"/></svg>');
+            background-size: 1200px 120px;
+            animation: waveMotion 14s linear infinite reverse;
+            height: 120px;
+            opacity: 0.7;
+        }
+        .wave3 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,40 C300,15 420,35 600,15 C780,35 900,10 1200,30 L1200,120 L0,120 Z" fill="rgba(0,119,182,0.75)"/></svg>');
+            background-size: 1400px 120px;
+            animation: waveMotion 9s linear infinite;
+            height: 100px;
+        }
+
+        /* 木製縁側デッキ風の底面装飾 */
+        .wood-deck {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 18px;
+            background: linear-gradient(to bottom, #d4a373 0%, #b5835a 100%);
+            box-shadow: inset 0 4px 4px rgba(0,0,0,0.15), 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 2;
+            border-top: 2px solid #e9c46a;
+            pointer-events: none;
+        }
+
+        /* アニメーション用キーフレーム定義 */
+        @keyframes swing {
+            0% { transform: rotate(-8deg); }
+            100% { transform: rotate(8deg); }
+        }
+        @keyframes sub-swing {
+            0% { transform: translateX(-50%) rotate(-4deg); }
+            100% { transform: translateX(-50%) rotate(4deg); }
+        }
+        @keyframes strip-swing {
+            0% { transform: translateX(-50%) rotate(-12deg); }
+            100% { transform: translateX(-50%) rotate(12deg); }
+        }
+        @keyframes floatCloud {
+            0% { left: -220px; }
+            100% { left: 100%; }
+        }
+        @keyframes waveMotion {
+            0% { background-position-x: 0px; }
+            100% { background-position-x: 1000px; }
+        }
+
+        /* モバイル対応の風鈴非表示（邪魔にならないように） */
+        @media (max-width: 640px) {
+            .wind-bell-container {
+                left: 10px;
+                top: 75px;
+                transform: scale(0.85);
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen text-slate-800 antialiased">
