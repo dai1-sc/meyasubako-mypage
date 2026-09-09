@@ -5,9 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>500 Internal Server Error</title>
 </head>
-<body>
-  <h2>500</h2>
-      <h3>Internal Server Error</h3>
-  <h4>アクセスしようとしたページは表示できませんでした</h4>
+<<body>
+    <script>
+        document.body.innerHTML = `
+            <div style="
+                min-height:100vh;
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                align-items:center;
+                font-family:sans-serif;
+                background:#f8fafc;
+                color:#333;
+            ">
+                <h1 style="font-size:72px;margin:0;">500</h1>
+                <p style="font-size:20px;">Internal Server Error</p>
+                <p style="color:#888;">サーバー内部でエラーが発生しました。</p>
+            </div>
+        `;
+    </script>
 </body>
 </html>
